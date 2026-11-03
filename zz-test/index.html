@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Roofing Lead Follow-up (GoHighLevel + Claude)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <!-- Top bar -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">Lead Flow</a>
+        <a href="#controls" class="hover:text-white transition">Office Controls</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your roofing company
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Every lead gets a text within two minutes, and an AI that <span class="text-accent-400">books the estimate</span> into your GoHighLevel calendar, then hands off to your office when it should.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Built inside your GoHighLevel, Make and Anthropic accounts. Website form, Facebook lead ads and Angi all
+        land on one contact record. Your office pauses the AI on any lead with one tag, and you get a daily
+        summary of leads in, booked and lost.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the lead flow</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">&lt; 2 min</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">First text · 7 days · nights too</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">3 sources</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Website · Facebook · Angi</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">4 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">To go-live, with handover video</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$2,000</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed · 3 milestones</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Understanding -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-5 gap-12">
+        <div class="md:col-span-2">
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+          <p class="mt-5 text-slate-400 leading-relaxed">
+            Leads arrive from your website form, Facebook lead ads and Angi, and three office staff call them back
+            when they get a chance. On a busy day that is 3-4 hours later, and by then half of them have booked
+            with someone else. A roofing lead who filled in a form at 9pm is comparing three companies; the one
+            that texts back first usually gets the estimate.
+          </p>
+          <p class="mt-4 text-slate-400 leading-relaxed">
+            You already have GoHighLevel. You want the AI to do the texting and the booking, your office to keep
+            the final say on any lead, and nothing for you to manage afterwards.
+          </p>
+        </div>
+        <div class="md:col-span-3 grid sm:grid-cols-2 gap-4">
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">A text within 2 minutes, 7 days a week, even at night</div>
+            <p class="text-sm text-slate-400">The "got your request, when's a good time for an estimate?" text is sent by a GoHighLevel workflow the moment the contact is created. It does not wait for the AI, so it goes out in seconds even if everything else is down.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">AI handles the back-and-forth and books the estimate</div>
+            <p class="text-sm text-slate-400">Claude reads the thread, asks what it needs (address, roof issue, best times), checks your GoHighLevel calendar for open slots and books the appointment. The lead gets the normal GHL confirmation and reminders.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Hand it to a human in your office with a notification</div>
+            <p class="text-sm text-slate-400">If the lead asks something the AI can't answer, gets annoyed, or asks for a person, the contact is tagged <span class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">needs-human</span>, assigned to your office and a GHL notification goes out. The AI stops on that lead.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Office staff can pause the AI for a specific lead</div>
+            <p class="text-sm text-slate-400">One tag, <span class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">ai-paused</span>, added from the GHL inbox or mobile app. The AI checks for it before every reply. Remove the tag and it picks the thread back up.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">A daily summary to the owner of leads in, booked, lost</div>
+            <p class="text-sm text-slate-400">Every morning at a time you choose, a short email (and a text if you want it): leads in by source, estimates booked, leads waiting on a human, leads lost and why.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Nothing to manage afterwards</div>
+            <p class="text-sm text-slate-400">Written documentation, a handover video of the build, and a five-minute video for the office on pausing, taking over and changing the AI's wording. Everything you might change lives in one Google Sheet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lead flow -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">New lead to booked estimate, in one diagram</h2>
+        <p class="mt-5 text-slate-400 text-lg">
+          GoHighLevel decides <em>whether</em> to text and does all the sending. Make decides <em>what</em> the AI says
+          and books. The Google Sheet decides <em>how</em>: wording, hours, limits.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Column 1: GHL intake -->
+        <div class="bg-ink-900/60 border border-white/10 rounded-2xl p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">GoHighLevel · intake</span>
+          </div>
+          <div class="space-y-0">
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">TRIGGER · 3 SOURCES</div>
+              <div class="text-sm font-medium">Website form, Facebook lead ad, Angi lead</div>
+              <div class="text-xs text-slate-500 mt-1">Form and Facebook use GHL's native connections. Angi leads arrive by email; Make parses them into a contact.</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">CONTACT CREATED</div>
+              <div class="text-sm font-medium">One record, tagged with its source</div>
+              <div class="text-xs text-slate-500 mt-1">Existing number → no duplicate, note added instead. Pipeline stage: New.</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">WORKFLOW · FIRST TEXT</div>
+              <div class="text-sm font-medium">"Got your request, when's a good time for an estimate?" sent within 2 minutes</div>
+              <div class="text-xs text-slate-500 mt-1">Fires 7 days a week, any hour. Wording comes from the sheet.</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">WORKFLOW · LEAD REPLIES</div>
+              <div class="text-sm font-medium">"Customer replied" posts the contact and conversation to Make</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Make + Claude -->
+        <div class="bg-ink-900/60 border border-accent-400/30 rounded-2xl p-6 shadow-xl shadow-accent-500/5">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-accent-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Make · the AI relay</span>
+          </div>
+          <div class="space-y-0">
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">1 · GATE</div>
+              <div class="text-sm font-medium">Paused? Handed over? Turn cap hit? Then stop.</div>
+              <div class="text-xs text-slate-500 mt-1">Reads the contact's tags and the sheet. A 45-second batch window turns four quick texts into one reply.</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">2 · CONTEXT</div>
+              <div class="text-sm font-medium">Full thread from GHL + your instructions from the sheet</div>
+              <div class="text-xs text-slate-500 mt-1">Services, service area, what a free estimate includes, what not to promise.</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">3 · CLAUDE WITH TOOLS</div>
+              <div class="text-sm font-medium">Replies, or calls a tool: check availability · book estimate · hand to human</div>
+              <div class="text-xs text-slate-500 mt-1">Availability comes live from your GHL calendar. Instructions are cached, so each reply costs cents.</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">4 · ACT IN GHL</div>
+              <div class="text-sm font-medium">Send the SMS, create the appointment, move the pipeline stage, write the Log row</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: outcomes -->
+        <div class="bg-ink-900/60 border border-white/10 rounded-2xl p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Back in GoHighLevel</span>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <div class="bg-white/[0.04] border border-accent-400/30 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">BOOKED</div>
+              <div class="text-sm font-medium">Estimate on your GHL calendar, confirmation and reminders sent</div>
+              <div class="text-xs text-slate-500 mt-1">Stage → Booked. Estimator sees it where they already look.</div>
+            </div>
+            <div class="bg-white/[0.04] border border-amber-400/30 rounded-lg p-4">
+              <div class="text-xs font-mono text-amber-300 mb-1">NEEDS HUMAN</div>
+              <div class="text-sm font-medium">Tagged, assigned to your office, GHL notification sent</div>
+              <div class="text-xs text-slate-500 mt-1">Triggered by a question outside the instructions, frustration, "can I speak to someone", or any error. AI goes quiet on that lead.</div>
+            </div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-slate-400 mb-1">LOST</div>
+              <div class="text-sm font-medium">Said no, went elsewhere, or silent after the nudges</div>
+              <div class="text-xs text-slate-500 mt-1">Reason recorded so the daily summary can say why.</div>
+            </div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-slate-400 mb-1">7:00 AM DAILY</div>
+              <div class="text-sm font-medium">Owner summary: leads in by source, booked, waiting on a human, lost</div>
+              <div class="text-xs text-slate-500 mt-1">Written by Claude from the Log, sent by email and optionally SMS.</div>
+            </div>
+            <div class="mt-2 pt-4 border-t border-white/10">
+              <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">Then, in every case</div>
+              <ul class="space-y-2 text-sm text-slate-300">
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> The whole conversation sits in the GHL inbox like any other</li>
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> Pipeline stage reflects where the lead actually is</li>
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> Row written to the Log tab with source, outcome and response time</li>
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> Your office can take over by typing in the thread</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Office controls -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-5 gap-12 items-start">
+        <div class="md:col-span-2">
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Office controls</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Pausing is one tag in GHL. Everything else is one sheet.</h2>
+          <p class="text-slate-400 leading-relaxed mb-6">
+            Your office already lives in the GoHighLevel inbox and mobile app, so the per-lead controls stay there.
+            The settings nobody touches daily live in a Google Sheet that Make reads at the start of every run, so a
+            change takes effect on the next text. Nobody has to open Make after handover.
+          </p>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">In GHL, per lead</span> — add <span class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">ai-paused</span> to stop the AI on that contact; remove it to resume. Typing a reply yourself also makes the AI step back.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Settings tab</span> — AI mode (live / draft / off), quiet hours, turn cap, who gets handover notifications, summary time and recipients.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Instructions tab</span> — the first text, the AI's wording and tone, what it may and may not say, in plain English.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Log tab</span> — every lead: source, time in, time of first text, outcome, estimate date.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Errors tab</span> — anything that failed, in plain language, with what was done about it.</div></li>
+          </ul>
+        </div>
+
+        <!-- Sheet mock -->
+        <div class="md:col-span-3">
+          <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-ink-800/60">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-400/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-green-400/70"></span>
+              <span class="ml-3 text-xs text-slate-400 font-mono">Lead Follow-up Settings · Google Sheets</span>
+            </div>
+            <div class="flex border-b border-white/10 text-xs">
+              <div class="px-4 py-2 bg-white/5 text-white border-r border-white/10 font-medium">Settings</div>
+              <div class="px-4 py-2 text-slate-500 border-r border-white/10">Instructions</div>
+              <div class="px-4 py-2 text-slate-500 border-r border-white/10">Log</div>
+              <div class="px-4 py-2 text-slate-500">Errors</div>
+            </div>
+            <div class="font-mono text-sm">
+              <div class="grid grid-cols-12 text-xs text-slate-500 border-b border-white/10 px-4 py-2">
+                <div class="col-span-4">A · Setting</div>
+                <div class="col-span-5">B · Value</div>
+                <div class="col-span-3">C · Allowed</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-4 text-slate-300">ai_mode</div>
+                <div class="col-span-5"><span class="bg-accent-400/15 text-accent-400 px-2 py-0.5 rounded">live</span></div>
+                <div class="col-span-3 text-slate-500 text-xs">live · draft · off</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-4 text-slate-300">timezone</div>
+                <div class="col-span-5 text-white">America/Chicago</div>
+                <div class="col-span-3 text-slate-500 text-xs">tz name</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-4 text-slate-300">quiet_hours</div>
+                <div class="col-span-5 text-white">21:00–08:00</div>
+                <div class="col-span-3 text-slate-500 text-xs">no AI-started texts</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-4 text-slate-300">max_ai_turns_per_lead</div>
+                <div class="col-span-5 text-white">12</div>
+                <div class="col-span-3 text-slate-500 text-xs">then hand to human</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-4 text-slate-300">handover_notify</div>
+                <div class="col-span-5 text-white truncate">office@yourcompany.com</div>
+                <div class="col-span-3 text-slate-500 text-xs">GHL user</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-4 text-slate-300">nudge_after_hours</div>
+                <div class="col-span-5 text-white">2 · 24 · 72</div>
+                <div class="col-span-3 text-slate-500 text-xs">if no reply</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3">
+                <div class="col-span-4 text-slate-300">summary_time</div>
+                <div class="col-span-5 text-white">07:00 · email + SMS</div>
+                <div class="col-span-3 text-slate-500 text-xs">owner</div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Illustrative. Column C is a dropdown where it can be, so invalid values can't be typed. Draft mode posts
+            what the AI would have said as an internal note instead of sending it; useful for the first few days.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reliability -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Reliability</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so no lead waits 3-4 hours again, and none is dropped silently</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">01</div>
+          <h3 class="font-semibold mb-2">The 2-minute text never waits for the AI</h3>
+          <p class="text-sm text-slate-400">It is a plain GoHighLevel workflow step, sent from your number the moment the contact exists. If Make or Claude is ever down, the lead still hears from you and your office gets a notification to pick it up.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">02</div>
+          <h3 class="font-semibold mb-2">Fails to a human, never to silence</h3>
+          <p class="text-sm text-slate-400">Any error, any question the instructions don't cover, any sign of frustration, or a lead asking for a person: tag <span class="font-mono text-xs">needs-human</span>, assign to your office, notify. The lead gets a short "someone from the office will text you shortly" so they are not left hanging.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">03</div>
+          <h3 class="font-semibold mb-2">Pause means pause</h3>
+          <p class="text-sm text-slate-400">The <span class="font-mono text-xs">ai-paused</span> tag is checked before every reply, not once at the start. Before each reply Make also reads the thread from GHL; if the last outbound text came from a person, the AI treats the lead as taken over and stays quiet.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">04</div>
+          <h3 class="font-semibold mb-2">One reply per burst, no double-booking</h3>
+          <p class="text-sm text-slate-400">A per-contact lock in Make's data store means two texts seconds apart can't trigger two Claude calls or two appointments. Availability is re-checked at the moment of booking, not when it was first offered.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">05</div>
+          <h3 class="font-semibold mb-2">2am handled, Central time, within the rules</h3>
+          <p class="text-sm text-slate-400">A lead who texts at 2am gets answered at 2am; they started the conversation. The AI never starts one in quiet hours: nudges to a silent lead wait until 8am America/Chicago. A turn cap per lead stops any loop, and every text carries the opt-out wording US carriers expect.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">06</div>
+          <h3 class="font-semibold mb-2">Yours, in your accounts</h3>
+          <p class="text-sm text-slate-400">GHL workflows, Make scenarios, the Anthropic key and the Google Sheet all live under your logins. The documentation and handover video mean any competent GHL person could maintain it. If we part ways, nothing stops working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Milestones -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your three milestones, four weeks</h2>
+        <p class="mt-5 text-slate-400 text-lg">Each milestone ends with something you can click on, or text, in your own accounts.</p>
+      </div>
+
+      <div class="space-y-6">
+        <div class="relative step-line pl-14">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h3 class="text-xl font-semibold">All three sources in, 2-minute text live</h3>
+              <span class="text-xs font-mono text-slate-400 bg-white/5 px-2 py-1 rounded">Days 1–7</span>
+            </div>
+            <p class="text-slate-400 mb-4">Website form and Facebook lead ads connected to GHL, Angi emails parsed by Make into contacts, source tags and the pipeline stages set up. The first-text workflow live 7 days a week. SMS registration checked on day 1 so it is never the thing we wait on. Settings sheet created with the first text and instructions drafted from your website for you to edit.</p>
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">You'll see</div>
+            <p class="text-sm text-slate-300">You submit a test form, a Facebook test lead and a forwarded Angi email, and your phone gets the "got your request" text within two minutes each time, with the right source on the contact in GHL.</p>
+          </div>
+        </div>
+
+        <div class="relative step-line pl-14">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h3 class="text-xl font-semibold">AI texting, booking, handover and pause working</h3>
+              <span class="text-xs font-mono text-slate-400 bg-white/5 px-2 py-1 rounded">Days 8–18</span>
+            </div>
+            <p class="text-slate-400 mb-4">Make relay built: batching, lock, pause and handover gates, Claude with the availability, booking and hand-to-human tools, replies posted through GHL. Then a scripted test set of twenty conversations: the easy booking, the lead who wants a price over text, the annoyed one, the one who asks for a person, four texts in a row, a 2am reply, a double-booked slot, a Claude timeout. Runs in draft mode first so your office can read what the AI would have said.</p>
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">You'll see</div>
+            <p class="text-sm text-slate-300">You text the number as a lead and book an estimate that appears on your GHL calendar. You add the <span class="font-mono text-xs">ai-paused</span> tag mid-conversation and watch the AI stop. You ask it something off-script and the office gets the notification.</p>
+          </div>
+        </div>
+
+        <div class="relative step-line pl-14">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h3 class="text-xl font-semibold">Daily summary, go-live, documentation and handover video</h3>
+              <span class="text-xs font-mono text-slate-400 bg-white/5 px-2 py-1 rounded">Days 19–28</span>
+            </div>
+            <p class="text-slate-400 mb-4">Daily owner summary scheduled. Flip to live on real leads with me watching the Log and Errors tabs for the first three days and tuning the wording. Deliver the written documentation, the build handover video, and a five-minute office video on pause, take-over and editing the sheet. One month of bug fixes starts the day you go live.</p>
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">You'll see</div>
+            <p class="text-sm text-slate-300">Real leads texted back inside two minutes, estimates landing on the calendar overnight, and a 7am summary in your inbox you did not have to ask anyone for.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid</h2>
+        <p class="mt-5 text-slate-400 text-lg">One number, paid against your three milestones. Nothing up front.</p>
+      </div>
+
+      <div class="bg-ink-800 border border-accent-400/30 rounded-2xl overflow-hidden shadow-2xl shadow-accent-500/10">
+        <div class="p-8 md:p-10 border-b border-white/10 text-center">
+          <div class="text-sm text-slate-400 uppercase tracking-wider mb-2">Total project</div>
+          <div class="text-5xl md:text-6xl font-bold tracking-tight">
+            <span class="text-accent-400">$2,000</span>
+            <span class="text-slate-500 text-2xl font-normal ml-2">USD</span>
+          </div>
+          <div class="text-sm text-slate-400 mt-3">Fixed price · 4 weeks · paid per milestone</div>
+        </div>
+
+        <div class="p-8 md:p-10">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center py-3 border-b border-white/5">
+              <div>
+                <div class="font-medium">M1 — Sources in, 2-minute text live</div>
+                <div class="text-xs text-slate-500">Due when your three test leads each get the first text</div>
+              </div>
+              <div class="font-mono font-semibold">$800</div>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-white/5">
+              <div>
+                <div class="font-medium">M2 — AI booking, handover, pause tested</div>
+                <div class="text-xs text-slate-500">Due on your sign-off of the test run</div>
+              </div>
+              <div class="font-mono font-semibold">$700</div>
+            </div>
+            <div class="flex justify-between items-center py-3">
+              <div>
+                <div class="font-medium">M3 — Summary, go-live, docs, video, 1 month support</div>
+                <div class="text-xs text-slate-500">Due on go-live with real leads</div>
+              </div>
+              <div class="font-mono font-semibold">$500</div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-white/10">
+            <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">What's included</div>
+            <div class="grid md:grid-cols-2 gap-2 text-sm text-slate-300">
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Website form, Facebook lead ads and Angi into GHL</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> 2-minute first text, 7 days a week</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Claude texting agent with live calendar booking</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Handover to your office with notification</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Per-lead pause tag, draft / live / off mode</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Daily owner summary: in, booked, lost</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Settings sheet, Log and Errors tabs</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Written docs, handover video, 5-minute office video</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> One month of bug fixes after go-live</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Built entirely in your accounts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional retainer -->
+      <div class="mt-6 bg-white/[0.03] border border-white/10 rounded-2xl p-6 md:p-8 grid md:grid-cols-3 gap-6 items-center">
+        <div>
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Optional, after month one</div>
+          <div class="mt-2 text-3xl font-bold"><span class="text-accent-400">$500</span><span class="text-slate-500 text-base font-normal"> / month</span></div>
+          <div class="text-xs text-slate-500 mt-1">Cancel any month</div>
+        </div>
+        <div class="md:col-span-2 text-sm text-slate-400 leading-relaxed">
+          You said you don't want to manage this afterwards. If you would rather nobody in the office thinks about it at all: I spot-check transcripts weekly, tune the wording as you learn what leads ask, and cover up to four hours a month of changes, such as a new lead source or a second calendar. Not needed for the system to keep running.
+        </div>
+      </div>
+
+      <!-- Running costs -->
+      <div class="mt-10">
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-4 text-center">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <div class="text-xs text-slate-500 mb-1">Anthropic (Claude Sonnet)</div>
+            <div class="font-semibold mb-1">~$0.05–0.15 per lead conversation</div>
+            <p class="text-xs text-slate-400">Instructions are cached, so a 10-turn booking conversation costs cents. 300 leads a month is roughly $20–40.</p>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <div class="text-xs text-slate-500 mb-1">Make</div>
+            <div class="font-semibold mb-1">~10–15 operations per AI reply</div>
+            <p class="text-xs text-slate-400">At a few hundred leads a month this sits in the Core or Pro plan, roughly $10–30 a month.</p>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <div class="text-xs text-slate-500 mb-1">GoHighLevel / SMS / Sheets</div>
+            <div class="font-semibold mb-1 text-accent-400">$0 added to your plan</div>
+            <p class="text-xs text-slate-400">Uses what you already pay for. Texts are metered through your GHL phone system at about a cent a segment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Worked examples -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-12">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+        <p class="mt-5 text-slate-400 text-lg">
+          Illustrative scenarios, not client case studies. They show how the same building blocks, a CRM doing the
+          sending, Make in the middle, Claude with booking tools, and an owner-editable sheet, bend to other
+          home-service businesses.
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-ink-800 border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 mb-3">WORKED EXAMPLE · HVAC COMPANY</div>
+          <h3 class="text-lg font-semibold mb-3">Facebook leads texted in a minute, service calls round-robined across techs</h3>
+          <p class="text-sm text-slate-400 leading-relaxed mb-4">
+            An HVAC company runs Facebook lead ads all summer and loses leads to whoever answers first. The lead ad
+            form drops the contact into GHL, the first text goes out in under a minute, and Claude asks whether it is
+            a repair or a replacement, confirms the ZIP is in the service area, and offers the next two slots from a
+            round-robin calendar across four technicians. Emergencies ("no AC, 100 degrees, kids at home") are
+            handed straight to the dispatcher with a notification instead of being booked days out. The owner edits
+            the service area and the emergency phrases in the sheet.
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Lead-ad intake</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Round-robin booking</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Urgency handover</span>
+          </div>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 mb-3">WORKED EXAMPLE · SOLAR INSTALLER</div>
+          <h3 class="text-lg font-semibold mb-3">Marketplace leads qualified by text before a rep drives out</h3>
+          <p class="text-sm text-slate-400 leading-relaxed mb-4">
+            A solar installer buys leads from two marketplaces that each send a differently formatted email. Make
+            parses both into one contact with the source tagged, GHL sends the first text, and Claude checks the
+            three things that decide whether a site visit is worth it: homeowner or renter, roof age, and monthly
+            bill band. Qualified leads book a survey on the rep's calendar; the rest get a polite close and a note.
+            The morning summary tells the owner leads in by marketplace, so he can see which one is worth paying
+            for.
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Email-lead parsing</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Qualify before booking</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Source in the daily summary</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div>
+            <div class="font-medium mb-1">Have you sent texts from GoHighLevel before?</div>
+            <p class="text-sm text-slate-400">US carriers require A2P 10DLC registration before business texting works reliably. If you are already texting from GHL, nothing to do. If not, I file it on day 1, because approval is the one thing in this build I can't speed up, and the 2-minute text goes live the day it clears.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div>
+            <div class="font-medium mb-1">Whose calendar does an estimate land on, and how do you split the territory?</div>
+            <p class="text-sm text-slate-400">Forty crews do the roofing; usually a few estimators do the visits. Default: one Estimates calendar in GHL, round-robin across your estimators, 30-minute travel buffers, and the lead's ZIP deciding who is eligible. If you already have calendars set up, I use those.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div>
+            <div class="font-medium mb-1">How do Angi leads reach you today, and what counts as "lost"?</div>
+            <p class="text-sm text-slate-400">Default: Angi's lead emails are forwarded to an inbox Make watches and parsed into a contact; if your Angi account can push leads by webhook I'll use that instead. For the summary, "lost" defaults to said no, booked elsewhere, or silent after the third nudge. You can change the nudge timings in the sheet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="grid md:grid-cols-3 gap-10 items-start">
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+          <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+        </div>
+        <div class="md:col-span-2 space-y-4 text-slate-300 leading-relaxed">
+          <p>
+            I'm Kristof. Speed-to-lead systems for home-improvement and other service businesses are the main thing
+            I build: a CRM doing the sending, Make in the middle, Claude holding the conversation, and every setting
+            the owner might touch in a spreadsheet. GoHighLevel plus the Claude API is my standard pattern for it,
+            because GHL already does the texting, calendars and inbox well, and Claude does the talking better than
+            the built-in option.
+          </p>
+          <p>
+            I work directly with the Claude API, including tool use for booking, prompt caching and multi-turn
+            history, which is what keeps a 300-lead month costing tens of dollars rather than hundreds. I write the
+            limitations down before I write any scenarios, and I build everything to fail to a person with a note,
+            never to silence. You will not need to open Make after handover; the documentation and videos are part
+            of the price, not an extra.
+          </p>
+          <p class="text-slate-400 italic">
+            Happy to walk you through a past build of this pattern on a call before you commit.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send a GHL login for your sub-account, access to your Facebook page and the Angi lead emails, and the
+        names of whoever does estimates. I'll come back inside 48 hours with the kickoff date and the day your
+        first test lead gets its two-minute text.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">
+        kristof@getflowtive.com · Proposal valid for 30 days
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your roofing company</div>
+      <div>Roofing Lead Follow-up Proposal · GoHighLevel + Claude</div>
+    </div>
+  </footer>
+
+</body>
+</html>
