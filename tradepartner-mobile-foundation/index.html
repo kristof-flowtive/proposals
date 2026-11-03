@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — TradePartner mobile foundation (offline-first, on-device)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">Architecture</a>
+        <a href="#controls" class="hover:text-white transition">Daily cadence</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for the TradePartner team at ITG Platforms
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        A TradePartner foundation that works with <span class="text-accent-400">zero cellular connection</span>, on the device's own silicon.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        One React Native codebase for iPhone and Android. Offline storage, speech and the blueprint overlay all run on OS frameworks already on the phone, so your core tools have no external web dependency to fail in the field. Daily pushes to your ITG repository, TestFlight builds every week.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the architecture</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View the four milestones</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">On-device</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Speech · AR · storage</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">6 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Four milestones</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Daily</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Pushes to your repo</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,500</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed · your escrow split</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 Understanding -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">
+        Your operators work on heavy industrial sites with gloves on, often with no signal, and the app has to keep working anyway. Most mobile bids will reach for a cloud speech API and a hosted sync service and quietly fail your third requirement. The brief is really a constraint: everything core runs on the phone, and the network is a convenience, not a dependency.
+      </p>
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Fully functional with zero cellular connection"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">SQLite on the device is the source of truth. Every screen reads and writes locally; a sync queue replays changes when a connection appears. Airplane mode is a test case, not an edge case.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Localized device CPU/NPU processing, zero external web dependencies"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Speech uses Apple's on-device recognition and Android's on-device recognizer. The overlay uses ARKit and ARCore. No third-party SDK sits in the path of a core tool, so there is nothing to phone home and nothing to expire.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Daily code pushes" and "clickable builds via TestFlight"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">A commit to your private ITG repository every working day, on a dated branch merged at each milestone. A TestFlight build every Friday from day five, with an Android internal-testing build alongside it.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Glove-friendly UI trigger"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">A single oversized press-and-hold control, high contrast, with haptic confirmation, so a gloved hand can start and stop dictation without looking. Also mapped to the volume-up button as a hardware fallback.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6 md:col-span-2">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Confidentiality and firewall</div>
+          <h3 class="font-semibold text-lg">ITG Platforms LLC only. No tracking, no location logging, no stakeholder references.</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">No analytics or crash-reporting SDK unless you ask for one. Location permission is never requested in the foundation build. Nothing about field sites, founders or stakeholder metrics is written to logs, commits or test data. Branding, bundle identifiers and store listings carry ITG Platforms LLC and nothing of mine.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Architecture -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Four modules, one codebase, nothing core leaves the phone</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">React Native with an Expo custom development client. Shared TypeScript for the screens and data layer, thin native modules in Swift and Kotlin where the OS does the heavy lifting.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <!-- Lane 1 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">On the device · core tools</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M1 · DIN offline engine</div>
+            <div class="font-medium">SQLite database with a write-ahead sync queue</div>
+            <div class="text-xs text-slate-400 mt-1">Bids, scopes, contacts and drawing sets stored locally. Every mutation is queued with a timestamp and device ID for later replay.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M2 · VIA speech</div>
+            <div class="font-medium">On-device speech recognition behind one gloved button</div>
+            <div class="text-xs text-slate-400 mt-1">Apple Speech with on-device recognition required; Android's on-device recognizer. Transcript lands in the active bid field and triggers the image capture flow.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M3 · Blueprint overlay</div>
+            <div class="font-medium">ARKit / ARCore plane detection, scaled drawing projected on the surface</div>
+            <div class="text-xs text-slate-400 mt-1">Two-point calibration sets the scale. Opacity and lock controls sized for gloves.</div>
+          </div>
+        </div>
+
+        <!-- Lane 2 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Housekeeping · local, scheduled</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M3 · Purge / sync scrub</div>
+            <div class="font-medium">Background task on the device</div>
+            <div class="text-xs text-slate-400 mt-1">Removes superseded drawing versions and captured images past a retention window you set. Keeps the newest version of every drawing set regardless of age.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">When a connection appears</div>
+            <div class="font-medium">Sync queue replays to your backend, newest wins per field</div>
+            <div class="text-xs text-slate-400 mt-1">Conflict rule is explicit and logged locally. The app never blocks on the network.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Daily</div>
+            <div class="font-medium">Commit to the ITG repository; Friday TestFlight build</div>
+            <div class="text-xs text-slate-400 mt-1">EAS Build signs and submits to TestFlight. Android goes to the Play internal testing track or a direct APK, your choice.</div>
+          </div>
+        </div>
+
+        <!-- Lane 3 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Commercial · the only networked module</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M4 · Bidding board</div>
+            <div class="font-medium">Scopes, GC contacts, drawing sets, status per bid</div>
+            <div class="text-xs text-slate-400 mt-1">Reads from the local database, so the board works offline too. Filters and sort sized for a gloved thumb.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M4 · Stripe tiers</div>
+            <div class="font-medium">$45/mo Basic · $1,499.99 setup + $139/mo Premium</div>
+            <div class="text-xs text-slate-400 mt-1">Stripe's mobile SDK for checkout and subscription state. Tier gates are checked locally against the last known entitlement so a lapsed signal never locks a paying user out.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">M4 · Priority email blasts</div>
+            <div class="font-medium">SMTP send from your mail account, queued offline</div>
+            <div class="text-xs text-slate-400 mt-1">High-priority headers set. If there is no signal, the blast waits in the queue and goes when there is.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, in every module</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Airplane-mode test passes before the milestone is called done</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>No analytics, crash or location SDK in the build</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>TypeScript types shared between screens and the database schema</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Native modules kept thin, so the next developer can read them in an afternoon</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Cadence -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Daily cadence</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">You see progress every day, in your own repository</h2>
+        <p class="text-slate-400 leading-relaxed">Your two non-negotiables about delivery are the easiest part of the brief to prove, so the plan makes them visible from day one. Every working day ends with a push you can read; every week ends with a build you can tap.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Daily commit</strong> to a dated branch in the ITG repository, with a one-paragraph note of what changed and what to test.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Friday TestFlight build</strong> from the end of week one, plus the Android equivalent, with a short checklist for your field testers.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Milestone merge</strong> to main only when its acceptance checks pass on a real iPhone in airplane mode.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>CHANGELOG and README</strong> kept current in the repository so nothing about the build lives only in my head.</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between">
+          <span>ITG · tradepartner-mobile · commits</span>
+          <span class="text-white">main</span>
+        </div>
+        <table class="w-full text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">Day</th><th class="text-left px-4 py-2 font-normal">Push</th><th class="text-left px-4 py-2 font-normal">Build</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Mon 1</td><td class="px-4 py-2 text-slate-300">schema, migrations, seed data</td><td class="px-4 py-2 text-slate-500">—</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Tue 2</td><td class="px-4 py-2 text-slate-300">repositories + sync queue</td><td class="px-4 py-2 text-slate-500">—</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Wed 3</td><td class="px-4 py-2 text-slate-300">offline bid list screen</td><td class="px-4 py-2 text-slate-500">—</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Thu 4</td><td class="px-4 py-2 text-slate-300">conflict rule + local log</td><td class="px-4 py-2 text-slate-500">—</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Fri 5</td><td class="px-4 py-2 text-slate-300">airplane-mode test pass</td><td class="px-4 py-2 text-accent-400">TestFlight 0.1</td></tr>
+          </tbody>
+        </table>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative first week. The shape repeats: four days of pushes, a Friday build.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Reliability -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — In the field</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so a dead zone never costs an operator a bid</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">Local first, always</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Writes commit to SQLite before anything else happens. If the phone dies mid-entry, the last saved field is still there on restart.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">Speech works in a basement</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Recognition is forced to on-device mode. If a device cannot support it, the app says so at setup rather than silently falling back to a server.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Overlay degrades honestly</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If plane detection cannot lock (poor light, reflective surface), the overlay switches to a manual two-corner pin mode instead of drifting.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Purge never deletes the only copy</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The scrub script keeps the newest version of each drawing set and anything not yet synced, whatever the retention window says.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Paid users stay paid offline</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Entitlement is cached with a grace period, so a Premium operator in a dead zone is not downgraded to Basic by a missed Stripe check.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Yours, in your accounts</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Apple Developer, Play Console, Stripe and the repository all stay under ITG Platforms LLC. I work from invitations you can revoke the day we finish.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Milestones -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your four milestones, six weeks</h2>
+      <p class="mt-4 text-slate-400">The split is yours as posted. Each milestone ends with a TestFlight build you can put in an operator's hand, in airplane mode.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">DIN offline storage engine</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–8</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Project scaffold in your repository, SQLite schema for bids, scopes, GC contacts and drawing sets, repositories and the sync queue, first offline screens, the conflict rule and its local log. Expo dev client running on iPhone and Android.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a TestFlight build where you create and edit bids in airplane mode, restart the phone, and find them intact; then watch the queue replay when signal returns.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">VIA voice activation and local speech engine</h3>
+            <span class="text-xs font-mono text-slate-500">Days 9–16</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Native speech modules for iOS and Android in on-device mode, the gloved press-and-hold trigger with haptics and the hardware-button fallback, transcript into the bid field, and the voice-to-image handoff that opens capture and attaches the photo to the current item.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> dictation working with the SIM removed and Wi‑Fi off, operated with work gloves on.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Blueprint overlay and version scrub</h3>
+            <span class="text-xs font-mono text-slate-500">Days 17–24</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">ARKit and ARCore modules behind one JavaScript interface, plane detection with two-point scale calibration, opacity and lock controls, the manual pin fallback, and the scheduled local purge/sync script with its retention rules.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a drawing set projected to scale on a floor or wall through the camera, and old versions disappearing on schedule while the newest never does.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">4</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Bidding board and Stripe pipeline</h3>
+            <span class="text-xs font-mono text-slate-500">Days 25–30</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Bidding board view over the local data, the two tiers hardcoded exactly as specified with Stripe checkout and cached entitlements, and queued high-priority SMTP blasts from your mail account. Handover notes and a build-and-release guide in the repository.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a test subscription on each tier, the board filtering live bids, and a priority email arriving from a blast queued while offline.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Investment -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid, your escrow split</h2>
+      <p class="mt-4 text-slate-400">The four milestones as you posted them. Each is released on a build you have tested yourself.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Total project</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,500</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 6 weeks · four escrow milestones</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — DIN offline storage engine</div><div class="text-xs text-slate-500">Released on the airplane-mode TestFlight build</div></div>
+              <div class="font-mono text-accent-400">$375</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — VIA voice and local speech</div><div class="text-xs text-slate-500">Released on gloved, offline dictation working</div></div>
+              <div class="font-mono text-accent-400">$375</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M3 — Blueprint overlay and scrub</div><div class="text-xs text-slate-500">Released on the overlay and purge demonstrated on device</div></div>
+              <div class="font-mono text-accent-400">$375</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M4 — Bidding board and Stripe</div><div class="text-xs text-slate-500">Released on test subscriptions and a queued blast delivered</div></div>
+              <div class="font-mono text-accent-400">$375</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>iPhone and Android from one codebase</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Daily pushes to your ITG repository</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Weekly TestFlight and Android test builds</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Native speech and AR modules, iOS and Android</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Offline engine, sync queue, purge script</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Stripe tiers and SMTP blast queue</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>README, CHANGELOG, build-and-release guide</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Two weeks of bug fixes after milestone four</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Apple Developer Program</div><div class="text-accent-400 font-mono mt-1">$99 / year</div><div class="text-xs text-slate-500 mt-1">Required for TestFlight. Enrol as ITG Platforms LLC.</div></div>
+          <div><div class="font-medium">Google Play Console</div><div class="text-accent-400 font-mono mt-1">$25 once</div><div class="text-xs text-slate-500 mt-1">Only if you want Play internal testing rather than direct APKs.</div></div>
+          <div><div class="font-medium">Stripe · Expo EAS</div><div class="text-accent-400 font-mono mt-1">Stripe fees only · EAS free tier</div><div class="text-xs text-slate-500 mt-1">Speech, AR and storage cost nothing: they are the phone's own frameworks.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Worked examples -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks, a local database as source of truth, a replayable sync queue and on-device processing, bend to other field businesses.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Utility inspection crews</div>
+          <h3 class="text-lg font-semibold mb-3">Pole inspections dictated in the field, filed when the truck reaches town</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Inspectors work rural lines with no coverage for hours. Each inspection is dictated on-device into a structured form, photos attach to the record, and everything sits in SQLite until the truck is back in range. The sync queue replays in order, the office sees the day's work by evening, and nothing was ever typed with cold hands.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">On-device speech</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Replayable sync queue</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Gloved UI</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Commercial flooring installer</div>
+          <h3 class="text-lg font-semibold mb-3">Layout drawings projected onto the slab before the first cut</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The installer loads the drawing set for the job, calibrates two known points on the slab, and sees the layout through the camera at true scale. Drawing versions are purged on a schedule, except the current one, so the crew never cuts to a superseded plan. The bid for the next job is built on the same board, offline, from the same local data.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">AR overlay</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Version scrub</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Offline bidding board</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 Before kickoff -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">What does the sync queue replay to?</div><div class="text-sm text-slate-400 mt-1">The brief covers the device side. If there is no backend yet, I'll default to a minimal endpoint spec you own and can host anywhere, and the app will be complete without it.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Which devices will operators actually carry?</div><div class="text-sm text-slate-400 mt-1">On-device speech and AR need relatively recent hardware. I'll assume iPhone 12 or newer and ARCore-certified Android, and tell you before milestone two if a target device falls short.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Whose mail account sends the priority blasts, and which Stripe account?</div><div class="text-sm text-slate-400 mt-1">Both should be ITG's. I'll need SMTP credentials and a Stripe test key at milestone four, nothing earlier.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 Note on me -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build software for people who need it to work in the conditions they actually have, not the conditions a demo assumes. My habit is to write down the constraints before writing code: here, that is no signal, gloves, and nothing core allowed to leave the phone.</p>
+        <p>What I bring to this brief specifically: an AI-assisted build process that keeps a one-person team moving at a daily-push cadence across two platforms, and a bias for the OS's own frameworks over third-party SDKs, which is exactly what your firewall and zero-dependency rules call for.</p>
+        <p>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send an invitation to the ITG repository, access to the Apple Developer team, and any existing designs or drawing-set samples. I'll come back inside 48 hours with the kickoff date and the first TestFlight date.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for the TradePartner team at ITG Platforms</div>
+      <div>TradePartner Mobile Foundation Proposal</div>
+    </div>
+  </footer>
+
+</body>
+</html>
