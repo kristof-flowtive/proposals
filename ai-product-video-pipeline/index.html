@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — AI product video pipeline, 90 appliances</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">Pipeline</a>
+        <a href="#controls" class="hover:text-white transition">Approval board</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your appliance product team
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Ninety products, one pipeline: a 10-second video and a lifestyle set for each, with <span class="text-accent-400">every control and logo correct</span>.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Built in n8n and ComfyUI, driven by your product sheet, with reference-image conditioning so the appliance on screen is your appliance. You approve each product on a board before it goes to post. Five-product pilot first, so you see real output before the batch is funded.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the pipeline</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">90</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Products · video + 4–6 images</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">8 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Pilot in week one</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">You approve</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Every product, before post</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$9,800</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed · 4 milestones</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 Understanding -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">
+        Ninety household appliances need a video and an image set each, inside two months, and the appliance has to be recognisably yours. Anyone can make an AI clip of "a kettle". The job is making a clip of <em>your</em> kettle, with its handle, its dial, its badge, ninety times over, without the output drifting. That is a workflow problem before it is a creative one, which is why your posting asks for a workflow builder.
+      </p>
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"One 10 second AI video and a set of 4 to 6 lifestyle images" per product</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Ninety videos and roughly 450 images. The pipeline generates several candidates per product and keeps the ones that pass accuracy, so the numbers are a batch, not ninety separate briefs.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Deliberate camera angles and movement, then finish it in post editing"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">A shot list per product category (slow orbit for a stand mixer, push-in on the control panel for an oven) drives camera prompts. Post is a reusable template: colour, grade, your end card, sound bed, export presets per channel.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Keep every product detail accurate, including shape, colour, controls and logos"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">The part most AI video gets wrong, so the pipeline is built around it: generation conditioned on your reference photos, a per-product checklist against the spec sheet, and a reject-and-regenerate loop before anything reaches post.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Bonus you asked for</div>
+          <h3 class="font-semibold text-lg">"Technical background in coding or AI automation using n8n / ComfyUI"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">That is the build: n8n orchestrates the batch from your product sheet, ComfyUI graphs produce the image sets, Python handles files and checks, and the whole thing is handed over so your team can run the next ninety.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Pipeline -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Spec sheet to finished video, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Your product sheet decides what gets made. The pipeline decides how. You decide what ships.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <!-- Lane 1 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Inputs · your product sheet</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Per product</div>
+            <div class="font-medium">Name, category, spec sheet, 3–6 reference photos, brand rules</div>
+            <div class="text-xs text-slate-400 mt-1">One row per product in a Google Sheet. Reference photos in a shared folder named by SKU.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Shot list</div>
+            <div class="font-medium">Camera moves and scenes per category, agreed in the pilot</div>
+            <div class="text-xs text-slate-400 mt-1">Kitchen counter at morning light for small appliances, utility room for laundry, and so on. Editable by you.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude</div>
+            <div class="font-medium">Writes the image and video prompts for each product from its row</div>
+            <div class="text-xs text-slate-400 mt-1">Specific to the product's shape, colour and controls, not a generic template.</div>
+          </div>
+        </div>
+
+        <!-- Lane 2 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Generation · n8n orchestrates</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">1 · Images</div>
+            <div class="font-medium">ComfyUI graph with reference-image conditioning</div>
+            <div class="text-xs text-slate-400 mt-1">Your product photos anchor the appliance; the scene and lighting come from the shot list. Eight to twelve candidates per product.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">2 · Video</div>
+            <div class="font-medium">Image-to-video from an approved hero frame, with camera motion control</div>
+            <div class="text-xs text-slate-400 mt-1">Starting from a correct still is how the product stays correct through the move. Model chosen in the pilot by accuracy on your products.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">3 · Accuracy check</div>
+            <div class="font-medium">Candidates compared to the spec sheet and references</div>
+            <div class="text-xs text-slate-400 mt-1">Wrong colour, missing dial, warped logo: rejected and regenerated automatically before you ever see it.</div>
+          </div>
+        </div>
+
+        <!-- Lane 3 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Approval and post · your call</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Approval board</div>
+            <div class="font-medium">You pick the hero still and the take per product, or reject with a reason</div>
+            <div class="text-xs text-slate-400 mt-1">Rejects go back round with your note in the prompt. Nothing goes to post unapproved.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Post editing</div>
+            <div class="font-medium">Template edit: grade, pacing, end card, sound, per-channel exports</div>
+            <div class="text-xs text-slate-400 mt-1">Finishing by hand on approved takes only, so the editing hours go where they show.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Delivery</div>
+            <div class="font-medium">Folder per SKU: video in 16:9 and 9:16, images at full resolution</div>
+            <div class="text-xs text-slate-400 mt-1">Named to your convention, with the sheet marked delivered.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, for every product</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Sheet row updated: candidates, approved take, delivery date</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Prompts and seeds saved, so a product can be re-run later for a new scene</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Generation cost logged per product</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Rejects and their reasons kept, so the shot list improves as the batch runs</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Approval board -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Your controls</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Everything you'd want to change is a cell in one sheet</h2>
+        <p class="text-slate-400 leading-relaxed">The pipeline reads the sheet at the start of every product, so a change to the shot list or the brand rules takes effect on the next run. No need to open n8n or ComfyUI.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Products tab</strong> — one row per SKU: status, references, approved take, delivery.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Shot list tab</strong> — scenes and camera moves per category, in plain English.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Brand rules tab</strong> — what must never appear, logo treatment, colour references.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Approvals tab</strong> — candidate thumbnails with approve / reject and a reason box.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Costs tab</strong> — generation spend per product, so there are no surprises at the end.</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between">
+          <span>Product pipeline · Google Sheets</span>
+          <span class="flex gap-3"><span class="text-white">Products</span><span>Shot list</span><span>Brand rules</span><span>Approvals</span><span>Costs</span></span>
+        </div>
+        <table class="w-full text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">SKU</th><th class="text-left px-4 py-2 font-normal">Product</th><th class="text-left px-4 py-2 font-normal">Status</th><th class="text-left px-4 py-2 font-normal">Take</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">KT-204</td><td class="px-4 py-2 text-slate-300">1.7L kettle, matte black</td><td class="px-4 py-2 text-accent-400">delivered</td><td class="px-4 py-2 text-slate-500">v2 · orbit</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">TO-118</td><td class="px-4 py-2 text-slate-300">4-slice toaster, cream</td><td class="px-4 py-2 text-slate-300">in post</td><td class="px-4 py-2 text-slate-500">v1 · push-in</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">MX-310</td><td class="px-4 py-2 text-slate-300">Stand mixer, red</td><td class="px-4 py-2 text-amber-400">awaiting approval</td><td class="px-4 py-2 text-slate-500">3 candidates</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">AF-502</td><td class="px-4 py-2 text-slate-300">Air fryer, 5.5L</td><td class="px-4 py-2 text-slate-300">regenerating</td><td class="px-4 py-2 text-slate-500">rejected: dial colour</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">WM-740</td><td class="px-4 py-2 text-slate-300">Washing machine, 9kg</td><td class="px-4 py-2 text-slate-300">queued</td><td class="px-4 py-2 text-slate-500">—</td></tr>
+          </tbody>
+        </table>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative rows. Prefer Airtable or Notion for the approval board? Same design, different file.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Accuracy -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Accuracy</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so the appliance on screen is your appliance</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">References anchor every frame</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Image generation is conditioned on your product photos, not described from text alone. The scene changes; the product does not.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">Video starts from a correct still</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Image-to-video from an approved hero frame keeps shape and colour through the camera move far better than text-to-video does.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Checklist per product</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Shape, colour, control layout, logo placement, checked against the spec sheet before a candidate reaches your board. Fails are regenerated, not argued over.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Logos handled in post when needed</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Where a model still softens a badge, the clean logo is tracked and composited in the edit. The honest answer to a known weakness.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Cost cap per product</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">A product that keeps failing stops after a set number of attempts and flags for a human look, so one awkward SKU cannot burn the batch budget.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Yours, in your accounts</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">n8n workflows, ComfyUI graphs, model API keys and the sheet all live under your logins. After handover your team can run product 91.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Milestones -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Pilot first, then two batches, eight weeks</h2>
+      <p class="mt-4 text-slate-400">You see five finished products before the batch is funded. Each milestone ends with files in your folder.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Pilot: five products, pipeline proven</h3>
+            <span class="text-xs font-mono text-slate-500">Week 1–2</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Shot list and brand rules agreed. Video model chosen by testing two or three on your actual products. ComfyUI graphs and n8n workflow built. Five products run end to end, including post, with real generation costs measured.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> five finished videos and image sets, the approval board working, and a per-product cost you can multiply by 85.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Batch one: products 6 to 45</h3>
+            <span class="text-xs font-mono text-slate-500">Week 3–5</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Pipeline runs daily; you approve in the board as candidates arrive. Post editing on approved takes, delivered in weekly drops of roughly fifteen products.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> forty-five products delivered to the folder, the sheet tracking each, and the shot list improved from your rejection notes.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Batch two: products 46 to 90</h3>
+            <span class="text-xs font-mono text-slate-500">Week 5–7</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Same cadence. Any product still failing accuracy after the cap gets a hands-on pass rather than another automated attempt.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> all ninety products delivered, with the hard ones called out and resolved.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">4</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Final pass and handover</h3>
+            <span class="text-xs font-mono text-slate-500">Week 8</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Consistency pass across the full set, per-channel exports, a tidy delivery pack, and a handover video showing your team how to run the pipeline for new products.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> the complete library, and someone on your side running product 91 from the sheet without me.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Investment -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid</h2>
+      <p class="mt-4 text-slate-400">One number, paid against four milestones. The pilot is the only commitment until you have seen five finished products.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Total project</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$9,800</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 8 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Pilot, five products</div><div class="text-xs text-slate-500">Due on your approval of the five finished products</div></div>
+              <div class="font-mono text-accent-400">$1,800</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Batch one, products 6–45</div><div class="text-xs text-slate-500">Due on delivery of product 45</div></div>
+              <div class="font-mono text-accent-400">$3,400</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M3 — Batch two, products 46–90</div><div class="text-xs text-slate-500">Due on delivery of product 90</div></div>
+              <div class="font-mono text-accent-400">$3,400</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M4 — Final pass, delivery pack, handover</div><div class="text-xs text-slate-500">Due on the handover video and your team's first solo run</div></div>
+              <div class="font-mono text-accent-400">$1,200</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>90 finished 10-second videos, 16:9 and 9:16</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>4–6 lifestyle images per product, full resolution</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>n8n workflow and ComfyUI graphs, in your accounts</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Product sheet with approval board and cost log</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Post-production template and per-channel presets</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Handover video for running new products</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>One month of fixes after delivery</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Video model API</div><div class="text-accent-400 font-mono mt-1">Measured in the pilot</div><div class="text-xs text-slate-500 mt-1">Several candidate clips per product. Model pricing varies, so the pilot produces a real per-product number before batch one.</div></div>
+          <div><div class="font-medium">Image generation compute</div><div class="text-accent-400 font-mono mt-1">Cloud GPU by the hour</div><div class="text-xs text-slate-500 mt-1">ComfyUI on a rented GPU during batches, switched off between them. Logged per product in the Costs tab.</div></div>
+          <div><div class="font-medium">n8n · Claude · Sheets</div><div class="text-accent-400 font-mono mt-1">Tens of dollars for the project</div><div class="text-xs text-slate-500 mt-1">Orchestration and prompt writing are cheap relative to generation.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Worked examples -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks, a sheet-driven batch, reference-conditioned generation, an accuracy gate and a human approval board, bend to other catalogues.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Furniture retailer</div>
+          <h3 class="text-lg font-semibold mb-3">Two hundred sofas, each shown in four rooms it was never photographed in</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The merchandising team has one cut-out photo per sofa and wants lifestyle imagery for the website and paid social. The pipeline conditions on the cut-out, places each sofa in four room scenes from the shot list, checks fabric colour and leg shape against the product data, and sends candidates to a board where a merchandiser approves one per room. Rejected scenes carry the note back into the next attempt.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Reference conditioning</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Sheet-driven batch</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Approval board</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Power tool brand</div>
+          <h3 class="text-lg font-semibold mb-3">Short product clips for marketplace listings, regenerated whenever the range changes</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Each tool gets an eight-second clip for Amazon and the brand site. Image-to-video from an approved hero frame keeps the tool's colour scheme and badge intact through the camera move. When a model is refreshed, the product manager edits one row, the pipeline re-runs that SKU, and the new clip lands in the same folder with the old one archived.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Image-to-video</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Re-run per SKU</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Accuracy gate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 Before kickoff -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">What reference material exists per product?</div><div class="text-sm text-slate-400 mt-1">Three to six clean photos per appliance is the ideal input. If some products only have one, the pilot will include one of those so we see the difference.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Where will the videos run?</div><div class="text-sm text-slate-400 mt-1">Marketplace listings, paid social and your own site each want different aspect ratios, lengths and end cards. I'll assume 16:9 and 9:16 with a brand end card unless you say otherwise.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Who approves, and how fast?</div><div class="text-sm text-slate-400 mt-1">Eight weeks for ninety products needs approvals turned around within a day or two. One named approver on your side keeps the batch moving.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 Note on me -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build AI pipelines for businesses that need a repeatable result ninety times, not a one-off: n8n and Make workflows with Claude writing the per-item inputs, node-based generation graphs, and a human approval step wherever a wrong output would cost more than a minute of someone's time.</p>
+        <p>I'll be straight about the screening question: I don't have a product-video reel to show you. What I'd rather do is make your first product as the pilot, so you judge the pipeline on your own appliance before any batch is funded. My default pattern is what your bonus line describes: the creative decisions in a sheet you control, the production in workflows your team can run after I've gone.</p>
+        <p>Happy to walk you through a past automation build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send the product list, reference photos for five products you'd like in the pilot, and any brand guidelines. I'll come back inside 48 hours with the kickoff date and the day you'll see the first finished product.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your appliance product team</div>
+      <div>AI Product Video Pipeline Proposal</div>
+    </div>
+  </footer>
+
+</body>
+</html>
