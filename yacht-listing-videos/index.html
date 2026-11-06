@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — AI yacht listing videos, 225 listings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">Pipeline</a>
+        <a href="#controls" class="hover:text-white transition">Listing board</a>
+        <a href="#quality" class="hover:text-white transition">Quality</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your yacht brokerage
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        225 premium listing videos, each one <span class="text-accent-400">the same vessel in every shot</span>.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Every shot animated from the listing's own photos, never invented from text. Photos improved for light, sky and water only, with the hull, lines and layout locked. Exterior, deck and interior cut to one pacing and one grade, 1080p, no sound, no titles. Run from a listing sheet in n8n and ComfyUI, so the 225th video holds the standard of the first.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the pipeline</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">225</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Listings · 10s · 1080p</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">9 Nov–15 Feb</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">First 15 listings by 23 Nov</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Hull locked</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Photo fixes never touch the boat</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$13,500</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed · 4 milestones</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 Understanding -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">
+        A new brokerage launches with 225 listings, and every listing deserves a video that looks more expensive than the photos it came from. Buyers at this level know boats: a hull line that bends, a flybridge that grows a deck, or a saloon that changes colour between shots is worse than no video at all. A ten-second video is really three or four shots cut together, so the hard part is not one good clip. It is the same yacht surviving every cut, 225 times.
+      </p>
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Video quality</div>
+          <h3 class="font-semibold text-lg">"Clearly better than the input images, without looking artificial"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Listing photos get improved where it is safe: exposure, white balance, sky, water texture, noise and resolution. That is where "elevated" comes from. Nothing that would make a surveyor look twice gets generated.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Yacht accuracy</div>
+          <h3 class="font-semibold text-lg">"The same vessel in every shot, matching the input images"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Every shot starts from one of that listing's photos, so the hull, colour, layout and key features come from the listing, not from a model's idea of a yacht. Each clip's first and last frames are checked against its source photo before it is cut in.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Stable, natural motion</div>
+          <h3 class="font-semibold text-lg">"Smooth camera moves with believable water, reflections and people"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Slow, camera-led moves (push-in, lateral track, gentle orbit on the exterior) rather than the boat moving. Water and reflections are where AI gives itself away, so they are the first thing the review checks. People stay small and secondary, or out of frame when a listing photo has none.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Editing</div>
+          <h3 class="font-semibold text-lg">"Good pacing and consistent colour across exterior, deck and interior shots"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">One edit template for all 225: a fixed shot order and rhythm, one colour pipeline that matches interiors to exteriors, 1080p export, no sound. "Titles and labels are not needed", so none are added.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Pipeline -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Listing photos to finished video, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Your listing decides what is in the video. The pipeline does the repetitive work. A person signs off every video before it is delivered.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <!-- Lane 1 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Inputs · your listing</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Trigger</div>
+            <div class="font-medium">A listing row: reference, model, length, hull colour, photo folder</div>
+            <div class="text-xs text-slate-400 mt-1">One row per listing in a Google Sheet. Marking it "ready" queues it.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude · shot selection</div>
+            <div class="font-medium">Sorts the photos into exterior, deck and interior and picks the best three or four</div>
+            <div class="text-xs text-slate-400 mt-1">Prefers sharp, well-framed photos with clear water lines. Flags a listing with no usable exterior instead of guessing.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude · prompts</div>
+            <div class="font-medium">Writes a camera prompt per shot from the photo and the listing details</div>
+            <div class="text-xs text-slate-400 mt-1">Built from the camera-move library you approve in the pilot, so prompts stay consistent across 225 listings.</div>
+          </div>
+        </div>
+
+        <!-- Lane 2 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Generation · n8n orchestrates</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">1 · Improve the photo</div>
+            <div class="font-medium">ComfyUI: upscale, denoise, relight, clean sky and water</div>
+            <div class="text-xs text-slate-400 mt-1">Structure locked: the hull, superstructure, windows and interior layout are masked off from any generative change.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">2 · Animate</div>
+            <div class="font-medium">Image-to-video with camera control, three or four candidates per shot</div>
+            <div class="text-xs text-slate-400 mt-1">Model chosen in the pilot by which one holds a hull line and renders water best on your listings.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">3 · Accuracy gate</div>
+            <div class="font-medium">Frames compared to the source photo; drift, warping and flicker rejected</div>
+            <div class="text-xs text-slate-400 mt-1">A failed shot is regenerated with a tighter prompt, up to a set number of attempts, then flagged for a hands-on fix.</div>
+          </div>
+        </div>
+
+        <!-- Lane 3 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Edit and delivery · signed off by a person</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Pick</div>
+            <div class="font-medium">Best take per shot chosen and reviewed against the listing</div>
+            <div class="text-xs text-slate-400 mt-1">I review every shot. You see a contact sheet per listing and can reject with a note.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Post</div>
+            <div class="font-medium">DaVinci Resolve template: shot order, pacing, one grade across all shots</div>
+            <div class="text-xs text-slate-400 mt-1">Interiors matched to the exterior grade, so a listing reads as one film. 10 seconds, 1080p, no audio track, no titles.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Delivery</div>
+            <div class="font-medium">Video in the listing's folder, named by listing reference</div>
+            <div class="text-xs text-slate-400 mt-1">Sheet row marked delivered with the date and a link.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, for every listing</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Improved photos kept alongside the originals, so you can use them on the listing page too</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Prompts, seeds and chosen takes saved, so a video can be re-cut when a listing changes</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Generation cost logged per listing</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Your rejection notes fed back into the camera-move library, so the batch gets better as it runs</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Listing board -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Your controls</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">You see where every listing is without asking</h2>
+        <p class="text-slate-400 leading-relaxed">One sheet runs the project. The pipeline reads it at the start of every listing, so a change to the camera moves or the grade takes effect on the next one. Nobody on your side needs to open n8n or ComfyUI.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Listings tab</strong> — one row per yacht: status, photos used, delivered link.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Camera moves tab</strong> — the approved moves per shot type, in plain English.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>House style tab</strong> — pacing, grade reference, what must never appear.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Review tab</strong> — contact sheet per listing with approve / reject and a note.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Costs tab</strong> — generation spend per listing and running total.</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between gap-3">
+          <span>Listing videos · Google Sheets</span>
+          <span class="hidden sm:flex gap-3"><span class="text-white">Listings</span><span>Camera moves</span><span>House style</span><span>Review</span><span>Costs</span></span>
+        </div>
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">Ref</th><th class="text-left px-4 py-2 font-normal">Yacht</th><th class="text-left px-4 py-2 font-normal">Status</th><th class="text-left px-4 py-2 font-normal">Note</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">L-0012</td><td class="px-4 py-2 text-slate-300">24m flybridge, white hull</td><td class="px-4 py-2 text-accent-400">delivered</td><td class="px-4 py-2 text-slate-500">4 shots</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">L-0013</td><td class="px-4 py-2 text-slate-300">18m sports cruiser, navy</td><td class="px-4 py-2 text-slate-300">in edit</td><td class="px-4 py-2 text-slate-500">grade match</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">L-0014</td><td class="px-4 py-2 text-slate-300">30m motor yacht, grey</td><td class="px-4 py-2 text-amber-400">your review</td><td class="px-4 py-2 text-slate-500">contact sheet</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">L-0015</td><td class="px-4 py-2 text-slate-300">15m sailing yacht, cream</td><td class="px-4 py-2 text-slate-300">regenerating</td><td class="px-4 py-2 text-slate-500">mast drift, shot 2</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">L-0016</td><td class="px-4 py-2 text-slate-300">21m catamaran, white</td><td class="px-4 py-2 text-amber-400">flagged</td><td class="px-4 py-2 text-slate-500">no usable exterior</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative rows. If your listings already live in a CRM or Airtable, the pipeline reads from there instead.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Quality -->
+  <section id="quality" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Quality</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so a buyer never spots the AI</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">Never text-to-video</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Every shot starts from a real photo of that yacht. A model asked to imagine "a 24m flybridge" will give you a different boat; a model asked to move a camera across your photo gives you this one.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">Improvement has a fence around it</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Light, sky, water, noise and resolution can change. Hull, superstructure, window lines, deck hardware and interior layout cannot. That rule is enforced with masks, not left to a prompt.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Short moves, slow moves</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Two to three seconds per shot, with the camera doing the moving. That is what keeps water, reflections and rigging stable; long or fast moves are where models start inventing.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">People handled carefully</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Faces and hands are where AI looks artificial fastest. People appear only where a listing photo has them, kept at a distance and in natural motion, unless you want them added on specific shots.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Attempt cap per listing</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">A shot that keeps failing stops after a set number of tries and gets a hands-on fix or a different source photo, so one awkward listing cannot burn the generation budget.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Yours, in your accounts</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">n8n workflows, ComfyUI graphs, model API keys, the Resolve template and the sheet all sit under your logins. Listing 226 runs the same way after February.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Milestones -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fifteen listings first, then two batches, done by 15 February</h2>
+      <p class="mt-4 text-slate-400">About sixteen listings a week after the pilot, which leaves room for the holidays and for re-cuts. Each milestone ends with finished videos in your folders.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Pipeline and first fifteen listings</h3>
+            <span class="text-xs font-mono text-slate-500">9–23 Nov</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">House style agreed: shot order, pacing, grade reference, camera-move library. Two or three video models tested on your actual listings and one chosen. ComfyUI improvement graph, n8n workflow and Resolve template built. Fifteen listings delivered, picked to include your hardest photo sets.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> fifteen finished videos, the listing sheet tracking each one, and a real per-listing generation cost you can multiply by 210.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Batch one: listings 16 to 110</h3>
+            <span class="text-xs font-mono text-slate-500">24 Nov–28 Dec</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Pipeline runs daily. Weekly drops of roughly twenty listings, each with a contact sheet for your review. Rejection notes go straight back into the camera-move library.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> 110 listings delivered, and the reject rate falling week on week in the sheet.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Batch two: listings 111 to 225</h3>
+            <span class="text-xs font-mono text-slate-500">29 Dec–1 Feb</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Same cadence. Listings with weak photos, such as no clean exterior or mostly dockside shots, get a hands-on pass rather than more automated attempts.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> all 225 listings delivered, with the difficult ones named and resolved.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">4</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Consistency pass and handover</h3>
+            <span class="text-xs font-mono text-slate-500">2–15 Feb</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">The full library watched side by side for pacing and grade drift, re-cuts where needed, and a handover video showing your team how to run a new listing from the sheet. One month of fixes after this.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> 225 videos that look like one brokerage made them, and someone on your side running listing 226.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Investment -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">One fixed price for all 225 listings</h2>
+      <p class="mt-4 text-slate-400">About $60 per finished video, paid against four milestones. You know the total on 9 November, not on 15 February.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Total project</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$13,500</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 9 Nov to 15 Feb · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Pipeline and first 15 listings</div><div class="text-xs text-slate-500">Due on your approval of the fifteen videos</div></div>
+              <div class="font-mono text-accent-400">$2,500</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Batch one, listings 16–110</div><div class="text-xs text-slate-500">Due on delivery of listing 110</div></div>
+              <div class="font-mono text-accent-400">$4,500</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M3 — Batch two, listings 111–225</div><div class="text-xs text-slate-500">Due on delivery of listing 225</div></div>
+              <div class="font-mono text-accent-400">$4,500</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M4 — Consistency pass and handover</div><div class="text-xs text-slate-500">Due on the handover video and your team's first solo listing</div></div>
+              <div class="font-mono text-accent-400">$2,000</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>225 finished 10-second videos, 1080p, no sound</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Improved photos per listing, alongside the originals</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>n8n workflow and ComfyUI graphs, in your accounts</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Listing sheet with review tab and cost log</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>DaVinci Resolve edit template and grade</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Handover video for running new listings</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>One month of fixes and re-cuts after delivery</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Video model API</div><div class="text-accent-400 font-mono mt-1">Measured in milestone 1</div><div class="text-xs text-slate-500 mt-1">Three or four shots per listing, a few candidates each. Pricing differs by model, so the first fifteen listings give a real per-listing number before batch one.</div></div>
+          <div><div class="font-medium">Photo improvement compute</div><div class="text-accent-400 font-mono mt-1">Cloud GPU by the hour</div><div class="text-xs text-slate-500 mt-1">ComfyUI on a rented GPU while batches run, switched off in between. Logged in the Costs tab.</div></div>
+          <div><div class="font-medium">n8n · Claude · Sheets</div><div class="text-accent-400 font-mono mt-1">Tens of dollars for the project</div><div class="text-xs text-slate-500 mt-1">Shot selection and prompt writing are cheap next to generation.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Worked examples -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show the same building blocks, photo-anchored image-to-video, structure-locked improvement, an accuracy gate and one edit template, applied to other high-value listings.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Prime property agency</div>
+          <h3 class="text-lg font-semibold mb-3">Every new instruction gets a ten-second walk-through from the agent's photos</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The agency lists forty homes a month, each with a photographer's set but no video budget. The pipeline picks a frontage, a living space and a garden shot, improves sky and light without touching the architecture, animates each with a slow push-in, and cuts them to the agency's house grade. A home's floor plan and window count are checked frame by frame, because a buyer who spots an extra window stops trusting the listing.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Structure-locked improvement</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Shot selection</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">House grade</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Classic car dealer</div>
+          <h3 class="text-lg font-semibold mb-3">Stock videos that keep the exact paint, wheels and badges of each car</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">A dealer with 150 cars in stock wants a short clip per car for the website and marketplaces. Each clip is cut from three photos, a three-quarter front, the interior and a detail, animated with a slow orbit and matched to one grade. Paint colour and wheel design are checked against the source photos; a clip where a badge softens is rejected before it reaches the dealer.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Image-to-video</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Accuracy gate</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Sheet-driven batch</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 Before kickoff -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">What do a typical listing's photos look like?</div><div class="text-sm text-slate-400 mt-1">A professional set with clean exteriors underway is very different from dockside phone photos. I'll assume a mix, and put the weakest sets into the first fifteen so the pipeline is proven on them.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Aspect ratio, and where the videos will play?</div><div class="text-sm text-slate-400 mt-1">The brief says 1080p. I'll assume 16:9 for the listing pages; a 9:16 cut for social from the same shots is a small addition if you want it.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">How should we work day to day?</div><div class="text-sm text-slate-400 mt-1">You mentioned the London office. I'm UK-based; let's agree which days in the office would help most, likely the house-style days in week one and the weekly reviews, with the batches run remotely.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 Note on me -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build AI pipelines for jobs that need the same result hundreds of times: n8n and Make workflows with Claude writing the per-item inputs, node-based generation graphs, and a person checking the output wherever a wrong result would cost real money. A yacht listing video that shows the wrong boat is one of those places.</p>
+        <p>What I bring to this one is the part your bonus line asks for. Prompting gets you one good clip; a pipeline with a locked house style, an accuracy gate and a sheet you can read gets you 225 that match. I'm happy to do the screening task, and I'd treat it as the first look at exactly how milestone one will run.</p>
+        <p>Happy to walk you through a past automation build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send the screening task, or the photo folders for two or three listings you'd consider hard. I'll come back inside 48 hours with finished shots and a confirmed plan for 9 November.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your yacht brokerage</div>
+      <div>AI Yacht Listing Videos Proposal</div>
+    </div>
+  </footer>
+
+</body>
+</html>
