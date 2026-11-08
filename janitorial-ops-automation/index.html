@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Janitorial ops automation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 22px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">The build</a>
+        <a href="#controls" class="hover:text-white transition">Your sheet</a>
+        <a href="#milestones" class="hover:text-white transition">Phases</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your janitorial company
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Quotes answered, shifts covered, timesheets in, invoices paid: <span class="text-accent-400">one system that runs on its own</span> on WhatsApp, Google Workspace and QuickBooks.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Built in Make with Claude as the AI layer, inside your own accounts. Your cleaners and clients never install anything: WhatsApp is the only interface. Every rule you might want to change lives in one Google Sheet, and when something breaks it messages you instead of going quiet.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the build</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">Hourly and fixed-price options</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">6 workflows</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Leads · crew · timesheets · invoicing · clients · weekly</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">3 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Until leads are answered automatically</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">0 new apps</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">For cleaners or clients</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$46/hr</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Or fixed from $2,400</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 UNDERSTANDING -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-5 gap-12">
+        <div class="md:col-span-2">
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+          <p class="mt-5 text-slate-400 leading-relaxed">
+            The business is growing and the admin is eating your time. Quotes get answered late at night, cleaners get texted about shifts one by one, timesheets get chased, and clients get reminded to pay by hand. None of that is hard work. It is constant work, and it all lands on you.
+          </p>
+          <p class="mt-4 text-slate-400 leading-relaxed">
+            The thing the brief does not say out loud: five of your six asks depend on the same piece of data, the job schedule. No-show alerts, clock-ins, check-ins after each clean, recurring invoices and the weekly summary all need to know which cleaner is at which site at what time. So that schedule becomes the spine of the system, and everything else hangs off it.
+          </p>
+        </div>
+        <div class="md:col-span-3 grid sm:grid-cols-2 gap-4">
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Fast, human-sounding replies to inquiries</div>
+            <p class="text-sm text-slate-400">Website form, Google and WhatsApp inquiries all reach Claude within a minute. It replies in your voice, asks the few qualifying questions you set (office or home, square footage, frequency, postcode) and books the walkthrough into your Google Calendar.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Follow-ups on quotes nobody answered</div>
+            <p class="text-sm text-slate-400">Every quote you send gets a row in the sheet. Day 2, day 5 and day 10 follow-ups go out by WhatsApp or email unless the row is marked won or lost. You never chase a quote by hand again.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Alerts when a cleaner doesn't show up or a job isn't covered</div>
+            <p class="text-sm text-slate-400">The clock-in is the proof of showing up. If no clock-in arrives within your grace period after the start time, you get a WhatsApp message naming the site and the cleaner. A job with no cleaner assigned is flagged the evening before, not the morning of.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Clock-ins and job photos collected in one place</div>
+            <p class="text-sm text-slate-400">Cleaners send "here" and their photos to one WhatsApp number. The photos land in a Google Drive folder named by site and date, and the clock-in and clock-out times land on the job's row. No app to install, no login to forget.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">Recurring invoices and payment reminders, synced with QuickBooks</div>
+            <p class="text-sm text-slate-400">QuickBooks stays the source of truth for money. Recurring invoices are created in QuickBooks from the client's contract terms; Make watches invoice status and sends reminders at the intervals you set. Nothing is invoiced twice.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">A flag to you when someone complains</div>
+            <p class="text-sm text-slate-400">After each clean the client gets a short check-in. Claude reads the reply. Happy clients get a Google review link; anything that reads as a complaint stops the automation and pings you with the message and the site, so a human answers within the hour.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 THE BUILD -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Six workflows on one spine</h2>
+        <p class="mt-5 text-slate-400 text-lg">
+          WhatsApp, your website form and Gmail decide <em>whether</em> something happens. Make decides <em>what</em>. Claude writes the words. Your Google Sheet decides <em>how</em>, and QuickBooks keeps the money.
+        </p>
+      </div>
+
+      <!-- Spine: 3 lanes -->
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="bg-ink-900/60 border border-white/10 rounded-2xl p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">What comes in</span>
+          </div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">WEBSITE FORM</div>
+            <div class="text-sm font-medium">Form submission hits a Make webhook</div>
+            <div class="text-xs text-slate-500 mt-1">Most form plugins post to a URL natively; email-only forms are parsed from Gmail.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">GOOGLE</div>
+            <div class="text-sm font-medium">Lead emails from your Google Business Profile or Local Services Ads, watched in Gmail</div>
+            <div class="text-xs text-slate-500 mt-1">Missed calls can trigger a text-back; see first-call questions.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">WHATSAPP</div>
+            <div class="text-sm font-medium">One business number for leads, cleaners and clients</div>
+            <div class="text-xs text-slate-500 mt-1">Make matches the sender's number against the Cleaners and Clients tabs. Unknown number = lead.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">CLOCK</div>
+            <div class="text-sm font-medium">Scheduled runs: 6pm shift reminders, 15-minute no-show checks, invoice reminders, Monday summary</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-900/60 border border-accent-400/30 rounded-2xl p-6 shadow-xl shadow-accent-500/5">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-accent-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Make + Claude</span>
+          </div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">1 · ROUTE</div>
+            <div class="text-sm font-medium">Who is this and what is it about?</div>
+            <div class="text-xs text-slate-500 mt-1">Lead, cleaner or client by number. Claude classifies the intent: inquiry, clock-in, photo, "can't make it", payment question, complaint.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">2 · READ THE SHEET</div>
+            <div class="text-sm font-medium">Settings, today's jobs, the client's contract, the conversation so far</div>
+            <div class="text-xs text-slate-500 mt-1">Mode off for any workflow = that workflow stops, nothing else does.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">3 · CLAUDE</div>
+            <div class="text-sm font-medium">Writes the reply in your voice, or extracts the facts (time, site, photo count, sentiment) as structured data</div>
+            <div class="text-xs text-slate-500 mt-1">Your instructions and FAQs are cached, so each call costs cents and the tone stays consistent.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">4 · ACT</div>
+            <div class="text-sm font-medium">Send, book, file, invoice or alert</div>
+            <div class="text-xs text-slate-500 mt-1">Every action writes a row to the Log tab. Every failure writes to Errors and messages you.</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-900/60 border border-white/10 rounded-2xl p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Where it lands</span>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-sky-300 mb-1">GOOGLE SHEET</div>
+              <div class="text-sm font-medium">Jobs, Quotes, Cleaners, Clients, Settings, Log, Errors</div>
+            </div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-sky-300 mb-1">GOOGLE CALENDAR</div>
+              <div class="text-sm font-medium">Walkthrough bookings, with the lead's answers in the event description</div>
+            </div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-sky-300 mb-1">GOOGLE DRIVE</div>
+              <div class="text-sm font-medium">Job photos: /Sites/&lt;client&gt;/&lt;date&gt;/</div>
+            </div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-sky-300 mb-1">QUICKBOOKS</div>
+              <div class="text-sm font-medium">Recurring invoices, payment status, customer records</div>
+            </div>
+            <div class="bg-white/[0.04] border border-amber-400/30 rounded-lg p-4">
+              <div class="text-xs font-mono text-amber-300 mb-1">YOUR WHATSAPP</div>
+              <div class="text-sm font-medium">No-shows, uncovered jobs, complaints, overdue invoices, breakages, and the Monday summary</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Six workflows -->
+      <div class="mt-14">
+        <h3 class="text-xl font-semibold mb-6">The six workflows, one card each</h3>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+            <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Leads</div>
+            <h4 class="font-semibold">Inquiry to walkthrough in one conversation</h4>
+            <ul class="mt-3 space-y-2 text-sm text-slate-400">
+              <li><span class="text-slate-500 font-mono text-xs">TRIGGER</span> New form, Google lead email or WhatsApp from an unknown number.</li>
+              <li><span class="text-slate-500 font-mono text-xs">THEN</span> Claude replies within a minute, asks your qualifying questions, offers walkthrough slots from your calendar, books the one they pick.</li>
+              <li><span class="text-slate-500 font-mono text-xs">AFTER</span> Quote row created. Follow-ups on day 2, 5 and 10 until you mark won or lost.</li>
+            </ul>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+            <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Crew</div>
+            <h4 class="font-semibold">Shift reminders and the no-show alarm</h4>
+            <ul class="mt-3 space-y-2 text-sm text-slate-400">
+              <li><span class="text-slate-500 font-mono text-xs">6PM</span> Each cleaner gets tomorrow's jobs by WhatsApp: site, address, time, notes. A reply of "can't" opens an uncovered-job alert to you.</li>
+              <li><span class="text-slate-500 font-mono text-xs">EVENING</span> Any job for tomorrow with no cleaner assigned is flagged to you.</li>
+              <li><span class="text-slate-500 font-mono text-xs">START + GRACE</span> No clock-in yet? Cleaner gets a nudge; you get a message five minutes later if still nothing.</li>
+            </ul>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+            <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Timesheets</div>
+            <h4 class="font-semibold">Clock-in, photos and clock-out on WhatsApp</h4>
+            <ul class="mt-3 space-y-2 text-sm text-slate-400">
+              <li><span class="text-slate-500 font-mono text-xs">"HERE"</span> Any arrival message stamps clock-in on the job row. Claude handles "arrived", "on site", "starting now" without a fixed keyword.</li>
+              <li><span class="text-slate-500 font-mono text-xs">PHOTOS</span> Saved to Drive under the site and date, count written to the row. A job with fewer than your minimum photos is flagged.</li>
+              <li><span class="text-slate-500 font-mono text-xs">"DONE"</span> Stamps clock-out, computes hours, marks the job complete. A Timesheets tab sums hours per cleaner per week.</li>
+            </ul>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+            <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Invoicing</div>
+            <h4 class="font-semibold">Recurring invoices and reminders through QuickBooks</h4>
+            <ul class="mt-3 space-y-2 text-sm text-slate-400">
+              <li><span class="text-slate-500 font-mono text-xs">CONTRACT</span> Each office client's terms (amount, frequency, day) live in QuickBooks as a recurring invoice. One-off home cleans are invoiced from the completed job row.</li>
+              <li><span class="text-slate-500 font-mono text-xs">DAILY</span> Make reads open invoices. Reminders at due day, +7 and +14 by email or WhatsApp, worded by Claude, never sent twice.</li>
+              <li><span class="text-slate-500 font-mono text-xs">+21</span> Still unpaid? Escalates to you with the client, the amount and the history.</li>
+            </ul>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+            <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Clients</div>
+            <h4 class="font-semibold">Check-in, review request, complaint flag</h4>
+            <ul class="mt-3 space-y-2 text-sm text-slate-400">
+              <li><span class="text-slate-500 font-mono text-xs">JOB DONE + 2H</span> Client gets a one-line check-in. Office clients get it per visit at the cadence you set, not daily.</li>
+              <li><span class="text-slate-500 font-mono text-xs">REPLY</span> Claude reads the tone. Positive: a thank-you with your Google review link, once per client per quarter. Negative or unclear: no automated reply.</li>
+              <li><span class="text-slate-500 font-mono text-xs">COMPLAINT</span> You get the message, the site, the cleaner and the photos from that visit in one WhatsApp.</li>
+            </ul>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+            <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Weekly summary</div>
+            <h4 class="font-semibold">Monday 7am, one message</h4>
+            <ul class="mt-3 space-y-2 text-sm text-slate-400">
+              <li><span class="text-slate-500 font-mono text-xs">READS</span> Jobs done and missed, hours per cleaner, revenue invoiced and collected from QuickBooks, quotes open by age, complaints and errors.</li>
+              <li><span class="text-slate-500 font-mono text-xs">WRITES</span> Claude turns it into eight lines you can read on your phone, plus a link to the full sheet.</li>
+              <li><span class="text-slate-500 font-mono text-xs">ALSO</span> A one-line "all systems ran" heartbeat every morning, so silence is never mistaken for calm.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, in every workflow</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>A row in the Log tab: time, who, what was sent or filed, which workflow.</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>A WhatsApp to you on any error, with a one-line cause and the row it affected.</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>You can reply to any thread yourself at any time; the automation steps back for that conversation.</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Nothing goes to a client or cleaner that is not in the Log first.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 CONTROLS -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Owner controls</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Everything you might change lives in one Google Sheet</h2>
+        <p class="text-slate-400 leading-relaxed">Make reads the sheet on every run. Change a grace period, a reminder time, a qualifying question or the wording of a check-in, and the next run uses it. You never open Make after handover, and if you move your schedule to a proper tool later, the sheet is the thing we swap out, not the logic.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Jobs</strong> — one row per visit: client, site, cleaner, date, start, status, clock-in, clock-out, photos. The spine.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Quotes</strong> — every quote sent, its value, last follow-up, won or lost.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Cleaners</strong> and <strong>Clients</strong> — names, WhatsApp numbers, sites, contract cadence, review link sent date.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Settings</strong> — mode per workflow (draft, live, off), grace minutes, reminder times, follow-up days, minimum photos, your tone notes and FAQs for Claude.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Log</strong> and <strong>Errors</strong> — what the system did, and what it couldn't.</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between">
+          <span>Ops Control · Google Sheets</span>
+          <span class="flex gap-3"><span class="text-white">Jobs</span><span>Quotes</span><span>Cleaners</span><span>Settings</span><span>Log</span><span>Errors</span></span>
+        </div>
+        <table class="w-full text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">Site</th><th class="text-left px-4 py-2 font-normal">Cleaner</th><th class="text-left px-4 py-2 font-normal">Start</th><th class="text-left px-4 py-2 font-normal">Status</th><th class="text-left px-4 py-2 font-normal">Photos</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Unit 4, Riverside Offices</td><td class="px-4 py-2 text-slate-300">Maria</td><td class="px-4 py-2 text-slate-300">18:00</td><td class="px-4 py-2 text-accent-400">done 18:02–20:11</td><td class="px-4 py-2 text-slate-500">6</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Harbour Dental, 2nd floor</td><td class="px-4 py-2 text-slate-300">Dev</td><td class="px-4 py-2 text-slate-300">19:00</td><td class="px-4 py-2 text-accent-400">clocked in 19:04</td><td class="px-4 py-2 text-slate-500">2</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">14 Elm Rd (home)</td><td class="px-4 py-2 text-slate-300">Tasha</td><td class="px-4 py-2 text-slate-300">09:00</td><td class="px-4 py-2 text-amber-300">no clock-in · you alerted 09:20</td><td class="px-4 py-2 text-slate-500">0</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Northgate Coworking</td><td class="px-4 py-2 text-rose-300">unassigned</td><td class="px-4 py-2 text-slate-300">tomorrow 18:30</td><td class="px-4 py-2 text-rose-300">uncovered · flagged</td><td class="px-4 py-2 text-slate-500">–</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Settings → grace_minutes</td><td class="px-4 py-2 text-accent-400" colspan="2">15</td><td class="px-4 py-2 text-slate-500" colspan="2">5 · 10 · 15 · 30</td></tr>
+          </tbody>
+        </table>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative rows. If you already keep the schedule in Google Calendar, Make reads it from there and the Jobs tab mirrors it.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 RELIABILITY -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Reliability</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so it alerts you when something breaks, and stays quiet when it doesn't</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">Fails to you, never to silence</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Every Make scenario has an error route that writes to the Errors tab and messages you on WhatsApp. A 7am heartbeat confirms yesterday's runs happened. If the heartbeat itself doesn't arrive, that is the alert.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">No false no-show alarms</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The cleaner is nudged first, at start plus grace. A reply of "running 20 late" moves the check instead of waking you. Only a second miss reaches your phone. Grace minutes are yours to set per site.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Draft mode before live mode</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Lead replies and client check-ins start in draft: Claude's message is sent to you for a tap of approval. After a week of reading them, you flip the Settings cell to live. Crew reminders go live from day one because the content is just the schedule.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Nothing invoiced or reminded twice</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">QuickBooks owns invoices; Make only reads their status and records each reminder it sends against the invoice ID. A rerun after a failure picks up where it stopped, it doesn't start again.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">WhatsApp's rules, designed in</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">WhatsApp only allows free-form business messages within 24 hours of the other person's last message. Shift reminders, check-ins and payment reminders therefore go out as approved message templates, which I write and submit for you. Replies then open a normal conversation.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Your accounts, your keys</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Make, the WhatsApp Business number, the Claude API key, Drive and QuickBooks are all yours. I build inside them and hand over the admin logins at the end. If we part ways, nothing stops working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 PHASES -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Phases</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Three phases, eight weeks, each one usable on its own</h2>
+      <p class="mt-4 text-slate-400">Phase 1 is where the money is being lost, so it goes first. Each phase ends with something running live in your own accounts. The fixed-price scenarios below are these phases, cumulatively.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Leads engine</h3>
+            <span class="text-xs font-mono text-slate-500">Weeks 1–3</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Week 1: WhatsApp Business API number set up, the Ops Control sheet built, your tone and qualifying questions captured in a 45-minute call. Week 2: website form, Google lead emails and WhatsApp inquiries all answered by Claude in draft mode, walkthroughs booked into Google Calendar. Week 3: quote follow-ups, flip to live, tune on real conversations.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a lead message your own number from a new phone, get a reply inside a minute, answer three questions and land a walkthrough in your calendar. Then watch a stale quote get its day-2 follow-up without you.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Crew, timesheets and clients</h3>
+            <span class="text-xs font-mono text-slate-500">Weeks 4–6</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Your schedule loaded into the Jobs tab (or read from Google Calendar). 6pm shift reminders, uncovered-job flags, clock-in by WhatsApp, photos to Drive, no-show alerts with the nudge-then-escalate rule. After-clean check-ins, review requests and the complaint flag, starting in draft. WhatsApp templates submitted and approved.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> tomorrow's reminders go out at 6pm, a cleaner's "here" and photos appear on the row and in Drive, and one deliberately skipped clock-in turn into a message on your phone at start plus grace.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">QuickBooks, weekly summary, handover</h3>
+            <span class="text-xs font-mono text-slate-500">Weeks 7–8</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Recurring invoices set up per office client in QuickBooks, one-off invoices from completed home jobs, payment reminders at your intervals, escalation at +21. Monday summary and the daily heartbeat. Three short handover videos (how to change settings, how to read the Log, what to do when you get an error message) and 30 days of bug fixes.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> an invoice go overdue on a test customer and the reminder arrive, then your first Monday summary with last week's jobs, revenue, open quotes and issues in eight lines.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 WORKED EXAMPLES -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks bend to other service businesses that send people to sites.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Landscaping company</div>
+          <h3 class="text-lg font-semibold mb-3">Four crews, forty recurring contracts, one owner who used to do the invoicing on Sundays</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Contracts live in QuickBooks as recurring invoices. Crews text "here" and a photo of the finished lawn to one WhatsApp number; the photo goes to the client with the check-in two hours later. Rain days are a single cell in Settings: set it, and the day's reminders rephrase themselves and the schedule shifts. Payment reminders go out at due, +7 and +14. The owner's Sunday is now the Monday summary.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Recurring invoices in QuickBooks</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Photo-backed check-ins</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Settings cell changes behaviour</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Home care agency</div>
+          <h3 class="text-lg font-semibold mb-3">Carers on shifts where a no-show matters within minutes</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Visits are the Jobs tab. Carers get the next day's visits at 7pm and confirm with one word; a "can't" at 7pm gives the coordinator the whole evening to re-cover, and an uncovered visit is flagged on her phone, not discovered the next morning. Clock-in by WhatsApp at the door, nudge at plus ten, coordinator alerted at plus fifteen. Family check-ins are read by Claude and anything that reads as concern goes straight to a human.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Nudge then escalate</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Uncovered-shift flag the evening before</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Sentiment routed to a human</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 BEFORE KICKOFF -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Four things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Where does the schedule live today?</div><div class="text-sm text-slate-400 mt-1">Google Calendar, a spreadsheet, or your head. Everything in phase 2 reads from it. Default: I build the Jobs tab from whatever you have and, if you use Google Calendar, keep it in sync so you carry on working the way you do now.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Is your WhatsApp the normal app or the Business app, and are you attached to that number?</div><div class="text-sm text-slate-400 mt-1">Automation needs the WhatsApp Business API, and a number can be on the app or the API but not both. Default: a new number on the API for the system, your existing number untouched. Cleaners and clients save one new contact. Moving your current number over is possible if you prefer.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">QuickBooks Online or QuickBooks Desktop?</div><div class="text-sm text-slate-400 mt-1">Online has an API Make connects to directly. Desktop does not, in any way I would put my name to. Default: Online. If you are on Desktop, phase 3 becomes an export-based reminder flow and I will say so before you pay for it.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q4</div>
+          <div><div class="font-medium">What does an inquiry "from Google" look like when it arrives?</div><div class="text-sm text-slate-400 mt-1">Google retired Business Profile chat in 2024, so these are most likely phone calls, or lead emails from your profile or Local Services Ads. Default: lead emails parsed from Gmail. If most are calls, I add a missed-call text-back so an unanswered call still gets a reply within a minute.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 INVESTMENT -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Hourly, or one of three fixed prices</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">The posting is hourly, so that option is here as asked. I have also priced the three phases as fixed scopes, because I think you would rather know the number before we start. The fixed prices sit just under what the same work would come to by the hour, and the risk of it taking longer is mine.</p>
+
+      <!-- Hourly -->
+      <div class="mt-12 bg-white/[0.03] border border-white/10 rounded-2xl p-8 grid md:grid-cols-5 gap-6 items-center">
+        <div class="md:col-span-2">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Option 0 · Hourly</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-5xl font-bold text-white">$46</span><span class="text-slate-400">per hour, USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Tracked in Upwork · weekly cap you set · same phases, same order</div>
+        </div>
+        <div class="md:col-span-3 grid sm:grid-cols-3 gap-3 text-sm">
+          <div class="bg-ink-900 border border-white/10 rounded-lg p-4"><div class="text-slate-400 text-xs">Phase 1 estimate</div><div class="font-mono text-white mt-1">50–55 hrs</div><div class="text-xs text-slate-500 mt-1">≈ $2,300–2,530</div></div>
+          <div class="bg-ink-900 border border-white/10 rounded-lg p-4"><div class="text-slate-400 text-xs">Phase 2 estimate</div><div class="font-mono text-white mt-1">55–60 hrs</div><div class="text-xs text-slate-500 mt-1">≈ $2,530–2,760</div></div>
+          <div class="bg-ink-900 border border-white/10 rounded-lg p-4"><div class="text-slate-400 text-xs">Phase 3 estimate</div><div class="font-mono text-white mt-1">45–50 hrs</div><div class="text-xs text-slate-500 mt-1">≈ $2,070–2,300</div></div>
+        </div>
+      </div>
+
+      <!-- Three scenarios -->
+      <div class="mt-8 grid lg:grid-cols-3 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8 flex flex-col">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Scenario A · Stop losing quotes</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-5xl font-bold text-accent-400">$2,400</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 3 weeks · Phase 1 only</div>
+          <p class="mt-5 text-sm text-slate-300 leading-relaxed">Inquiries from the website, Google and WhatsApp answered in your voice within a minute, qualified, booked into your calendar, and every quote followed up until it is won or lost. The Ops Control sheet is built here, so phases 2 and 3 can be added later at the prices on the right.</p>
+          <div class="mt-6 space-y-2 text-sm border-t border-white/5 pt-5">
+            <div class="flex justify-between"><span class="text-slate-400">M1 · Number live, sheet built, tone captured</span><span class="font-mono text-accent-400">$1,000</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">M2 · All three channels replying in draft</span><span class="font-mono text-accent-400">$900</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">M3 · Follow-ups on, live mode, 30 days fixes</span><span class="font-mono text-accent-400">$500</span></div>
+          </div>
+          <div class="mt-auto pt-6 text-xs text-slate-500">Equivalent to about 52 hours at $46. Best if you want to test me on the part that costs you the most first.</div>
+        </div>
+
+        <div class="bg-white/[0.03] border border-accent-500/40 rounded-2xl p-8 flex flex-col shadow-xl shadow-accent-500/5 relative">
+          <div class="absolute -top-3 left-8 text-[10px] font-mono uppercase tracking-wider bg-accent-500 text-ink-900 px-2 py-1 rounded">Recommended</div>
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Scenario B · Leads, crew and clients</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-5xl font-bold text-accent-400">$4,800</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 6 weeks · Phases 1 and 2</div>
+          <p class="mt-5 text-sm text-slate-300 leading-relaxed">Everything in A, plus shift reminders, uncovered-job flags, no-show alerts, clock-ins and photos by WhatsApp, after-clean check-ins, review requests and the complaint flag. This is the scope that gets you out of texting cleaners and chasing timesheets, which is most of the admin in your brief.</p>
+          <div class="mt-6 space-y-2 text-sm border-t border-white/5 pt-5">
+            <div class="flex justify-between"><span class="text-slate-400">M1 · Phase 1 live (as Scenario A)</span><span class="font-mono text-accent-400">$2,000</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">M2 · Reminders, clock-ins, photos, no-show alerts</span><span class="font-mono text-accent-400">$1,600</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">M3 · Client check-ins and complaint flag, 30 days fixes</span><span class="font-mono text-accent-400">$1,200</span></div>
+          </div>
+          <div class="mt-auto pt-6 text-xs text-slate-500">Equivalent to about 104 hours at $46. Invoicing stays manual for now; phase 3 can be added afterwards for $2,100.</div>
+        </div>
+
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8 flex flex-col">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Scenario C · The whole brief</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-5xl font-bold text-accent-400">$6,900</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 8 weeks · Phases 1, 2 and 3</div>
+          <p class="mt-5 text-sm text-slate-300 leading-relaxed">Everything in B, plus recurring invoices and payment reminders synced with QuickBooks Online, the Monday summary with jobs, revenue, open quotes and issues, the daily heartbeat, handover videos and 30 days of fixes across the whole system. All six items in your list, running on their own.</p>
+          <div class="mt-6 space-y-2 text-sm border-t border-white/5 pt-5">
+            <div class="flex justify-between"><span class="text-slate-400">M1 · Phase 1 live</span><span class="font-mono text-accent-400">$2,400</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">M2 · Phase 2 live</span><span class="font-mono text-accent-400">$2,400</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">M3 · QuickBooks, weekly summary, handover</span><span class="font-mono text-accent-400">$2,100</span></div>
+          </div>
+          <div class="mt-auto pt-6 text-xs text-slate-500">Equivalent to about 150 hours at $46. Optional afterwards: $500 a month for up to four hours of changes as the business grows.</div>
+        </div>
+      </div>
+
+      <div class="mt-8 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Included in every fixed price</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Built in your own Make, WhatsApp, Google and QuickBooks accounts</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Ops Control sheet with Settings, Log and Errors tabs</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Claude prompts written in your voice, editable by you in the sheet</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>WhatsApp message templates written and submitted for approval</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Error alerts to your phone from day one</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Handover videos and 30 days of bug fixes after go-live</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Paid per milestone, nothing up front</span></li>
+          </ul>
+        </div>
+        <div class="lg:col-span-3 bg-ink-800 border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs after go-live, paid by you to the vendors</div>
+          <div class="grid sm:grid-cols-2 gap-5 text-sm">
+            <div><div class="font-medium">Claude API</div><div class="text-accent-400 font-mono mt-1">~$0.01–0.03 per message</div><div class="text-xs text-slate-500 mt-1">Roughly $10–25 a month at a few hundred conversations. Prompt caching keeps it there.</div></div>
+            <div><div class="font-medium">Make</div><div class="text-accent-400 font-mono mt-1">from ~$11 a month</div><div class="text-xs text-slate-500 mt-1">Core plan covers this volume. Pro (~$19) if you want faster scheduled checks.</div></div>
+            <div><div class="font-medium">WhatsApp Business API</div><div class="text-accent-400 font-mono mt-1">Meta per-conversation fees, cents each</div><div class="text-xs text-slate-500 mt-1">Direct through Meta's Cloud API there is no platform fee. If you want a shared team inbox, respond.io or similar runs from about $79 a month.</div></div>
+            <div><div class="font-medium">QuickBooks Online, Google Workspace</div><div class="text-accent-400 font-mono mt-1">$0 extra</div><div class="text-xs text-slate-500 mt-1">You already pay for these. Their APIs are included.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 NOTE ON ME -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof, a Claude Certified Architect running Flowtive. I build automation systems for service business owners who would rather not think about them: lead response, scheduling, follow-up and reporting, in Make and n8n with Claude doing the reading and writing.</p>
+        <p>Most of my work is exactly this shape: a WhatsApp number, an AI layer that sounds like the owner, a Google Sheet the owner controls, and alerts that go to a human instead of nowhere. The part of your brief I would get right that most bidders would not is the spine. Six separate automations that each hold their own copy of the schedule will drift apart within a month. One schedule, six workflows reading it, will not.</p>
+        <p>Happy to walk you through a past build on a call before you commit, including the sheet, the error handling and what the owner actually sees on their phone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Tell me which option you want and the answers to the four questions above. I'll come back inside 48 hours with the kickoff date and the day your first lead gets answered automatically.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the options</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your janitorial company</div>
+      <div>Proposal: operations automation on WhatsApp, Google Workspace and QuickBooks</div>
+    </div>
+  </footer>
+
+</body>
+</html>
