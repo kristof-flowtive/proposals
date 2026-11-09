@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Faceless Video Pipeline</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">The Pipeline</a>
+        <a href="#controls" class="hover:text-white transition">Dashboard</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your DIY credit repair brand
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Type a topic into Airtable. Get a <span class="text-accent-400">finished faceless video</span> in Google Drive.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Airtable, Make.com, ElevenLabs and Claude or GPT-4o, built in your accounts. You approve every script before
+        a cent goes on voice or rendering, and every script is written under a compliance guardrail that keeps
+        score guarantees out of your content.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the pipeline</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">&lt; 50s</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Checked on the real audio</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">1 click</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Your approval, then it runs</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">3 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">To turnkey</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,500</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed · start at $500</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Understanding -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">
+        Your digital product funnel needs a steady stream of short-form videos, and you don't want to be on camera or
+        in an editor. As a non-technical business owner you want a turnkey system: you enter a core topic or angle,
+        and a finished video shows up in a Google Drive folder labelled by date.
+      </p>
+      <p class="mt-4 text-slate-400 text-lg max-w-3xl leading-relaxed">
+        The step most bids skip is assembly. Make.com moves data between apps; it cannot cut video. Pairing the
+        voiceover with visuals needs a cloud render service driven by a template, with captions timed to the voice.
+        That is where most of this build's effort goes, and it is designed in from day one below.
+      </p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"High-retention video script under 50 seconds using proven hook frameworks"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">A Hook frameworks table in Airtable (myth vs fact, mistake callout, question, number list, pattern interrupt) that you pick from or leave on auto. The script comes back as structured beats with a word cap, and the 50 seconds is checked again on the finished voiceover.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"The approved script"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Scripts land in Airtable as "Needs approval". Nothing goes to ElevenLabs until you change the status to Approved, so you never pay for a voiceover you'd have rejected. Edit the text in the cell first if you want; the edit is what gets voiced.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Relevant cinematic visuals" from stock video APIs or Runway</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Each script beat carries its own visual search terms. Make pulls vertical clips per beat from a stock API, never reuses a clip within 30 days, and can send just the hook shot to Runway when you want something no stock library has.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Organized folders in Google Drive, labeled by date"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">One folder per day (<span class="font-mono">2026-11-24</span>), one file set per video: the MP4, the script and the voiceover. The Drive link is written back to the Airtable row so you can find any video from the dashboard.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6 md:col-span-2">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Not in your brief, but your niche needs it</div>
+          <h3 class="font-semibold text-lg">Scripts that stay on the right side of credit repair advertising rules</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Credit repair claims draw US regulator and platform attention (the Credit Repair Organizations Act and the FTC on misleading claims). The script prompt forbids guaranteed score increases, specific point or timeline promises and "remove accurate negative items" language, and a banned-claims list you control in Airtable is checked before a script reaches you. A guardrail, not legal advice, but it means a fast hook never turns into a claim you'd have to take down.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flow -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Topic to finished video, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">
+        You decide <em>what</em> gets made and <em>whether</em> it ships. Make moves each video along. The render template decides <em>how</em> it looks, the same way every time.
+      </p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <!-- Lane 1 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Airtable · you</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Input</div>
+            <div class="font-medium">New row: core topic or angle, optional hook framework</div>
+            <div class="text-xs text-slate-400 mt-1">Status set to "Write script". Leave hook blank and the AI picks.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Trigger</div>
+            <div class="font-medium">Airtable automation calls the Make webhook</div>
+            <div class="text-xs text-slate-400 mt-1">Instant, rather than Make polling every 15 minutes.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-accent-500/30 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Approval gate</div>
+            <div class="font-medium">You read the script, edit if you like, set Approved</div>
+            <div class="text-xs text-slate-400 mt-1">Rejected → back to "Write script" with your note in the prompt.</div>
+          </div>
+        </div>
+
+        <!-- Lane 2 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Make · script &amp; voice</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">1 · Claude or GPT-4o</div>
+            <div class="font-medium">Script returned as structured beats</div>
+            <div class="text-xs text-slate-400 mt-1">Hook, 4–6 beats (voice line + visual search terms), caption text, CTA. Word cap from Settings.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">2 · Compliance check</div>
+            <div class="font-medium">Banned-claims list + a second AI pass</div>
+            <div class="text-xs text-slate-400 mt-1">Flags appear on the row for you to see. Then status → "Needs approval".</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">3 · ElevenLabs</div>
+            <div class="font-medium">Voiceover with word-level timestamps</div>
+            <div class="text-xs text-slate-400 mt-1">Your chosen voice ID. Over 50s → row back to you with the real length.</div>
+          </div>
+        </div>
+
+        <!-- Lane 3 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Make · visuals &amp; render</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">4 · Stock API</div>
+            <div class="font-medium">One vertical clip per beat</div>
+            <div class="text-xs text-slate-400 mt-1">Pexels by default, a premium library if you have one. Clip log prevents repeats; no match → your backup b-roll folder.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">5 · Render API</div>
+            <div class="font-medium">9:16 template: clips cut to the voice, captions burned in</div>
+            <div class="text-xs text-slate-400 mt-1">Creatomate by default (Shotstack or JSON2Video also fit). Brand colours, word-by-word captions, CTA end card.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">6 · Google Drive</div>
+            <div class="font-medium">Render-complete webhook → upload to today's folder</div>
+            <div class="text-xs text-slate-400 mt-1">Folder created if it doesn't exist yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, for every video</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span><span class="font-mono text-slate-300">/Faceless Videos/2026-11-24/</span> holds the MP4, script and voiceover</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Airtable row set to Done with the Drive link and final length</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Clips used written to the Clip log, so they aren't repeated next week</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Vendor cost for that video written to the Log table</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Your dashboard</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">You run everything from one Airtable base</h2>
+        <p class="text-slate-400 leading-relaxed">
+          Make reads your settings on every run, so a change to the voice, the CTA or the banned-claims list applies
+          to the very next video. You never need to open Make after handover.
+        </p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Topics</strong> — your master board: one row per video, status from Write script to Done, script, flags and Drive link.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Settings</strong> — voice ID, word cap, CTA line, caption style, daily render cap.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Hook frameworks</strong> — the hook patterns and an example of each. Add your own and the AI uses them.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Banned claims</strong> — phrases no script may contain. Seeded for credit repair, yours to extend.</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Clip log, Log &amp; Errors</strong> — which clips were used, what ran, what it cost, and anything that failed, in plain English.</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex flex-wrap gap-2 items-center justify-between">
+          <span>Content Pipeline · Airtable</span>
+          <span class="flex gap-3"><span class="text-white">Topics</span><span>Settings</span><span>Hooks</span><span>Log</span><span>Errors</span></span>
+        </div>
+        <div class="overflow-x-auto">
+        <table class="w-full text-xs md:text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">Topic</th><th class="text-left px-4 py-2 font-normal">Hook</th><th class="text-left px-4 py-2 font-normal">Status</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">3 report errors to dispute first</td><td class="px-4 py-2 text-slate-400">Mistake callout</td><td class="px-4 py-2 text-accent-400">Done · 46s</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Goodwill letters, explained</td><td class="px-4 py-2 text-slate-400">Myth vs fact</td><td class="px-4 py-2 text-slate-300">Rendering</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Read your report in 5 minutes</td><td class="px-4 py-2 text-slate-400">Number list</td><td class="px-4 py-2 text-amber-300">Needs approval</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">"Fix your score in 30 days"</td><td class="px-4 py-2 text-slate-400">Question</td><td class="px-4 py-2 text-rose-300">Flagged · timeline claim</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Hard vs soft inquiries</td><td class="px-4 py-2 text-slate-400">auto</td><td class="px-4 py-2 text-slate-500">Write script</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative. Status is a single-select, so a typo can't stall a video. Interface view available if you'd rather have buttons than a grid.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reliability -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Reliability</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so no video fails silently or ships wrong</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">You approve before money is spent</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Script generation costs pennies. Voice and rendering are the paid steps, and neither runs until the row says Approved.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">50 seconds, checked twice</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">A word cap in the prompt, then the real length from the ElevenLabs file. A voice that reads slower than expected can't push a video past your limit unnoticed.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Compliance guardrail on every script</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">No guaranteed results, no point or day promises, no "erase accurate items". The prompt forbids them, the check flags them, and you see the flag before approving.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">No stale or repeated footage</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Portrait clips only, a 30-day clip log against repeats, and a fallback to a Drive folder of backup b-roll you choose, so a weak search never leaves a black frame.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Fails to you, never to silence</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If ElevenLabs, the stock API or the renderer errors, the row goes to Error with a plain-English reason and you get an email. Fix it, set the status back, and it resumes from that step.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Your accounts, your keys, a cost cap</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Airtable, Make, ElevenLabs, the AI key, the renderer and Drive are all under your logins. A daily render cap in Settings stops a runaway batch.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Milestones -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your three milestones, three weeks</h2>
+      <p class="mt-4 text-slate-400">Each milestone ends with something you can click on in your own accounts.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Dashboard, scripts and voiceovers</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–6</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Airtable base with all tables and statuses. Script scenario with hook frameworks, structured beats, word cap and the compliance check. Approval gate. ElevenLabs voiceover with the length check, saved to the dated Drive folder.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> you type a topic, read the script, click Approved, and a voiceover appears in today's Drive folder.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Visuals, render and captions</h3>
+            <span class="text-xs font-mono text-slate-500">Days 7–15</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Stock clip matching per beat with the clip log and backup folder. 9:16 render template with your brand colours, word-by-word captions timed from the voice, and a CTA end card. Render-complete webhook into Drive. Optional Runway hook shot if you want it.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your first finished, captioned video in Drive, made with nobody touching an editor.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Ten-topic test run and handover</h3>
+            <span class="text-xs font-mono text-slate-500">Days 16–21</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Ten real topics through the whole pipeline, plus the failure cases: a rejected script, an over-length voice, a flagged claim, a clip search with no match, a render timeout. Then the 10-minute Loom on using the dashboard. One month of bug fixes starts at go-live.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> ten videos in dated folders, the Error table catching each broken case, and a Loom you can rewatch whenever you need it.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">The full turnkey pipeline is more work than $500 covers, mostly because of the render step. So you can start at your number: milestone 1 is $500 and works on its own, and you decide on the rest once you've used it.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Full pipeline</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,500</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 3 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Dashboard, scripts, voiceovers</div><div class="text-xs text-slate-500">Due when an approved topic produces a voiceover in Drive</div></div>
+              <div class="font-mono text-accent-400">$500</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Visuals, render, captions</div><div class="text-xs text-slate-500">Due when the first finished video lands in Drive</div></div>
+              <div class="font-mono text-accent-400">$600</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M3 — Test run, Loom, 1 month support</div><div class="text-xs text-slate-500">Due on your sign-off of the ten-topic run</div></div>
+              <div class="font-mono text-accent-400">$400</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Bug-tested Make.com scenarios</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Airtable master dashboard, seven tables</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Hook frameworks and compliance guardrail</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>ElevenLabs voice with length check</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Stock matching, render template, captions</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Dated Google Drive folders</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>10-minute Loom walkthrough</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>One month of bug fixes after go-live</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Built entirely in your accounts</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6 bg-white/[0.03] border border-white/10 rounded-2xl p-6 grid md:grid-cols-2 gap-6">
+        <div>
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Prefer to start at $500?</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-3xl font-bold text-slate-100">$500</span><span class="text-slate-400 text-sm">Phase 1 · 1 week</span></div>
+          <p class="mt-2 text-sm text-slate-400">Milestone 1 on its own: the dashboard, approved scripts and finished voiceovers in dated Drive folders, with a short handover video. You can drop each voiceover into CapCut yourself while you decide.</p>
+        </div>
+        <div>
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Phase 2, when you're ready</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-3xl font-bold text-slate-100">$1,000</span><span class="text-slate-400 text-sm">2 weeks</span></div>
+          <p class="mt-2 text-sm text-slate-400">What moves out of phase 1: visual matching, the render template, captions, the ten-topic test run, the 10-minute Loom and the support month. Same total either way.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">ElevenLabs</div><div class="text-accent-400 font-mono mt-1">~$22/mo Creator</div><div class="text-xs text-slate-500 mt-1">A 50-second script is about 750 characters, so the plan covers 100+ videos a month. Commercial use needs a paid plan.</div></div>
+          <div><div class="font-medium">Render API</div><div class="text-accent-400 font-mono mt-1">~$40–60/mo entry tier</div><div class="text-xs text-slate-500 mt-1">Creatomate, Shotstack or JSON2Video. I'll size the tier to your weekly volume in milestone 2.</div></div>
+          <div><div class="font-medium">Make.com</div><div class="text-accent-400 font-mono mt-1">~$11/mo Core</div><div class="text-xs text-slate-500 mt-1">About 40–60 operations per video, so a few hundred videos a month fit the base tier.</div></div>
+          <div><div class="font-medium">Claude or GPT-4o</div><div class="text-accent-400 font-mono mt-1">~$0.01–0.03 per script</div><div class="text-xs text-slate-500 mt-1">Including the compliance pass. Under $3 for a hundred scripts.</div></div>
+          <div><div class="font-medium">Stock footage</div><div class="text-accent-400 font-mono mt-1">$0 with Pexels</div><div class="text-xs text-slate-500 mt-1">A premium library is priced on its own plan if you want a deeper catalogue.</div></div>
+          <div><div class="font-medium">Runway (optional)</div><div class="text-accent-400 font-mono mt-1">Per-second credits</div><div class="text-xs text-slate-500 mt-1">Only if you turn on AI hook shots. Off by default.</div></div>
+        </div>
+        <p class="mt-5 text-xs text-slate-500">Prices are vendor list prices as I understand them today and will be confirmed against your volume at kickoff. Airtable and Google Drive add nothing at this volume.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Worked examples -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks, a topic board, structured AI scripts, an approval gate and a template renderer, bend to different businesses.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Budgeting course creator</div>
+          <h3 class="text-lg font-semibold mb-3">Three money-tip shorts a day, each pointing to the course</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The creator drops a week of angles into Airtable on Sunday night. Scripts come back by morning in a myth-vs-fact format, with a guardrail against investment-return promises. She approves on her phone over coffee; voice and render run while she works. Each video ends on the same CTA card, and the clip log keeps the footage from looking recycled by week three.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Batch-and-approve</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Claims guardrail</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Clip log</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Home-improvement installer</div>
+          <h3 class="text-lg font-semibold mb-3">"Before you hire a roofer" explainers for local ads</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The owner lists the questions customers ask on site visits. Each becomes a 40-second faceless explainer: question hook, three beats, a "get a free quote" end card. Stock roofing footage is matched per beat, with the company's own job-site clips as the backup folder. Finished files land in dated Drive folders that the ads manager pulls from each Monday.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Question hooks</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Own-footage fallback</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Dated delivery</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Before kickoff -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Stock library, Runway, or InVideo?</div><div class="text-sm text-slate-400 mt-1">I'd build on a stock API plus a render service, because both are driven cleanly from Make. InVideo is built around its own editor, so if you have a reason to use it I'll check what its API allows before committing. Default: Pexels, with Runway available for hook shots.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Which voice, and which look?</div><div class="text-sm text-slate-400 mt-1">Pick an ElevenLabs voice (or let me shortlist three) and send your brand colours and font. Default: one voice, bold word-by-word captions in the lower third, 1080×1920.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">What's the CTA, and what can your product claim?</div><div class="text-sm text-slate-400 mt-1">The end card and the banned-claims list both depend on it. Default: one CTA line in Settings, and a banned list seeded with guarantees, point and day promises, and deleting accurate items. Posting to TikTok or Instagram isn't in scope; Drive is the finish line, as briefed.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build Make.com automations with AI at the centre for owners who'd rather not think about them once they're running. Your brief is that pattern exactly: a record in, Make in the middle, an AI model doing the writing, and a finished file out.</p>
+        <p>I work with the Claude and OpenAI APIs directly, using structured outputs so every script arrives as clean beats Make can act on, not a paragraph someone has to cut up. A past build of mine, an AI report pipeline, works the same way: raw data in, finished output out, with no hand editing. I write the limits down before building, which is why the render step, the length check and the compliance guardrail are on this page now rather than discovered in week two.</p>
+        <p>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send five topics you'd like as your first videos, your brand colours, and access to Airtable, Make, ElevenLabs and your Google Drive.
+        I'll come back inside 48 hours with the kickoff date and the day your first voiceover lands in Drive.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your DIY credit repair brand</div>
+      <div>Faceless Video Pipeline Proposal</div>
+    </div>
+  </footer>
+
+</body>
+</html>
