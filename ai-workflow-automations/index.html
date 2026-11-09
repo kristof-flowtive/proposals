@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — AI Workflow Automations (Make / n8n + Claude)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <!-- Top bar -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">Workflow Spine</a>
+        <a href="#controls" class="hover:text-white transition">Control Sheet</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your growing business
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        AI workflows in Make or n8n that <span class="text-accent-400">run without constant supervision</span>, starting with the process that costs you most.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Week one ends with a written automation map and your first workflow live on real data. Claude only where it
+        genuinely helps. Every workflow built in your own accounts, with alerts, a log and your definition of done as the test.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the workflow spine</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Day 7</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Map + first workflow live</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Up to 3</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Workflows in 3 weeks</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">1 month</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Support (you asked for 2 weeks)</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,500</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed · 3 milestones</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Understanding -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-5 gap-12">
+        <div class="md:col-span-2">
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+          <p class="mt-5 text-slate-400 leading-relaxed">
+            Manual work is eating hours you need for growth: leads waiting for a reply, emails and PDFs retyped into a
+            sheet, reports pulled together by hand. You want to take each process "from idea to a working, tested system",
+            connected to the tools you already use, and then stop thinking about it.
+          </p>
+          <p class="mt-4 text-slate-400 leading-relaxed">
+            Your brief lists five kinds of use case against one budget. The honest way to make that work is to pick the
+            right ones first, in writing, and then build them properly. That is how this plan is shaped.
+          </p>
+        </div>
+        <div class="md:col-span-3 grid sm:grid-cols-2 gap-4">
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">"Review my current processes and recommend"</div>
+            <p class="text-sm text-slate-400">Week one produces an automation map: each candidate process with hours saved per week, the apps it touches, whether AI is needed, running cost and risk. You choose what gets built.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">AI "where it genuinely helps"</div>
+            <p class="text-sm text-slate-400">Claude handles the judgement steps: qualifying a lead, drafting a reply, pulling fields out of a PDF. Routing, dates and lookups stay as plain logic, which is cheaper and never improvises.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">"Errors trigger a clear alert or log entry"</div>
+            <p class="text-sm text-slate-400">Every workflow shares one error path: a plain-English row in an Errors tab, a Slack or Gmail alert, and the item parked for a person. Nothing fails quietly.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">"Test every workflow with real data"</div>
+            <p class="text-sm text-slate-400">Each workflow runs on your real leads, emails and files before handover, and your definition of done is the sign-off checklist, line by line.</p>
+          </div>
+          <div class="bg-ink-800 border border-white/10 rounded-xl p-5 sm:col-span-2">
+            <div class="text-accent-400 font-mono text-xs mb-2">REQUIREMENT</div>
+            <div class="font-semibold mb-1">"All accounts, credentials, and workflows are handed over to me" · "so I can maintain it"</div>
+            <p class="text-sm text-slate-400">Built in your Make (or n8n), Anthropic and app accounts from day one, so there is nothing to transfer at the end. One written doc per workflow plus a recorded walkthrough, and every setting you might change lives in a Google Sheet rather than inside the scenario.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The build -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">One spine carries every workflow, shown here on a new lead</h2>
+        <p class="mt-5 text-slate-400 text-lg">
+          Your apps decide <em>when</em> a workflow runs. Make decides <em>what</em> happens. Claude decides only what needs
+          judgement. The control sheet decides <em>how</em>. Workflow 1 is assumed to be lead capture, qualification and follow-up until the map says otherwise.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Lane 1: inputs -->
+        <div class="bg-ink-900/60 border border-white/10 rounded-2xl p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Your inputs</span>
+          </div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">TRIGGER</div>
+            <div class="text-sm font-medium">Web form submits, or an enquiry lands in Gmail</div>
+            <div class="text-xs text-slate-500 mt-1">Same pattern for a WhatsApp message via your provider's webhook, or a PDF dropped in Drive.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">WEBHOOK</div>
+            <div class="text-sm font-medium">Payload sent to Make in JSON</div>
+            <div class="text-xs text-slate-500 mt-1">Form ID or Gmail message ID kept as the de-duplication key.</div>
+          </div>
+        </div>
+
+        <!-- Lane 2: Make -->
+        <div class="bg-ink-900/60 border border-accent-400/30 rounded-2xl p-6 shadow-xl shadow-accent-500/5">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-accent-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Make scenario (or n8n)</span>
+          </div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">1 · CHECK &amp; SETTINGS</div>
+            <div class="text-sm font-medium">Seen this ID before? Read the control sheet</div>
+            <div class="text-xs text-slate-500 mt-1">Duplicate → stop. Mode = off → log and stop.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">2 · CLAUDE</div>
+            <div class="text-sm font-medium">Score the lead against your criteria, draft the first reply</div>
+            <div class="text-xs text-slate-500 mt-1">Returns fixed JSON: score, reason, budget, timeline, service, draft.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">3 · VALIDATE</div>
+            <div class="text-sm font-medium">Every field checked before anything is written</div>
+            <div class="text-xs text-slate-500 mt-1">Missing or malformed → one retry, then the review queue.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+            <div class="text-xs font-mono text-accent-400 mb-1">4 · ROUTE</div>
+            <div class="text-sm font-medium">Hot, warm or not a fit, using the thresholds in the sheet</div>
+          </div>
+        </div>
+
+        <!-- Lane 3: outputs -->
+        <div class="bg-ink-900/60 border border-white/10 rounded-2xl p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Back in your tools</span>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <div class="bg-white/[0.04] border border-accent-400/30 rounded-lg p-4">
+              <div class="text-xs font-mono text-accent-400 mb-1">HOT</div>
+              <div class="text-sm font-medium">CRM record created, Slack ping to the owner with the reason</div>
+              <div class="text-xs text-slate-500 mt-1">Follow-up email sent, or held as a draft while mode = draft.</div>
+            </div>
+            <div class="bg-white/[0.04] border border-amber-400/30 rounded-lg p-4">
+              <div class="text-xs font-mono text-amber-300 mb-1">WARM</div>
+              <div class="text-sm font-medium">CRM record + follow-up sequence, no ping</div>
+            </div>
+            <div class="bg-white/[0.04] border border-white/10 rounded-lg p-4">
+              <div class="text-xs font-mono text-slate-400 mb-1">NOT A FIT</div>
+              <div class="text-sm font-medium">Polite reply drafted, record tagged, nobody interrupted</div>
+            </div>
+            <div class="mt-2 pt-4 border-t border-white/10">
+              <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">Then, in every case</div>
+              <ul class="space-y-2 text-sm text-slate-300">
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> Row written to the Log tab</li>
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> Any failed step → Errors tab + alert</li>
+                <li class="flex gap-2"><span class="text-accent-400">✓</span> Item parked for a person, never dropped</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Same spine, other use cases -->
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">The same spine, bent to your other use cases</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div>
+            <div class="font-medium">Customer support replies</div>
+            <p class="text-slate-400 mt-1">Gmail or WhatsApp in, Claude drafts from your FAQ doc, reply waits for approval in Slack until you trust it enough to switch to live.</p>
+          </div>
+          <div>
+            <div class="font-medium">Data extraction</div>
+            <p class="text-slate-400 mt-1">Invoice, order or application PDF in, Claude pulls the fields you name into a fixed schema, row lands in Google Sheets or the CRM.</p>
+          </div>
+          <div>
+            <div class="font-medium">Scheduled reporting</div>
+            <p class="text-slate-400 mt-1">Monday 8am, Make pulls last week's numbers, Claude writes the summary, it goes to a review step and then to Slack or Notion.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Control sheet -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-5 gap-12 items-start">
+        <div class="md:col-span-2">
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Control sheet</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">You maintain it from a spreadsheet, not from inside Make</h2>
+          <p class="text-slate-400 leading-relaxed mb-6">
+            Each workflow reads one Google Sheet at the start of every run, so a change takes effect on the next lead or
+            email. Thresholds, wording and who gets alerted are yours to edit. Nobody has to open a scenario.
+          </p>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Settings</span> — mode per workflow, score thresholds, alert channel, daily caps.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Prompts</span> — what Claude is told, in plain English: your ideal lead, your tone, your FAQ.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Review</span> — drafts and anything uncertain, waiting for a person to approve.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Log</span> — every run: time, workflow, input, decision, outcome.</div></li>
+            <li class="flex gap-3"><span class="text-accent-400 mt-0.5">▸</span><div><span class="font-medium">Errors</span> — what failed and what to do, in a sentence, so you can see it without asking me.</div></li>
+          </ul>
+        </div>
+
+        <div class="md:col-span-3">
+          <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-ink-800/60">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-400/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-green-400/70"></span>
+              <span class="ml-3 text-xs text-slate-400 font-mono">Automation Control · Google Sheets</span>
+            </div>
+            <div class="flex border-b border-white/10 text-xs overflow-x-auto">
+              <div class="px-4 py-2 bg-white/5 text-white border-r border-white/10 font-medium">Settings</div>
+              <div class="px-4 py-2 text-slate-500 border-r border-white/10">Prompts</div>
+              <div class="px-4 py-2 text-slate-500 border-r border-white/10">Review</div>
+              <div class="px-4 py-2 text-slate-500 border-r border-white/10">Log</div>
+              <div class="px-4 py-2 text-slate-500">Errors</div>
+            </div>
+            <div class="font-mono text-sm">
+              <div class="grid grid-cols-12 text-xs text-slate-500 border-b border-white/10 px-4 py-2">
+                <div class="col-span-5">A · Setting</div>
+                <div class="col-span-4">B · Value</div>
+                <div class="col-span-3">C · Allowed</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-5 text-slate-300">leads.mode</div>
+                <div class="col-span-4"><span class="bg-amber-400/15 text-amber-300 px-2 py-0.5 rounded">draft</span></div>
+                <div class="col-span-3 text-slate-500 text-xs">draft · live · off</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-5 text-slate-300">leads.hot_score</div>
+                <div class="col-span-4 text-white">8</div>
+                <div class="col-span-3 text-slate-500 text-xs">1–10</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-5 text-slate-300">leads.alert_channel</div>
+                <div class="col-span-4 text-white truncate">#new-leads</div>
+                <div class="col-span-3 text-slate-500 text-xs">Slack channel</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-5 text-slate-300">support.mode</div>
+                <div class="col-span-4"><span class="bg-amber-400/15 text-amber-300 px-2 py-0.5 rounded">draft</span></div>
+                <div class="col-span-3 text-slate-500 text-xs">draft · live · off</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3 border-b border-white/5">
+                <div class="col-span-5 text-slate-300">ai.daily_call_cap</div>
+                <div class="col-span-4 text-white">300</div>
+                <div class="col-span-3 text-slate-500 text-xs">number</div>
+              </div>
+              <div class="sheet-row grid grid-cols-12 px-4 py-3">
+                <div class="col-span-5 text-slate-300">errors.alert_to</div>
+                <div class="col-span-4 text-white truncate">you@yourbusiness.com</div>
+                <div class="col-span-3 text-slate-500 text-xs">email or Slack</div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Illustrative. Column C is a dropdown so invalid values can't be typed. Rather keep settings in Notion or Airtable? Same design, different home.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reliability -->
+  <section id="reliability" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Reliability</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so a failure is caught the same day, not next month</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">01</div>
+          <h3 class="font-semibold mb-2">Fails to a person, never to silence</h3>
+          <p class="text-sm text-slate-400">If Claude, the CRM or Gmail errors, an error handler on that step writes the Errors row, sends the alert and parks the item in Review. The lead is still there on Monday.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">02</div>
+          <h3 class="font-semibold mb-2">No duplicates when a form fires twice</h3>
+          <p class="text-sm text-slate-400">Each item's source ID goes into a Make data store on first sight. A double-submit or webhook retry is logged and skipped, so nobody gets two follow-up emails.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">03</div>
+          <h3 class="font-semibold mb-2">AI output checked before it's trusted</h3>
+          <p class="text-sm text-slate-400">Claude answers in a fixed JSON shape. A missing field or a score out of range never reaches your CRM; it gets one retry, then goes to Review.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">04</div>
+          <h3 class="font-semibold mb-2">Human review where your brand is on the line</h3>
+          <p class="text-sm text-slate-400">Customer replies and generated content start in draft mode. You read a week of drafts, then flip one cell to live. Generated reports keep a review step for good, as your brief asks.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">05</div>
+          <h3 class="font-semibold mb-2">Costs that can't run away</h3>
+          <p class="text-sm text-slate-400">A daily cap on AI calls sits in the sheet. If a loop or a spam burst hits it, workflows switch to log-and-park and you get one alert, not a bill.</p>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-xl p-6">
+          <div class="w-9 h-9 rounded-lg bg-accent-500/15 text-accent-400 flex items-center justify-center mb-4 font-mono text-sm">06</div>
+          <h3 class="font-semibold mb-2">Yours from day one</h3>
+          <p class="text-sm text-slate-400">Scenarios, API keys and connections are created under your logins. Handover is a checklist, not a migration. If we part ways, nothing stops working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Milestones -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-14">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your three milestones, three weeks</h2>
+        <p class="mt-5 text-slate-400 text-lg">Each milestone ends with something you can click on in your own accounts. Short written progress update every two working days.</p>
+      </div>
+
+      <div class="space-y-6">
+        <div class="relative step-line pl-14">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h3 class="text-xl font-semibold">Automation map, and workflow 1 live</h3>
+              <span class="text-xs font-mono text-slate-400 bg-white/5 px-2 py-1 rounded">Days 1–7</span>
+            </div>
+            <p class="text-slate-400 mb-4">A 60-minute process review call (or a Loom of you doing the tasks). I write up every candidate: hours per week now, trigger, apps, whether AI is needed, running cost, risk. You pick up to three. Control sheet, shared error path and alerts set up, then workflow 1 built and running on real data in draft mode.</p>
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">You'll see</div>
+            <p class="text-sm text-slate-300">The written map in your inbox, and a real enquiry landing scored in your CRM with a Slack ping and a drafted reply.</p>
+          </div>
+        </div>
+
+        <div class="relative step-line pl-14">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h3 class="text-xl font-semibold">Workflows 2 and 3 running, error paths proven</h3>
+              <span class="text-xs font-mono text-slate-400 bg-white/5 px-2 py-1 rounded">Days 8–15</span>
+            </div>
+            <p class="text-slate-400 mb-4">The next two workflows from the map, built on the same spine and run on real data. Then I break things on purpose: expired connection, malformed PDF, duplicate submit, Claude timeout, cap reached. Each one has to show up in Errors and alert you.</p>
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">You'll see</div>
+            <p class="text-sm text-slate-300">All three workflows writing to the Log tab, and a short screen recording of each forced failure arriving as an alert.</p>
+          </div>
+        </div>
+
+        <div class="relative step-line pl-14">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h3 class="text-xl font-semibold">Sign-off against your definition of done, and handover</h3>
+              <span class="text-xs font-mono text-slate-400 bg-white/5 px-2 py-1 rounded">Days 16–21</span>
+            </div>
+            <p class="text-slate-400 mb-4">A run of real items through every workflow with no manual fixes, switched to live where you approve it. One written doc per workflow (what it does, each step, what an alert means and what to do). A recorded walkthrough call. Credentials checklist confirmed. One month of bug fixes and small adjustments starts that day.</p>
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">You'll see</div>
+            <p class="text-sm text-slate-300">Your five definition-of-done lines ticked one by one, with the evidence for each.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid, at your budget</h2>
+        <p class="mt-5 text-slate-400 text-lg">One number, paid against your three milestones. Nothing up front.</p>
+      </div>
+
+      <div class="bg-ink-800 border border-accent-400/30 rounded-2xl overflow-hidden shadow-2xl shadow-accent-500/10">
+        <div class="p-8 md:p-10 border-b border-white/10 text-center">
+          <div class="text-sm text-slate-400 uppercase tracking-wider mb-2">Total project</div>
+          <div class="text-5xl md:text-6xl font-bold tracking-tight">
+            <span class="text-accent-400">$1,500</span>
+            <span class="text-slate-500 text-2xl font-normal ml-2">USD</span>
+          </div>
+          <div class="text-sm text-slate-400 mt-3">Fixed price · 3 weeks · paid per milestone</div>
+        </div>
+
+        <div class="p-8 md:p-10">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center gap-4 py-3 border-b border-white/5">
+              <div>
+                <div class="font-medium">M1 — Automation map + workflow 1 live</div>
+                <div class="text-xs text-slate-500">Due when the map is delivered and a real item runs through workflow 1</div>
+              </div>
+              <div class="font-mono font-semibold">$600</div>
+            </div>
+            <div class="flex justify-between items-center gap-4 py-3 border-b border-white/5">
+              <div>
+                <div class="font-medium">M2 — Workflows 2 and 3, error paths proven</div>
+                <div class="text-xs text-slate-500">Due when all three run on real data and each forced failure alerts you</div>
+              </div>
+              <div class="font-mono font-semibold">$500</div>
+            </div>
+            <div class="flex justify-between items-center gap-4 py-3">
+              <div>
+                <div class="font-medium">M3 — Sign-off, docs, walkthrough, 1 month support</div>
+                <div class="text-xs text-slate-500">Due on your confirmation against the definition of done</div>
+              </div>
+              <div class="font-mono font-semibold">$400</div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-white/10">
+            <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">What's included</div>
+            <div class="grid md:grid-cols-2 gap-2 text-sm text-slate-300">
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Process review and written automation map</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Up to three workflows, built and tested</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Claude steps with validated JSON output</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Control sheet: settings, prompts, review, log</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Shared error handling, Errors tab, alerts</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> One written doc per workflow</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> Recorded walkthrough call</div>
+              <div class="flex gap-2"><span class="text-accent-400">✓</span> One month of bug fixes and small adjustments</div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-white/10 text-sm text-slate-400 leading-relaxed">
+            <span class="text-slate-200 font-medium">What "a workflow" means here.</span>
+            One trigger, up to four connected apps and one or two Claude steps: the size of anything on your typical use-cases list.
+            If the map turns up something bigger, like a full multi-turn WhatsApp chatbot or a custom-coded integration, I'll price
+            it in writing before building and you decide. Extra workflows of the same size are quoted fixed in the map, from $400 each.
+          </div>
+        </div>
+      </div>
+
+      <!-- Running costs -->
+      <div class="mt-10">
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-4 text-center">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <div class="text-xs text-slate-500 mb-1">Anthropic (Claude API)</div>
+            <div class="font-semibold mb-1">~1 cent per lead, a few cents per PDF</div>
+            <p class="text-xs text-slate-400">Estimate. The map prices it against your real monthly volumes, and the daily cap keeps it bounded.</p>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <div class="text-xs text-slate-500 mb-1">Make, or n8n</div>
+            <div class="font-semibold mb-1">Make Core, roughly $10–20 / month</div>
+            <p class="text-xs text-slate-400">At small-business volumes. Self-hosted n8n is a small server instead; I'll size whichever you choose in week one.</p>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <div class="text-xs text-slate-500 mb-1">Sheets / Gmail / Slack / Notion / CRM</div>
+            <div class="font-semibold mb-1 text-accent-400">$0 added</div>
+            <p class="text-xs text-slate-400">Uses what you already pay for. Your CRM plan needs API access; WhatsApp needs a Business API provider.</p>
+          </div>
+        </div>
+        <p class="mt-6 text-center text-xs text-slate-500">If you plan to keep adding workflows after the support month, an optional $500 / month covers up to four hours of improvements. Not needed to start.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Worked examples -->
+  <section id="examples" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-3xl mb-12">
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+        <p class="mt-5 text-slate-400 text-lg">
+          Illustrative scenarios, not client case studies. They show how the same spine, a trigger, Make in the middle,
+          Claude on the judgement step, an owner-editable sheet and a shared error path, bends to different businesses.
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-ink-800 border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 mb-3">WORKED EXAMPLE · RECRUITMENT AGENCY</div>
+          <h3 class="text-lg font-semibold mb-3">CVs from Gmail into the CRM, scored against the live job</h3>
+          <p class="text-sm text-slate-400 leading-relaxed mb-4">
+            Applications arrive as Gmail attachments. Make picks up each email, Claude extracts name, contact details,
+            notice period, salary and skills from the CV into a fixed schema, then scores the candidate against the job
+            spec held in the sheet. Strong matches create a CRM record and ping the consultant in Slack; weak ones are
+            filed with a reason. A CV that won't parse goes to Review with the original attached, so nobody is lost.
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Document extraction</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Scoring against criteria</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Parse failure to Review</span>
+          </div>
+        </div>
+        <div class="bg-ink-800 border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 mb-3">WORKED EXAMPLE · HOME-SERVICES COMPANY</div>
+          <h3 class="text-lg font-semibold mb-3">Web enquiries answered in minutes, Monday report written for you</h3>
+          <p class="text-sm text-slate-400 leading-relaxed mb-4">
+            Quote requests come from a website form at all hours. Claude reads the job description, tags service type,
+            urgency and postcode, and drafts a reply with the next available survey slots from the sheet. The owner
+            approves drafts in Slack for the first week, then switches to live. Every Monday a second scenario counts the
+            week's enquiries by source and outcome, Claude writes three lines on what changed, and it lands in Slack after a quick review.
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Lead qualification</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Draft-then-live replies</span>
+            <span class="bg-white/5 border border-white/10 px-2 py-1 rounded">Scheduled reporting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section id="questions" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Four things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div>
+            <div class="font-medium mb-1">Which task eats the most hours each week right now?</div>
+            <p class="text-sm text-slate-400">That becomes workflow 1. If you're unsure, I'll assume lead capture, qualification and follow-up, because a slow reply to a lead costs money every day it stays manual.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div>
+            <div class="font-medium mb-1">Are you already paying for Make, n8n or Zapier, and do you want self-hosting?</div>
+            <p class="text-sm text-slate-400">Default is Make in your account: visual, quick to hand over, and cheaper than Zapier at multi-step volumes. n8n if you want self-hosting or heavier custom code. Zapier only if your team already lives in it.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div>
+            <div class="font-medium mb-1">Which CRM, and does your plan include API access?</div>
+            <p class="text-sm text-slate-400">Some entry-level CRM plans lock the API. If yours does, I'll tell you before kickoff, and the fallback is a Google Sheet as the lead record until you upgrade.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 bg-ink-900 border border-white/10 rounded-xl p-5">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q4</div>
+          <div>
+            <div class="font-medium mb-1">Is WhatsApp in scope, and through which provider?</div>
+            <p class="text-sm text-slate-400">Automated WhatsApp needs the Business API through a provider such as respond.io or Twilio, not the phone app. If you don't have one yet, I'll keep WhatsApp out of the first three and leave it on the map as the next build.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="grid md:grid-cols-3 gap-10 items-start">
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+          <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+        </div>
+        <div class="md:col-span-2 space-y-4 text-slate-300 leading-relaxed">
+          <p>
+            I'm Kristof. I build automation systems for people who'd rather not think about them: Make as the
+            orchestration layer, the Claude API for the steps that need judgement, and a spreadsheet for every setting the
+            owner might touch. Lead response and follow-up for service businesses is my core focus.
+          </p>
+          <p>
+            Two past builds map closely onto your list. An AI report pipeline that takes raw data in and produces a
+            finished, client-ready deck with no hand editing, which is your "content and report generation" case. And a
+            WhatsApp assistant on respond.io, Make and Claude that answers leads on Saturdays and hands them to a named
+            person, with every owner setting in a Google Sheet. Both use structured Claude output and the same
+            fail-to-a-person error path you see above.
+          </p>
+          <p class="text-slate-400 italic">
+            I'd rather show you than tell you: happy to walk you through either build on a call before you commit.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send a short list of the tasks you'd most like gone, the apps you use today, and a time for the process review call.
+        I'll come back inside 48 hours with the kickoff date and the day your first workflow goes live.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">
+        kristof@getflowtive.com · Proposal valid for 30 days
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your growing business</div>
+      <div>AI Workflow Automations Proposal</div>
+    </div>
+  </footer>
+
+</body>
+</html>
