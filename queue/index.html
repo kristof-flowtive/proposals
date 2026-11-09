@@ -52,11 +52,11 @@
   </header>
 
   <h1>Upwork queue</h1>
-  <p class="sub">Paste a job. It is picked up by the morning pipeline and the proposal is waiting when you get to your desk.</p>
+  <p class="sub">Paste a job. The link is optional (the Upwork app hides it); the posting text is what matters. It is picked up by the morning pipeline and the proposal is waiting when you get to your desk.</p>
 
   <form id="f" autocomplete="off">
-    <label for="link">Upwork link</label>
-    <input id="link" type="url" inputmode="url" placeholder="https://www.upwork.com/jobs/~0…" required />
+    <label for="link">Upwork link (optional)</label>
+    <input id="link" type="url" inputmode="url" placeholder="https://www.upwork.com/jobs/~0… or leave blank on the phone" />
     <label for="posting">Job posting (title, description, budget, screening questions)</label>
     <textarea id="posting" placeholder="Paste the whole posting here" required></textarea>
     <label for="note">Note to Claude (optional)</label>
@@ -93,7 +93,7 @@
   function render() {
     const q = load();
     $("queue").hidden = q.length === 0;
-    $("items").innerHTML = q.map((j) => `<div class="item"><span>${j.link.replace(/^https?:\/\/(www\.)?/, "")}</span><b>queued</b></div>`).join("");
+    $("items").innerHTML = q.map((j) => `<div class="item"><span>${(j.link ? j.link.replace(/^https?:\/\/(www\.)?/, "") : (j.posting.split("\n")[0] || "job")).slice(0, 80)}</span><b>queued</b></div>`).join("");
     $("net").textContent = navigator.onLine ? (q.length ? `${q.length} queued` : "online") : `offline · ${q.length} queued`;
     $("net").className = "pill" + (q.length ? " q" : "");
   }
