@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — WhatsApp Lead &amp; Booking System (GHL + Claude)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    section[id] { scroll-margin-top: 4rem; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">The System</a>
+        <a href="#controls" class="hover:text-white transition">Per-Client Template</a>
+        <a href="#proof" class="hover:text-white transition">Proof</a>
+        <a href="#milestones" class="hover:text-white transition">Pilot</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your marketing agency
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Convert more WhatsApp and ad enquiries into <span class="text-accent-400">qualified appointments</span>, on GoHighLevel and Claude, built once and deployed per client.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Piloted inside your own agency first and measured against a baseline from day one, so the pilot produces the case study you sell with.
+        One template, one config sheet per client, and your clients' teams still run every consultation and close every sale.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the system</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View pilot and partner pricing</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">4 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Pilot in your agency</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Before / after</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Measured from day one</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">1 template</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Config sheet per client</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,000</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed pilot · 3 milestones</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 UNDERSTANDING -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">
+        Your ads already make the phone buzz. Then the responsibility is passed to the business owner or salesperson, and that is where it leaks:
+        leads aren't responded to quickly enough, enquiries aren't properly qualified, and nobody follows up. You want to sell a fully managed fix to
+        Singapore service businesses, where WhatsApp is one of the primary channels, without becoming the technical support desk yourself.
+      </p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-accent-500/30 rounded-xl p-6 md:col-span-2">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your most important requirement, answered straight</div>
+          <h3 class="font-semibold text-lg">"Proven results" and "how much of the improvement can reasonably be attributed to the system"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">
+            I don't have a published client case study with before-and-after numbers to show you yet, and I won't dress one up. What I do have is a past
+            WhatsApp AI build I can walk you through, a design built specifically for this kind of service business, and a pilot that measures itself:
+            a baseline from your last 60 days of enquiries, the same metrics after go-live, and a written note on what the system can and can't take credit for.
+            That report is the case study you take to your first client. <a href="#proof" class="text-accent-400 underline underline-offset-2">How it's measured</a>.
+          </p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Respond instantly to new enquiries through WhatsApp"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Every form, Meta lead ad and WhatsApp message gets a reply in under a minute, 24/7, answering services, pricing, process and availability from that client's own FAQ, never from guesswork.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"I don't want AI to completely replace human salespeople"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">The AI qualifies and books; the consultation, relationship-building and closing stay with the owner or sales team. Handover rules (asks for a person, complaint, out-of-scope, high-value job) live in each client's sheet.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Without requiring a complete rebuild for every new client"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">One GHL snapshot, one Claude relay, one config sheet row per client. A new aesthetic clinic or waterproofing contractor is a clone plus a filled-in sheet, answering leads in draft mode within 3–5 working days.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"I'm not a technical person"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">I own the backend: deployment, monitoring, fixes and improvements. You see results in a dashboard and a weekly summary, and never have to open Make, n8n or a WhatsApp template manager.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 THE SYSTEM -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The system</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Enquiry to booked consultation, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">
+        GoHighLevel holds the leads, the calendar and the WhatsApp channel. Make relays each message to Claude and back. The client's config sheet decides what Claude knows and when a human takes over.
+      </p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <!-- Lane 1 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Capture · GoHighLevel</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Trigger</div>
+            <div class="font-medium">Enquiry arrives</div>
+            <div class="text-xs text-slate-400 mt-1">WhatsApp message, Meta lead ad, landing page or website form (Google Ads traffic lands here).</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">CRM</div>
+            <div class="font-medium">Contact created, source tagged</div>
+            <div class="text-xs text-slate-400 mt-1">UTM / campaign / form name kept, so booking rate can be split by ad source later.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Pipeline</div>
+            <div class="font-medium">Stage: New → AI engaged</div>
+            <div class="text-xs text-slate-400 mt-1">Form leads get a first WhatsApp template message, which opens the conversation.</div>
+          </div>
+        </div>
+
+        <!-- Lane 2 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">AI layer · Make + Claude</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">1 · Batch</div>
+            <div class="font-medium">Wait for the burst of messages to end</div>
+            <div class="text-xs text-slate-400 mt-1">Four quick WhatsApp messages get one considered reply, not four.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">2 · Config</div>
+            <div class="font-medium">Read this client's row in the config sheet</div>
+            <div class="text-xs text-slate-400 mt-1">Services, price guidance, FAQ, qualifying questions, area, handover rules, mode.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">3 · Claude</div>
+            <div class="font-medium">Answer, qualify, offer a slot</div>
+            <div class="text-xs text-slate-400 mt-1">Requirements, budget, timeline, interest. Tools: check availability, book, hand over. Prompt caching keeps cost per reply in cents.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">4 · Write back</div>
+            <div class="font-medium">Reply sent, fields and stage updated in GHL</div>
+            <div class="text-xs text-slate-400 mt-1">Mode = draft posts it as an internal note for your team to approve instead.</div>
+          </div>
+        </div>
+
+        <!-- Lane 3 -->
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Booking &amp; follow-up · GHL + WhatsApp templates</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Book</div>
+            <div class="font-medium">Consultation, appointment or site visit in the GHL calendar</div>
+            <div class="text-xs text-slate-400 mt-1">Synced to the owner's Google or Outlook calendar. Round-robin if there are several reps.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Remind</div>
+            <div class="font-medium">Confirmation, day-before and morning-of reminders</div>
+            <div class="text-xs text-slate-400 mt-1">Approved utility templates with a reschedule link. Reply "reschedule" and Claude finds a new slot.</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Recover &amp; nurture</div>
+            <div class="font-medium">No-show rebook, silent-lead chase, post-consultation follow-up</div>
+            <div class="text-xs text-slate-400 mt-1">Day 1 / 3 / 7 / 14 for non-responders, monthly for "not yet", re-engagement only for leads who consented.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, in every conversation</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>A one-line AI summary on the contact, so the salesperson walks into the consultation knowing the job, budget and timeline</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Handover to a named person in GHL (with a mobile app notification) whenever a handover rule fires</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Pipeline stage moved: Qualified · Booked · Showed · No-show · Won / Lost</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>A row in the Log tab: time, client, contact, first-response seconds, outcome</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 PER-CLIENT TEMPLATE -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Per-client template</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Every new client is a clone and one filled-in row</h2>
+          <p class="text-slate-400 leading-relaxed">
+            The difference between a renovation company and an aesthetic clinic is content, not plumbing. So the plumbing is built once (GHL snapshot, one Make relay serving every client),
+            and everything that makes a client theirs lives in a config sheet that Make reads on every message. Change a price line and the next reply uses it.
+          </p>
+          <ul class="mt-6 space-y-3 text-sm text-slate-300">
+            <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Clients tab</strong> — one row per client: mode, WhatsApp number, calendar, handover person, reminder timings.</span></li>
+            <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Knowledge tab</strong> — services, price guidance, FAQ, service area, in plain English. Claude drafts it from the client's website; you or they correct it.</span></li>
+            <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Qualifying tab</strong> — the questions per industry (unit type for renovation, treatment area for clinics) and what counts as qualified.</span></li>
+            <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Log and Errors tabs</strong> — everything the AI did and anything that failed, in plain language, visible without asking me.</span></li>
+          </ul>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex flex-wrap gap-2 items-center justify-between">
+            <span>Lead Engine Config · Google Sheets</span>
+            <span class="flex gap-3"><span class="text-white">Clients</span><span>Knowledge</span><span>Qualifying</span><span>Log</span><span>Errors</span></span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs font-mono">
+              <thead class="text-slate-500">
+                <tr><th class="text-left px-3 py-2 font-normal">client</th><th class="text-left px-3 py-2 font-normal">industry</th><th class="text-left px-3 py-2 font-normal">mode</th><th class="text-left px-3 py-2 font-normal">booking_type</th><th class="text-left px-3 py-2 font-normal">handover_to</th></tr>
+              </thead>
+              <tbody>
+                <tr class="sheet-row"><td class="px-3 py-2 text-slate-300">your-agency</td><td class="px-3 py-2 text-slate-400">marketing</td><td class="px-3 py-2 text-accent-400">live</td><td class="px-3 py-2 text-slate-400">strategy call</td><td class="px-3 py-2 text-slate-400">founder</td></tr>
+                <tr class="sheet-row"><td class="px-3 py-2 text-slate-300">client-02</td><td class="px-3 py-2 text-slate-400">aesthetics</td><td class="px-3 py-2 text-accent-400">draft</td><td class="px-3 py-2 text-slate-400">consultation</td><td class="px-3 py-2 text-slate-400">clinic manager</td></tr>
+                <tr class="sheet-row"><td class="px-3 py-2 text-slate-300">client-03</td><td class="px-3 py-2 text-slate-400">renovation</td><td class="px-3 py-2 text-accent-400">live</td><td class="px-3 py-2 text-slate-400">site visit</td><td class="px-3 py-2 text-slate-400">designer on rota</td></tr>
+                <tr class="sheet-row"><td class="px-3 py-2 text-slate-300">client-04</td><td class="px-3 py-2 text-slate-400">waterproofing</td><td class="px-3 py-2 text-slate-500">off</td><td class="px-3 py-2 text-slate-400">inspection</td><td class="px-3 py-2 text-slate-400">owner</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative rows. Mode is a dropdown (draft · live · off). n8n can replace Make if you prefer it; the sheet stays the same.</div>
+        </div>
+      </div>
+
+      <div class="mt-14">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Who does what, per client</div>
+        <div class="grid md:grid-cols-4 gap-4 text-sm">
+          <div class="bg-ink-900 border border-accent-500/30 rounded-xl p-5">
+            <div class="font-semibold text-accent-400">The AI</div>
+            <p class="mt-2 text-slate-400 leading-relaxed">Answers, qualifies, books, reminds, chases and rebooks. Drafts the client's knowledge tab from their website. Drafts the weekly summary.</p>
+          </div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-5">
+            <div class="font-semibold">Me</div>
+            <p class="mt-2 text-slate-400 leading-relaxed">Clone, connect the number, review the AI's drafts, test, go live. Transcript spot-checks, fixes, prompt updates. About 4–6 hours to launch, under 2 a month after.</p>
+          </div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-5">
+            <div class="font-semibold">Your agency</div>
+            <p class="mt-2 text-slate-400 leading-relaxed">Sells the service, runs Google and Meta ads, owns the client relationship, reads the dashboard with the client.</p>
+          </div>
+          <div class="bg-ink-900 border border-white/10 rounded-xl p-5">
+            <div class="font-semibold">The client's team</div>
+            <p class="mt-2 text-slate-400 leading-relaxed">Turns up to booked consultations and site visits, picks up handovers in the GHL app, closes the sale, marks won or lost.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 WHATSAPP IN SINGAPORE -->
+  <section id="whatsapp" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — WhatsApp in Singapore</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">The platform rules are designed in, not discovered mid-build</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">
+        Most "AI WhatsApp bots" are demoed inside a conversation the tester started. Reminders, no-show follow-ups and old-lead re-engagement are the opposite case, and they run on different rules.
+      </p>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">The 24-hour window</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">After a lead messages, the business can reply freely for 24 hours. Claude handles the live conversation inside that window; nothing outside it is sent as free text.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">Templates for everything after</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Reminders, no-show rebooks, chases and form-lead first touches go out as Meta-approved templates. The snapshot ships with a tested set per industry, submitted on day one of each client because approval takes time.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">One number per client business</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Each client gets their own WhatsApp Business number under their own Meta business, in their display name. Leads see the clinic, not your agency, and the number stays theirs.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Meta's fees are per template message</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Replies inside the window cost nothing from Meta; templates are charged per message by category at Singapore rates. Follow-up cadences are set with that in mind, and each client's monthly fee estimate is in the pilot report.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">PDPA consent before re-engagement</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">"Re-engage old leads" is marketing under the PDPA and the Do Not Call rules. New forms capture consent explicitly; old lists are only messaged where consent is on record, which we check per client before anything is sent.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Existing WhatsApp numbers</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Many clients already use the WhatsApp Business app on their main number. Whether to move that number onto the API, use coexistence, or add a new number is a per-client call I'll make with you at onboarding.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 PROOF -->
+  <section id="proof" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Proof</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">The pilot measures itself, so it becomes your case study</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">
+        You asked what was achieved, how it was measured and how much is attributable. Those three questions are the spec for the pilot report, and the same measurement is built into every client you deploy afterwards.
+      </p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono">Pilot report · metric definitions</div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="text-xs text-slate-500 font-mono">
+                <tr><th class="text-left px-4 py-2 font-normal">Metric</th><th class="text-left px-4 py-2 font-normal">Defined as</th><th class="text-left px-4 py-2 font-normal">Baseline from</th></tr>
+              </thead>
+              <tbody>
+                <tr class="sheet-row"><td class="px-4 py-3 font-medium">Median first response</td><td class="px-4 py-3 text-slate-400">Enquiry timestamp to first reply</td><td class="px-4 py-3 text-slate-400">WhatsApp and inbox timestamps, last 60 days</td></tr>
+                <tr class="sheet-row"><td class="px-4 py-3 font-medium">Qualified rate</td><td class="px-4 py-3 text-slate-400">Leads meeting the written criteria ÷ all leads</td><td class="px-4 py-3 text-slate-400">Same criteria applied to past enquiries</td></tr>
+                <tr class="sheet-row"><td class="px-4 py-3 font-medium">Booking rate</td><td class="px-4 py-3 text-slate-400">Booked consultations ÷ all leads</td><td class="px-4 py-3 text-slate-400">Your calendar, last 60 days</td></tr>
+                <tr class="sheet-row"><td class="px-4 py-3 font-medium">Show rate</td><td class="px-4 py-3 text-slate-400">Attended ÷ booked</td><td class="px-4 py-3 text-slate-400">Calendar plus your notes</td></tr>
+                <tr class="sheet-row"><td class="px-4 py-3 font-medium">Recovered leads</td><td class="px-4 py-3 text-slate-400">Booked after a chase or no-show message</td><td class="px-4 py-3 text-slate-400">Zero by definition, tagged per message</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Every rate is reported with its count ("14 of 52"), never as a bare percentage.</div>
+        </div>
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <h3 class="font-semibold">What's cleanly attributable</h3>
+            <p class="mt-2 text-sm text-slate-400 leading-relaxed">Response time and recovered leads. The system either replied in 40 seconds or it didn't, and a rebooked no-show is tagged with the message that recovered it.</p>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <h3 class="font-semibold">What needs caveats</h3>
+            <p class="mt-2 text-sm text-slate-400 leading-relaxed">Booking and show rates also move with ad spend, offer, season and lead volume. The report records spend and campaigns over both periods, and flags any change that muddies the comparison.</p>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+            <h3 class="font-semibold">If the numbers are small</h3>
+            <p class="mt-2 text-sm text-slate-400 leading-relaxed">Your agency's own lead volume may be modest. If so, the report says so, and your first client (with the same measurement on) becomes the stronger case study. An optional holdout, some leads handled the old way, gives the cleanest read if you want it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 RELIABILITY -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Reliability</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so no enquiry is dropped silently, in any client account</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">Fails to the client's team, never to silence</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If Claude, Make or the sheet errors, the lead is still assigned in GHL with a note that the AI couldn't answer, and the Errors tab and my alert fire.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">No invented prices or promises</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Claude only quotes what the Knowledge tab says ("from $X, final quote at the site visit"). A question it can't answer from the sheet is a handover, not a guess.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Draft mode for every new client</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">New clients start in draft: the AI writes, the team approves inside GHL. Switching to live is one cell in the sheet, once a week of drafts reads right.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Caps against loops and runaway cost</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">A per-conversation lock stops double replies, and a daily reply cap per client sends everything to handover-only if something unusual starts happening.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Singapore hours, UK support</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Singapore is 8 hours ahead of me, so the system is built to run unattended through your day. My end-of-day update lands in your morning, and 4–6pm SGT is our overlap for calls.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">In your accounts, not mine</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">GHL agency, Make, Anthropic key and each client's Meta business sit under your or the client's ownership. If we part ways, nothing stops working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 MILESTONES -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The pilot</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your three pilot milestones, four weeks</h2>
+      <p class="mt-4 text-slate-400">Run inside your own agency, on your own leads. Each milestone ends with something you can click on or message.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Baseline and first WhatsApp replies</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–7</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">WhatsApp number and Meta business verification started on day one. GHL pipeline, forms and Meta lead ads wired in with source tagging. Make relay, config sheet and Claude running in draft mode. Baseline pulled from your last 60 days of enquiries.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your own WhatsApp number answering a test enquiry with a Claude draft inside GHL, and a one-page baseline of your current response time, booking rate and show rate.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Qualify, book, remind, hand over, then go live</h3>
+            <span class="text-xs font-mono text-slate-500">Days 8–16</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Qualification flow, calendar booking and rescheduling, confirmation and reminder templates approved, no-show rebook, handover rules. Tested against bursts, out-of-hours, "can I speak to someone", price questions not in the sheet, and Claude timeouts. Switched to live on real leads.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a test lead going from a Meta form to a booked strategy call in your calendar with reminders, and a "speak to a person" message landing with your named handover person.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Nurture, dashboard, template packaged</h3>
+            <span class="text-xs font-mono text-slate-500">Days 17–28</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Silent-lead chase, "not yet" nurture and post-consultation follow-up. GHL dashboard plus a weekly AI summary. Snapshot, config sheet and industry starter sets (aesthetics, renovation, cleaning, waterproofing) packaged for client one. Handover videos. One month of bug fixes from go-live, and a full 30-day readout after go-live.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your dashboard with live pilot numbers next to the baseline, and a clone-ready template you can sell from.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 PRICING -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">A fixed pilot, then a simple per-client partnership</h2>
+      <p class="mt-4 text-slate-400">You asked for three numbers: pilot, per-client implementation, ongoing support. Here they are.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Pilot in your agency</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,000</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 4 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Baseline and first WhatsApp replies</div><div class="text-xs text-slate-500">Due when your number answers a test enquiry in GHL</div></div>
+              <div class="font-mono text-accent-400">$400</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Qualify, book, remind, go live</div><div class="text-xs text-slate-500">Due when a test lead books itself with reminders</div></div>
+              <div class="font-mono text-accent-400">$350</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M3 — Nurture, dashboard, template packaged</div><div class="text-xs text-slate-500">Due on handover of the clone-ready template</div></div>
+              <div class="font-mono text-accent-400">$250</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>GHL pipeline, calendar, forms, Meta lead ads, WhatsApp</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Make relay + Claude with prompt caching</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Config sheet with Log and Errors tabs</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Reminder, no-show and follow-up templates</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Baseline, dashboard and 30-day pilot report</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Snapshot and four industry starter sets</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Handover videos and one month of bug fixes</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Built entirely in your accounts</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Each client after the pilot</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-4xl font-bold">$750</span><span class="text-slate-400 text-sm">USD per client, one-off</span></div>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">Clone, Claude-drafted knowledge tab reviewed, WhatsApp number and templates, forms and calendar connected and tested: answering in draft mode within 3–5 working days (Meta approval is the usual long pole), switched to live after a week of drafts that read right. Baseline taken at onboarding so every client gets its own before / after.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Technical support, per client</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-4xl font-bold">$300</span><span class="text-slate-400 text-sm">USD per client, monthly</span></div>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">Monitoring and alerts, bug fixes, transcript spot-checks, prompt and FAQ updates, template changes, and a monthly metrics report you can forward to the client. Cancel per client with 30 days' notice. You set your own resale price.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs, paid by you (or your clients) to the vendors</div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 text-sm">
+          <div><div class="font-medium">GoHighLevel</div><div class="text-accent-400 font-mono mt-1">$97–$297 / month</div><div class="text-xs text-slate-500 mt-1">One agency plan for all clients; the Unlimited tier covers unlimited sub-accounts. $0 added if you're already on it.</div></div>
+          <div><div class="font-medium">WhatsApp (Meta)</div><div class="text-accent-400 font-mono mt-1">Cents per template</div><div class="text-xs text-slate-500 mt-1">In-window replies free from Meta; reminders and follow-ups charged per message at Singapore rates. Any GHL WhatsApp add-on fee confirmed on our call.</div></div>
+          <div><div class="font-medium">Anthropic (Claude)</div><div class="text-accent-400 font-mono mt-1">~$0.05–0.15 per lead</div><div class="text-xs text-slate-500 mt-1">A whole qualification conversation with caching. 200 leads a month is roughly $10–30.</div></div>
+          <div><div class="font-medium">Make or n8n</div><div class="text-accent-400 font-mono mt-1">Entry paid plan</div><div class="text-xs text-slate-500 mt-1">One relay shared by every client. Self-hosted n8n is an option if you'd rather pay for a server than operations.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 WORKED EXAMPLES -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — The same template, two clients</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of the per-client config</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same snapshot and relay bend to two of your target industries by changing only the sheet.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Aesthetic clinic</div>
+          <h3 class="text-lg font-semibold mb-3">Instagram ad enquiries booked into consultations, with medical questions handed over</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            A lead taps a Meta ad and messages on WhatsApp at 11pm asking about a treatment price. Claude answers from the Knowledge tab ("from $X, the doctor confirms at consultation"),
+            asks the treatment area and preferred dates, and offers two consultation slots. Any question about suitability, side effects or medication triggers a handover to the clinic manager instead of an answer.
+            Two reminders and a rebook message after a no-show run on approved templates.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Price guidance from the sheet</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Handover keywords</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">No-show rebook</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Renovation company</div>
+          <h3 class="text-lg font-semibold mb-3">Google Ads form leads qualified by unit type and key date, then booked for a site visit</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            A homeowner fills in the landing page form. Within a minute a template opens a WhatsApp conversation; Claude asks HDB, condo or landed, the scope, the budget band and when they get their keys,
+            then books a site visit on the designer rota. Leads with key dates months away go into the monthly "not yet" nurture instead of the calendar.
+            After the site visit, an unsigned quote gets a follow-up at day 3 and day 10, and the designer is told when someone replies.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Form to WhatsApp</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Timeline-based routing</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Post-consultation chase</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 BEFORE KICKOFF -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">10 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Are you on GoHighLevel already, and which WhatsApp number should the pilot use?</div><div class="text-sm text-slate-400 mt-1">I'll assume no GHL yet (I'll set up the agency plan in your name) and a number your agency already uses on the WhatsApp Business app. Whether we move it to the API, use coexistence, or add a new one decides the day-one setup, so we settle it first, along with GHL's current WhatsApp pricing.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Can we pull 60 days of your past enquiries for the baseline?</div><div class="text-sm text-slate-400 mt-1">WhatsApp chat timestamps, form notifications and your calendar are enough. If the history is thin, we take a two-week manual baseline before switching to live, which pushes go-live back by a week.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">What counts as a qualified lead for your agency, and did old leads consent to marketing?</div><div class="text-sm text-slate-400 mt-1">I'll draft criteria (business type, monthly ad budget, timeline) for you to edit. Old-lead re-engagement only runs on contacts with consent on record; I'll assume none until you confirm how they were collected.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 NOTE ON ME -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">11 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof, trading as Flowtive. Speed-to-lead for appointment-driven service businesses is my core offer: instant response, AI qualification, calendar booking and persistent follow-up on a GoHighLevel backbone with Claude doing the conversations. Your brief describes that system almost line for line, with the white-label partnership you want on top.</p>
+        <p>A past build I can show you is a Saturday WhatsApp assistant on respond.io, Make and Claude, with every owner setting in a Google Sheet, draft and live modes, and a clean handover to a named person. I work directly with the Claude API, including prompt caching and multi-turn history, which is what keeps cost per lead in cents. I'm a Claude Certified Architect, and I build so things fail to a human with a note, never to silence.</p>
+        <p>What I won't claim is a published client case study, which is why the pilot is built to produce one. Happy to walk you through that past build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send the WhatsApp number you want to pilot on, your GHL login if you have one, and a rough export of the last 60 days of enquiries. I'll come back inside 48 hours with the kickoff date and the day your number answers its first test enquiry.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the pilot plan</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your marketing agency</div>
+      <div>WhatsApp Lead &amp; Booking System Proposal</div>
+    </div>
+  </footer>
+
+</body>
+</html>
