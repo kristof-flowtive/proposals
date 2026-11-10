@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Rent comp report automation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#approach" class="hover:text-white transition">Approach</a>
+        <a href="#flow" class="hover:text-white transition">The build</a>
+        <a href="#photos" class="hover:text-white transition">Photos</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your multifamily portfolio
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Your rent comp report in <span class="text-accent-400">minutes instead of hours</span>, filed by building and unit.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Drop in the Rentometer, SmartMLS, RI MLS and HelloData exports, and Claude reads them into clean comp rows. Your existing Claude template writes the commentary, and the same branded PDF comes out every time, ready to re-run weekly or every two weeks. Built in your own accounts.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the build</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">3 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">To handover</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">500+ units</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Organised by building</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">1 click</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">To re-run a report</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,500</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed price</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 UNDERSTANDING -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">Your Claude project already produces a report you like. The hours go into everything around it: exporting from three tools, your assistant checking and adding comps, uploading files and retyping changes into the chat, and doing it again next time from scratch. You want it reliable and repeatable, and organised for 100+ buildings.</p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Extract the comp data accurately"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Every comp Claude extracts lands as a row with its source file and page, and anything that fails a check (rent out of range, missing beds or baths, same address from two sources) is flagged for your assistant before the report is built.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Consistent every time"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Layout lives in a fixed branded template, not in a chat. Claude fills in the numbers and writes the commentary, so the wording adapts but the pages, fonts and order never change.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Organize by building and by unit"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Buildings, units, comps, reports and lead stats are linked records. Open a unit and you see every report it has ever had; the PDFs sit in a Drive folder per building and unit.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Simple enough for my team to run without technical knowledge"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Your team works in one screen: pick a unit, drop files, press Build report, review, press Send. Nobody opens Make or writes a prompt.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 APPROACH -->
+  <section id="approach" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — Recommended approach</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">A small app, with Claude inside it</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">A Claude Project is a good place to design a report. It isn't a good place to run 500 of them: it has no memory of last week's comps, can't run on a schedule, and lays out the page a little differently each time. So I'd keep your Claude template as the brain and give it a database, a fixed layout and a button.</p>
+
+      <div class="mt-10 bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[620px]">
+            <thead class="text-xs text-slate-500">
+              <tr><th class="text-left px-4 py-3 font-normal">What you need</th><th class="text-left px-4 py-3 font-normal">Claude Project</th><th class="text-left px-4 py-3 font-normal">Small app (recommended)</th></tr>
+            </thead>
+            <tbody class="text-slate-300">
+              <tr class="sheet-row"><td class="px-4 py-3">Same layout every time</td><td class="px-4 py-3 text-slate-400">Close, never identical</td><td class="px-4 py-3 text-accent-400">Fixed branded template</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-3">Organised by building and unit</td><td class="px-4 py-3 text-slate-400">Chats and uploads only</td><td class="px-4 py-3 text-accent-400">Linked records and Drive folders</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-3">Re-run weekly or every two weeks</td><td class="px-4 py-3 text-slate-400">Manual each time</td><td class="px-4 py-3 text-accent-400">Schedule per unit</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-3">Rentometer API, HelloData later</td><td class="px-4 py-3 text-slate-400">Not without custom tooling</td><td class="px-4 py-3 text-accent-400">Direct API pulls</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-3">Team can run it</td><td class="px-4 py-3 text-slate-400">Needs prompting skill</td><td class="px-4 py-3 text-accent-400">Buttons and a review step</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-3">You own it</td><td class="px-4 py-3 text-slate-400">Yes</td><td class="px-4 py-3 text-accent-400">Yes, every account is yours</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="mt-6 text-sm text-slate-500 max-w-3xl">The parts: an Airtable base with a simple Interface for your team, Make.com to run each step, the Claude API to read the exports and write the commentary, a PDF render service for the branded report, and Google Drive for the filed PDFs. No servers to host.</p>
+    </div>
+  </section>
+
+  <!-- 03 FLOW -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — The build</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Exports in, branded report out, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Your team decides which comps count, Claude does the reading and writing, and the template decides how it looks.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Airtable · your team</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Start</div>
+            <div class="font-medium">Pick the unit, drop the exports</div>
+            <div class="text-xs text-slate-400 mt-1">Rentometer, SmartMLS / RI MLS and HelloData PDFs, Excel files, Zillow and Apartments.com lead stats</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Or scheduled</div>
+            <div class="font-medium">Weekly or every two weeks per unit</div>
+            <div class="text-xs text-slate-400 mt-1">Re-pulls Rentometer and the latest lead stats, keeps last run's verified comps</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Make.com + Claude</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude · extract</div>
+            <div class="font-medium">Each export read into comp rows</div>
+            <div class="text-xs text-slate-400 mt-1">Address, beds, baths, sq ft, rent, source, date, page. Fixed JSON, checked before saving</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">API</div>
+            <div class="font-medium">Rentometer pulled directly</div>
+            <div class="text-xs text-slate-400 mt-1">HelloData added the same way once you have API access</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300 mb-1">Check</div>
+            <div class="font-medium">Duplicates merged, outliers flagged</div>
+            <div class="text-xs text-slate-400 mt-1">Same address from two sources becomes one comp; flagged rows wait for your assistant</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Report + Drive</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Review</div>
+            <div class="font-medium">Assistant ticks the comps to include</div>
+            <div class="text-xs text-slate-400 mt-1">Adds missing comps by hand in the same table</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude · write</div>
+            <div class="font-medium">Commentary from your existing template</div>
+            <div class="text-xs text-slate-400 mt-1">Your Claude project instructions become the prompt, word for word to start</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Output</div>
+            <div class="font-medium">Branded PDF, filed and ready to send</div>
+            <div class="text-xs text-slate-400 mt-1">Drive folder per building and unit, linked on the report record</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, on every report</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Each comp in the PDF traces back to its source file and page</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Photo placed next to its comp, with source and attribution</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Lead stats (calls, tours, interest) shown next to the unit's asking rent</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Previous reports kept, so you can compare this run with the last</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 CONTROLS -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Where it's organised</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Every building, unit and report in one base</h2>
+        <p class="text-slate-400 leading-relaxed">Airtable handles 100 buildings and 500 units comfortably, and your team sees it as a few simple screens. Settings like the report schedule, the comp radius and who gets the PDF live on the unit, so changing them is editing a cell.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Buildings</strong> — address, market, brand details for the report</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Units</strong> — beds, baths, asking rent, schedule, recipients</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Comps</strong> — every extracted comp with source, page and photo</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Reports</strong> — each run, its PDF link, status and date sent</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Errors</strong> — anything that failed, in plain English</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex flex-wrap gap-2 items-center justify-between">
+          <span>Rent comps · Airtable</span>
+          <span class="flex gap-3"><span>Buildings</span><span class="text-white">Units</span><span>Comps</span><span>Reports</span></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm font-mono min-w-[480px]">
+            <thead class="text-xs text-slate-500">
+              <tr><th class="text-left px-4 py-2 font-normal">Unit</th><th class="text-left px-4 py-2 font-normal">Schedule</th><th class="text-left px-4 py-2 font-normal">Last report</th><th class="text-left px-4 py-2 font-normal">Status</th></tr>
+            </thead>
+            <tbody>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Bldg 014 · 2B</td><td class="px-4 py-2 text-slate-400">weekly</td><td class="px-4 py-2 text-slate-400">Nov 3</td><td class="px-4 py-2 text-accent-400">sent</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Bldg 014 · 3A</td><td class="px-4 py-2 text-slate-400">every 2 wks</td><td class="px-4 py-2 text-slate-400">Oct 27</td><td class="px-4 py-2 text-accent-400">sent</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Bldg 022 · 1C</td><td class="px-4 py-2 text-slate-400">weekly</td><td class="px-4 py-2 text-slate-400">Nov 10</td><td class="px-4 py-2 text-amber-300">2 comps flagged</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Bldg 031 · 4D</td><td class="px-4 py-2 text-slate-400">off market</td><td class="px-4 py-2 text-slate-400">Sep 29</td><td class="px-4 py-2 text-slate-500">paused</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Bldg 047 · 2A</td><td class="px-4 py-2 text-slate-400">weekly</td><td class="px-4 py-2 text-slate-400">Nov 10</td><td class="px-4 py-2 text-slate-300">ready to review</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative. Field names and screens are set up with your team in week one.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 PHOTOS -->
+  <section id="photos" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Photos</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Photos from sources you're allowed to use</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Pulling images from Zillow, Apartments.com or Google Images is a licensing problem, not a technical one: the photos belong to whoever took them, and those sites' terms forbid scraping. So the system goes down a list of sources that are allowed and flags the rest, instead of filling your reports with images you could be asked to take down.</p>
+      <div class="mt-12 grid md:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">FIRST</div>
+          <h3 class="font-semibold mb-2">Photo inside the MLS export</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If the SmartMLS or RI MLS export includes the listing photo, it's taken from there and placed next to the comp. MLS rules on using listing photos in a comparative report vary, so this is checked against your MLS rules in week one.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">THEN</div>
+          <h3 class="font-semibold mb-2">Street View image of the address</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Google's Street View Static API returns a front-of-building photo for most addresses, licensed for this kind of use when shown with Google's attribution. Costs well under a cent per image after Google's monthly free usage.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">OTHERWISE</div>
+          <h3 class="font-semibold mb-2">Uploaded once, reused forever</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Comps repeat week to week. If neither source works, the comp is flagged and your assistant drops in a photo once; it's stored on the comp and reused in every future report.</p>
+        </div>
+      </div>
+      <p class="mt-8 text-sm text-slate-500 max-w-3xl">In practice, after the first few weeks almost every comp already has a stored photo, which gets you close to "no manual photo searching" without the takedown risk.</p>
+    </div>
+  </section>
+
+  <!-- 06 RELIABILITY -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Reliability</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so a wrong number can't reach a report unnoticed</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">Extraction is checked, not trusted</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Claude returns fixed fields per comp. Rents outside a sensible range for the market, missing beds or baths, and totals that don't match the export are flagged before the comp is used.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">Tested on your real exports</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Milestone one runs on ten of your past exports from each source and compares the rows with what your assistant would have typed. Each source's layout gets its own tested instructions.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">A person approves before it sends</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Scheduled runs build the report and wait as "ready to review". Once you trust a unit's runs, you can switch it to send automatically, one checkbox per unit.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Failures land in the Errors table</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">A Rentometer outage or an unreadable PDF writes a plain-English line against the unit and emails whoever runs reports. Nothing fails silently.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Costs capped per run</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Re-runs reuse comps already extracted and verified, so Claude only reads new files. Rentometer pulls are counted against your plan's allowance and stop with a warning before they run over.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">All yours</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Airtable, Make, the Claude API key, the PDF template and Drive are all in your accounts. You own every prompt and file; if we part ways, nothing stops working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 MILESTONES -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your three milestones, three weeks</h2>
+      <p class="mt-4 text-slate-400">Each milestone ends with something you can click on in your own accounts.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Base and extraction</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–7</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Airtable base for buildings, units, comps and reports. Extraction for Rentometer, SmartMLS, RI MLS and HelloData PDFs and your Excel files, tested on your past exports. Rentometer API connected.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your real exports turned into clean comp rows, with flags, side by side with the originals.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Branded report and photos</h3>
+            <span class="text-xs font-mono text-slate-500">Days 8–14</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Your current Claude template rebuilt as a fixed branded PDF, commentary written from your existing instructions, lead stats section, photo sourcing, Drive filing by building and unit.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a finished PDF for three of your units, next to the reports you make today.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Team screens, schedules, handover</h3>
+            <span class="text-xs font-mono text-slate-500">Days 15–21</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">The Interface your team uses, weekly and bi-weekly schedules, review and send, error alerts. Your assistant runs ten real reports with me watching. Short written guide and walkthrough video, then one month of bug fixes.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your team producing reports without you or me, and the first scheduled run arriving on its own.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 PRICING -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid</h2>
+      <p class="mt-4 text-slate-400">One number, paid against your three milestones.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Total project</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,500</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 3 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Base and extraction</div><div class="text-xs text-slate-500">Due when your exports extract cleanly</div></div>
+              <div class="font-mono text-accent-400">$600</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Branded report and photos</div><div class="text-xs text-slate-500">Due on three finished PDFs</div></div>
+              <div class="font-mono text-accent-400">$500</div>
+            </div>
+            <div class="flex justify-between gap-4 pb-1">
+              <div><div class="font-medium">M3 — Team screens, schedules, handover</div><div class="text-xs text-slate-500">Due when your team runs ten reports</div></div>
+              <div class="font-mono text-accent-400">$400</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Extraction for all four sources plus Excel</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Rentometer API connection</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Branded PDF template, consistent every run</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Photo sourcing with attribution</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Building and unit organisation, schedules</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Written guide and walkthrough video</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>One month of bug fixes after handover</span></li>
+          </ul>
+          <p class="mt-5 text-xs text-slate-500">HelloData API, once you have access: about $300, priced in writing first.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Claude API</div><div class="text-accent-400 font-mono mt-1">~$0.10–0.40 per report</div><div class="text-xs text-slate-500 mt-1">Mostly reading new PDFs; re-runs cost less.</div></div>
+          <div><div class="font-medium">Airtable</div><div class="text-accent-400 font-mono mt-1">~$20–25 per editor / month</div><div class="text-xs text-slate-500 mt-1">Team plan for the people who run reports.</div></div>
+          <div><div class="font-medium">Make.com</div><div class="text-accent-400 font-mono mt-1">~$10–30 / month</div><div class="text-xs text-slate-500 mt-1">Depends on report volume; sized in week one.</div></div>
+          <div><div class="font-medium">PDF rendering</div><div class="text-accent-400 font-mono mt-1">~$0–30 / month</div><div class="text-xs text-slate-500 mt-1">A template-to-PDF service, tier by volume.</div></div>
+          <div><div class="font-medium">Street View images</div><div class="text-accent-400 font-mono mt-1">&lt;$0.01 per image</div><div class="text-xs text-slate-500 mt-1">After Google's monthly free usage; stored and reused.</div></div>
+          <div><div class="font-medium">Rentometer API</div><div class="text-accent-400 font-mono mt-1">Your plan</div><div class="text-xs text-slate-500 mt-1">Report credits per their pricing; confirmed in week one.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 WORKED EXAMPLES -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks bend to different property businesses.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Self-storage operator</div>
+          <h3 class="text-lg font-semibold mb-3">Weekly competitor rate survey per facility</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Area managers upload competitor rate sheets as PDFs. Claude extracts unit size and street rate into rows, duplicates across weeks are merged, and each facility gets a one-page branded PDF every Monday showing where its rates sit. Managers only review the flagged rows.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">PDF to rows</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Scheduled re-run</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Fixed template</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Student housing landlord</div>
+          <h3 class="text-lg font-semibold mb-3">Pre-leasing report for each building</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Listing enquiry exports and nearby asking rents are combined per building. Claude writes three lines of commentary from the owner's standing instructions, and the report files itself to the building's folder every two weeks with the enquiry trend beside the rent.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Lead stats beside rent</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Per-building folders</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Review before send</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 BEFORE KICKOFF -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">10 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Is the report per unit, per unit type, or per building?</div><div class="text-sm text-slate-400 mt-1">It changes how many reports a run makes and what each one costs. Default: one report per unit on the market, grouped under its building.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Which Rentometer plan are you on, and does it include API access?</div><div class="text-sm text-slate-400 mt-1">The API is a separate allowance on some plans. Default: we start with PDF uploads and switch Rentometer to direct pulls once access is confirmed.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Who receives the reports, and should they go out automatically?</div><div class="text-sm text-slate-400 mt-1">Default: reports wait for a quick review and are sent by email from your account; auto-send can be switched on per unit later.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 NOTE -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">11 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build automation systems for people who'd rather not think about them, usually with Claude doing the reading and writing and Make or Airtable doing the remembering.</p>
+        <p>The closest past build to yours is an AI report pipeline: raw data in, a finished client-ready report out, with no hand editing. The lesson from it applies directly here: let the AI fill a fixed template, never let it design the page, and check its numbers before they're printed.</p>
+        <p>Happy to walk you through that build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send a recent report you're happy with, its source exports, and your Claude project instructions. I'll come back inside 48 hours with the kickoff date, and your exports will be extracting into the base by the end of week one.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your multifamily portfolio</div>
+      <div>Rent comp report automation</div>
+    </div>
+  </footer>
+
+</body>
+</html>
