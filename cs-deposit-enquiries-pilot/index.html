@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — AI for deposit enquiries</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+        <a href="#first-steps" class="hover:text-white transition">First steps</a>
+        <a href="#flow" class="hover:text-white transition">Solution</a>
+        <a href="#tools" class="hover:text-white transition">Tools</a>
+        <a href="#limitations" class="hover:text-white transition">Limitations</a>
+        <a href="#test" class="hover:text-white transition">Test</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Vendor evaluation · Prepared for your customer service team
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Most deposit chats are a <span class="text-accent-400">lookup problem</span>, not a writing problem.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Your deposit enquiries go CS to Payments because CS can't see the transaction. Give LiveChat a read-only view of deposit status and an AI that drafts from those facts, and the common cases stop travelling six hops. The rest reach Payments with a ticket nobody has to ask the customer about twice.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the proposed workflow</a>
+        <a href="#test" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">The smallest useful test</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">6 → 2 hops</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">For status-only deposit cases</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Shadow first</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Agents approve every draft</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">4 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Pilot on one LiveChat market</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$400</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">For the finished recommendation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNDERSTANDING -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">00 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">You want to reduce repetitive customer service work without giving up accurate responses and smooth human handovers. Deposits come first, and today every deposit question runs Customer to CS to Payments Team to External Payment Provider to Payments Team to CS to Customer. Each hop is a wait, and each one is a chance for the customer to be asked the same thing again.</p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Accurate responses"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">The AI never tells a player where their money is from its own reasoning. It reads the transaction record, picks the matching case, and fills an approved reply. If it can't find the transaction or the record is ambiguous, it hands over.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Smooth human handovers"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Every handover arrives with a one-line summary, the deposit it is about (amount, method, time, provider reference, current status) and what the player has already been told. The agent starts at step three, not step one.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Multiple markets, brands and languages"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">One market on LiveChat first, built so a second brand or language is a new row of settings and translated templates, not a rebuild. LINE plugs into the same middle layer later.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Live deployment requires testing and our approval"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Nothing replies to a player until you sign it off. The test starts in shadow mode, where the AI only suggests replies to agents inside LiveChat, and the numbers from that phase decide whether any bucket goes live.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 FIRST STEPS -->
+  <section id="first-steps" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — First steps</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Measure where deposit chats actually go before building anything</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Your CS head's ranking tells you deposits are the volume. It doesn't yet tell you which deposit cases need Payments and which only need someone who can see the transaction. That split decides the whole design, so it comes first.</p>
+
+      <div class="mt-12 grid md:grid-cols-3 gap-5">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">STEP 1</div>
+          <h3 class="font-semibold mb-2">Tag 300 recent deposit chats</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Export anonymised transcripts from LiveChat for the pilot market. Claude sorts them into cases, an agent spot-checks a sample, and for each case we record: did it go to Payments, did Payments need the provider, how long did it take end to end.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">STEP 2</div>
+          <h3 class="font-semibold mb-2">Sit with Payments for one hour</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Watch how a payments agent answers a typical escalation. Which screen do they open, which fields do they read, when do they contact the provider? That screen is what the AI needs read access to.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">STEP 3</div>
+          <h3 class="font-semibold mb-2">Confirm what can be read by API</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Check whether the back office (or the provider's merchant API) exposes deposit status by player ID, and whether LiveChat passes a verified player ID into the chat. If either is missing, that's the first change to make, AI or not.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">The deposit cases I expect the tagging to find (to be confirmed with your data)</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[560px]">
+            <thead class="text-xs text-slate-500">
+              <tr><th class="text-left py-2 pr-4 font-normal">Case</th><th class="text-left py-2 pr-4 font-normal">What the record usually shows</th><th class="text-left py-2 font-normal">Needs Payments?</th></tr>
+            </thead>
+            <tbody class="text-slate-300">
+              <tr class="sheet-row"><td class="py-2 pr-4">Pending, within normal time</td><td class="py-2 pr-4 text-slate-400">Provider has not confirmed yet</td><td class="py-2 text-accent-400">No, explain and set expectation</td></tr>
+              <tr class="sheet-row"><td class="py-2 pr-4">Declined or failed</td><td class="py-2 pr-4 text-slate-400">Decline reason code from the provider</td><td class="py-2 text-accent-400">No, explain and suggest the next method</td></tr>
+              <tr class="sheet-row"><td class="py-2 pr-4">Credited, player can't see it</td><td class="py-2 pr-4 text-slate-400">Balance updated, often in another wallet or bonus balance</td><td class="py-2 text-accent-400">No, point to where it is</td></tr>
+              <tr class="sheet-row"><td class="py-2 pr-4">Bonus not applied</td><td class="py-2 pr-4 text-slate-400">Deposit fine, bonus rule not met</td><td class="py-2 text-slate-400">Usually no, agent if disputed</td></tr>
+              <tr class="sheet-row"><td class="py-2 pr-4">Pending past the normal window</td><td class="py-2 pr-4 text-slate-400">Stuck at provider</td><td class="py-2 text-amber-300">Yes, pre-filled ticket</td></tr>
+              <tr class="sheet-row"><td class="py-2 pr-4">Money left the bank, no record</td><td class="py-2 pr-4 text-slate-400">No matching transaction</td><td class="py-2 text-amber-300">Yes, with proof of payment attached</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-4 text-xs text-slate-500">If the top four cases are the majority, which is common, most deposit chats can be answered in CS with no Payments hop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 FLOW -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — Proposed solution</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">A deposit enquiry, from first message to resolution</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">The transaction record decides what happened. The AI decides which case it is and drafts the reply. Your agents decide anything involving judgement, money in dispute, or a player at risk.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">LiveChat</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Trigger</div>
+            <div class="font-medium">Player opens a chat about a deposit</div>
+            <div class="text-xs text-slate-400 mt-1">Logged-in player ID and language come with the chat</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Classify</div>
+            <div class="font-medium">Is this about a deposit, and which one?</div>
+            <div class="text-xs text-slate-400 mt-1">Not a deposit, or several issues at once: straight to the normal queue</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300 mb-1">Safety check</div>
+            <div class="font-medium">Responsible gambling or distress signals</div>
+            <div class="text-xs text-slate-400 mt-1">Any sign: human agent immediately, no automated reply</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Middleware in your cloud</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Lookup</div>
+            <div class="font-medium">Read the player's recent deposits</div>
+            <div class="text-xs text-slate-400 mt-1">Read-only: status, method, amount, time, provider reference, decline code</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude</div>
+            <div class="font-medium">Match the record to a case and draft the reply</div>
+            <div class="text-xs text-slate-400 mt-1">From your approved template for that case, in the player's language, fields filled from the record only</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Validate</div>
+            <div class="font-medium">Check every amount and reference in the draft</div>
+            <div class="text-xs text-slate-400 mt-1">Anything not in the record, or low confidence: handover</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Agent or Payments</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Resolve in CS</div>
+            <div class="font-medium">Status cases answered in the chat</div>
+            <div class="text-xs text-slate-400 mt-1">Shadow mode: agent sees the draft and sends or edits. Live (after approval): bot sends for agreed cases only</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300 mb-1">Escalate</div>
+            <div class="font-medium">Pre-filled Payments ticket</div>
+            <div class="text-xs text-slate-400 mt-1">Record, provider reference, player's proof of payment, summary. Payments goes to the provider without asking CS anything</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Close the loop</div>
+            <div class="font-medium">Status change triggers the update to the player</div>
+            <div class="text-xs text-slate-400 mt-1">Drafted for the agent, so nobody has to remember to check</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+          <div class="text-xs font-mono uppercase tracking-wide text-accent-400 mb-3">What the AI does</div>
+          <div class="space-y-2 text-sm text-slate-300">
+            <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Recognises deposit enquiries and which deposit they mean</span></div>
+            <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Matches the transaction record to one of your agreed cases</span></div>
+            <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Drafts the reply from your template in the player's language</span></div>
+            <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Writes the handover summary and fills the Payments ticket</span></div>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+          <div class="text-xs font-mono uppercase tracking-wide text-amber-300 mb-3">What your agents still handle</div>
+          <div class="space-y-2 text-sm text-slate-300">
+            <div class="flex gap-2"><span class="text-amber-300">●</span><span>Missing money, disputes, chargebacks and refunds</span></div>
+            <div class="flex gap-2"><span class="text-amber-300">●</span><span>KYC, verification and anything touching AML checks</span></div>
+            <div class="flex gap-2"><span class="text-amber-300">●</span><span>Responsible gambling signals, VIPs and angry players</span></div>
+            <div class="flex gap-2"><span class="text-amber-300">●</span><span>Payments still owns every provider investigation</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 TOOLS -->
+  <section id="tools" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Tools and information</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Few tools, chosen so player data stays with you</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">The hard requirement isn't the model, it's read access to the transaction record. Everything else is small.</p>
+
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Channel</div>
+          <h3 class="font-semibold mb-2">LiveChat, as you have it</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Webhooks for incoming chats, plus a small panel in the agent's view showing the draft and the record behind it. No new tool for your agents to learn. LINE uses the same middle layer later.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Middleware</div>
+          <h3 class="font-semibold mb-2">A small service in your cloud</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Player IDs and payment data shouldn't pass through a general automation platform in a regulated business. A small service you host and own keeps it inside your environment and your logging.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Model</div>
+          <h3 class="font-semibold mb-2">Claude API, structured output</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Strong at multilingual classification and following fixed templates. Every call returns fixed JSON (case, confidence, draft, summary) that the service checks before anything is shown. Only the fields needed are sent, not the player profile.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Data</div>
+          <h3 class="font-semibold mb-2">Read-only deposit status</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">From your back office, or from the payment provider's merchant API if the back office lags. By player ID: last few deposits with status, method, amount, timestamps, provider reference and decline code.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Content</div>
+          <h3 class="font-semibold mb-2">Your approved replies per case</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Your CS head writes or approves one template per case and the normal processing times per method. The AI fills them; it doesn't invent policy.</p>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Handover</div>
+          <h3 class="font-semibold mb-2">Whatever Payments uses today</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Ticket tool, Slack channel or email: the escalation lands where Payments already works, pre-filled. I'd rather fit your process than add a new queue.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 LIMITATIONS -->
+  <section id="limitations" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Limitations</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">What could stop this working, written down first</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">A constraint found in scoping costs a sentence. One found mid-pilot costs a week.</p>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">No API to the transaction record</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The biggest risk. Without read access the AI can only collect details and pre-fill tickets, which still helps, but the Payments hop stays. Assumption to validate in week one.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">Player not identified in the chat</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If chats can start logged out, the bot can't safely look anything up. It then asks the player to log in, or hands over. No lookups by email or name alone.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">The record is behind reality</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If the back office updates late from the provider, "pending" may already be credited. The test measures how often the record was wrong, and the replies set expectations rather than promise times.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Licence and compliance rules per market</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Some regulators expect disclosure that a player is talking to automation, and responsible gambling rules apply to every reply. Your compliance team approves the templates and the handover rules before anything goes live.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Language quality in smaller markets</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Drafts from approved templates keep wording safe, but a native-speaking agent should review the translated templates once. Shadow mode shows edit rates per language.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">The real case mix is different</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">If tagging shows most deposit chats truly need the provider, the win shifts from answering to a better ticket and an automatic update to the player. The first steps tell us which before money is spent on the build.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 TEST -->
+  <section id="test" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Smallest useful test</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Four weeks, one market, agents in control throughout</h2>
+      <p class="mt-4 text-slate-400">Shadow mode first, so accuracy is measured on real chats before any player sees an automated reply.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Baseline and setup</h3>
+            <span class="text-xs font-mono text-slate-500">Week 1</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Tag the 300 chats, agree the cases and templates with your CS head, connect the read-only lookup and the LiveChat panel in a test environment.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> the baseline numbers for your deposit chats and the panel drafting replies on test chats.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Shadow mode on live chats</h3>
+            <span class="text-xs font-mono text-slate-500">Weeks 2–3</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Agents on the pilot market see a draft and a handover summary for every deposit chat and send, edit or discard it. Every outcome is logged.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a weekly sheet of accuracy, edit rate and Payments escalations, by case.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Limited live, then readout</h3>
+            <span class="text-xs font-mono text-slate-500">Week 4</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Only if you approve it, and only for the cases that cleared the accuracy bar: the bot sends those replies itself, with an agent one click away. Then a written readout with a go, change or stop recommendation.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> before and after numbers for the pilot market and a plan for withdrawals next.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-14 bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono">How the test is measured</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[560px]">
+            <thead class="text-xs text-slate-500">
+              <tr><th class="text-left px-4 py-2 font-normal">Measure</th><th class="text-left px-4 py-2 font-normal">How</th><th class="text-left px-4 py-2 font-normal">Bar to go live (proposed)</th></tr>
+            </thead>
+            <tbody class="text-slate-300">
+              <tr class="sheet-row"><td class="px-4 py-2 font-medium">Accuracy</td><td class="px-4 py-2 text-slate-400">Correct case, and every fact in the draft matches the record; agent marks each draft</td><td class="px-4 py-2 text-accent-400">98%+ on a case before it goes live</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 font-medium">Reduced manual work</td><td class="px-4 py-2 text-slate-400">Share of deposit chats closed in CS without Payments; handle time; drafts sent unedited</td><td class="px-4 py-2 text-accent-400">Agreed against the week-1 baseline</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 font-medium">Handover quality</td><td class="px-4 py-2 text-slate-400">Agent rates each summary 1–5; Payments tickets needing a follow-up question to CS</td><td class="px-4 py-2 text-accent-400">Avg 4+, follow-ups near zero</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 font-medium">Player experience</td><td class="px-4 py-2 text-slate-400">LiveChat rating on deposit chats; repeat chats within 48h</td><td class="px-4 py-2 text-accent-400">No worse than baseline</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 PRICING -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">The recommendation now, the pilot priced so you can plan</h2>
+      <p class="mt-4 text-slate-400">You asked for the recommendation first and the pilot scoped separately. Here are both, so the next step is a decision, not another quote.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-2 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">This job: the recommendation</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$400</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 1 week</div>
+          <ul class="mt-6 space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>45-minute call with your CS head and a payments lead</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>300 anonymised deposit chats tagged and measured</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>The 1 to 2-page recommendation, this page's five points made specific to your data</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Credited in full against the pilot if you go ahead</span></li>
+          </ul>
+        </div>
+        <div class="lg:col-span-3 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Indicative pilot, scoped separately</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-5xl font-bold">$2,800</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 4 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Baseline and setup</div><div class="text-xs text-slate-500">Due when the panel drafts on test chats</div></div>
+              <div class="font-mono text-accent-400">$1,100</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Shadow mode on live chats</div><div class="text-xs text-slate-500">Due after two weeks of logged results</div></div>
+              <div class="font-mono text-accent-400">$1,000</div>
+            </div>
+            <div class="flex justify-between gap-4 pb-1">
+              <div><div class="font-medium">M3 — Limited live and readout</div><div class="text-xs text-slate-500">Due on the written readout</div></div>
+              <div class="font-mono text-accent-400">$700</div>
+            </div>
+          </div>
+          <p class="mt-6 text-xs text-slate-500">Assumes read-only API access to deposit status. Without it, the pilot narrows to ticket pre-filling and player updates, and the price comes down with it.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs during the pilot, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Claude API</div><div class="text-accent-400 font-mono mt-1">~$0.01–0.03 per chat</div><div class="text-xs text-slate-500 mt-1">Short structured calls; measured in week one.</div></div>
+          <div><div class="font-medium">Hosting the middleware</div><div class="text-accent-400 font-mono mt-1">~$10–30 / month</div><div class="text-xs text-slate-500 mt-1">A small container in your existing cloud.</div></div>
+          <div><div class="font-medium">LiveChat</div><div class="text-accent-400 font-mono mt-1">Your current plan</div><div class="text-xs text-slate-500 mt-1">API access to confirm on your plan.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 BEFORE KICKOFF -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Where does a payments agent look up a deposit today, and is there an API behind it?</div><div class="text-sm text-slate-400 mt-1">This decides whether CS can answer status cases directly. Default: your back office has an internal API we can be given read-only access to.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Are players logged in when they open LiveChat, and is their ID passed to the chat?</div><div class="text-sm text-slate-400 mt-1">Needed for any safe lookup. Default: yes on the website; logged-out chats go straight to an agent.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Which market and language is the pilot, and who signs off templates for compliance?</div><div class="text-sm text-slate-400 mt-1">Templates are approved before shadow mode starts. Default: one market, its main language plus English, your compliance lead signs off.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 NOTE -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build AI systems that answer customers and hand over to people cleanly: Claude doing the classification and drafting, the business's own records deciding the facts, and every failure landing with a human and a note rather than in silence.</p>
+        <p>For your deposits, what I bring is the discipline around the model more than the model itself: measuring the case mix before building, shadow mode before live, and an AI that can only say what the transaction record supports. A past build of mine, a WhatsApp assistant on respond.io and Claude, follows the same rule: the business decides the settings, the bot never improvises policy, and handover goes to a named person.</p>
+        <p>Happy to walk you through that build on a call before you choose a vendor.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send a time for the 45-minute call and an export of recent deposit chats from the pilot market. I'll come back inside 48 hours with the kickoff date, and the finished recommendation lands within a week of the call.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#test" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the test plan</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your customer service team</div>
+      <div>AI for deposit enquiries · vendor recommendation</div>
+    </div>
+  </footer>
+
+</body>
+</html>
