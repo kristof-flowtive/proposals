@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Proposal — Faceless Video Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+  :root {
+    --bg: #FFFFFF; --soft: #F5F6F8; --soft2: #EEF0F3; --ink: #0B0C0E; --tx: #1A1C20; --mut: #5F6672; --dim: #9097A3;
+    --line: #E6E8EC; --line2: #D3D7DE;
+    --ac: #0E9F4E; --ac2: #16B85C; --acbg: #E8F8EE; --acline: #BFE9CF; --lime: #7CF0A8;
+    --warn: #9A6400; --warnbg: #FFF3D6; --bad: #B4322B; --badbg: #FDE8E6; --info: #2B5BD7; --infobg: #E7EEFF;
+    --sans: 'DM Sans', Inter, system-ui, -apple-system, sans-serif; --mono: 'DM Mono', ui-monospace, monospace;
+    --sh: 0 1px 2px rgba(11,12,14,.04), 0 8px 24px -12px rgba(11,12,14,.1);
+    --sh2: 0 1px 2px rgba(11,12,14,.05), 0 30px 70px -30px rgba(11,12,14,.28);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+  body { background: var(--bg); color: var(--tx); font-family: var(--sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2 { text-wrap: balance; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .narrow { max-width: 800px; }
+  .mono { font-family: var(--mono); font-size: .88em; }
+
+  .js [data-r] { opacity: 0; transform: translateY(14px); transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+  .js [data-r].in { opacity: 1; transform: none; }
+
+  /* nav */
+  .nav { position: fixed; top: 14px; left: 0; right: 0; z-index: 50; padding: 0 16px; pointer-events: none; }
+  .nav .pill { pointer-events: auto; max-width: 860px; margin: 0 auto; height: 54px; padding: 0 8px 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(255,255,255,.94); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--sh); transition: box-shadow .3s; }
+  .nav.scrolled .pill { box-shadow: 0 1px 2px rgba(11,12,14,.05), 0 16px 40px -18px rgba(11,12,14,.22); }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
+  .bolt { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); display: grid; place-items: center; }
+  .bolt svg { width: 14px; height: 14px; }
+  .links { display: flex; gap: 2px; font-size: 14px; color: var(--mut); }
+  .links a { padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+  .links a:hover { color: var(--ink); }
+  .links a.on { color: var(--ink); background: var(--soft2); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 15px; padding: 12px 22px; border-radius: 999px; transition: transform .2s, background .2s, border-color .2s, box-shadow .2s; }
+  .btn svg { width: 15px; height: 15px; transition: transform .2s; } .btn:hover svg { transform: translateX(3px); }
+  .btn.p { background: var(--ink); color: #fff; box-shadow: 0 8px 20px -10px rgba(11,12,14,.6); } .btn.p:hover { background: #24272D; transform: translateY(-1px); }
+  .btn.g { background: #fff; border: 1px solid var(--line2); color: var(--ink); } .btn.g:hover { border-color: var(--ink); }
+  .btn.s { font-size: 14px; padding: 9px 16px; }
+  .btn.w { background: #fff; color: var(--ink); } .btn.w:hover { background: var(--lime); transform: translateY(-1px); }
+  .btn.o { border: 1px solid rgba(255,255,255,.22); color: #fff; } .btn.o:hover { background: rgba(255,255,255,.08); }
+
+  /* hero */
+  .hero { position: relative; padding: 148px 0 0; text-align: center; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; background: radial-gradient(60% 55% at 50% 0%, rgba(22,184,92,.13), transparent 70%), radial-gradient(circle, rgba(11,12,14,.09) 1px, transparent 1.2px) 0 0 / 22px 22px; -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); pointer-events: none; }
+  .hero > .wrap { position: relative; }
+  .badge { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--mut); background: #fff; border: 1px solid var(--line); padding: 6px 14px 6px 8px; border-radius: 999px; box-shadow: var(--sh); }
+  .badge b { font-weight: 500; font-size: 11.5px; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; }
+  h1 { font-size: clamp(2.4rem, 5.4vw, 4.3rem); font-weight: 600; letter-spacing: -.032em; line-height: 1.05; color: var(--ink); max-width: 940px; margin: 26px auto 0; }
+  h1 em { font-style: normal; color: var(--ac); position: relative; white-space: nowrap; }
+  h1 em svg { position: absolute; left: 0; bottom: -.14em; width: 100%; height: .22em; overflow: visible; }
+  h1 em path { fill: none; stroke: var(--ac2); stroke-width: 3; stroke-linecap: round; opacity: .55; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s cubic-bezier(.3,.7,.2,1) .6s; }
+  h1.in em path { stroke-dashoffset: 0; }
+  .lede { margin: 26px auto 0; font-size: 1.16rem; color: var(--mut); max-width: 680px; line-height: 1.6; }
+  .cta-row { margin-top: 34px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+  /* board */
+  .board { margin: 64px auto 0; max-width: 980px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .board .bar { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--mut); background: linear-gradient(#fff, #FBFBFC); }
+  .board .dots { display: flex; gap: 6px; } .board .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--soft2); border: 1px solid var(--line2); }
+  .board .bar b { color: var(--ink); font-weight: 600; }
+  .board .tabs { margin-left: auto; display: flex; gap: 2px; } .board .tabs span { padding: 4px 11px; border-radius: 8px; } .board .tabs .on { background: var(--soft2); color: var(--ink); font-weight: 500; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-family: var(--mono); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); padding: 12px 18px; background: var(--soft); border-bottom: 1px solid var(--line); }
+  td { padding: 13px 18px; border-top: 1px solid var(--line); white-space: nowrap; color: var(--tx); }
+  td:nth-child(2) { color: var(--mut); }
+  tbody tr:first-child td { border-top: 0; }
+  tbody tr { transition: background .2s; } tbody tr:hover { background: #FAFBFC; }
+  tr.live { background: linear-gradient(90deg, rgba(232,248,238,.7), transparent 70%); }
+  .meter { width: 96px; height: 6px; border-radius: 999px; background: var(--soft2); overflow: hidden; } .meter i { display: block; height: 100%; width: var(--w, 0%); background: var(--ac2); border-radius: inherit; transition: width .9s cubic-bezier(.3,.7,.2,1); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 3px 11px 3px 9px; border-radius: 999px; background: var(--soft2); color: var(--mut); transition: background .4s, color .4s; }
+  .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .chip.ok { background: var(--acbg); color: var(--ac); } .chip.run { background: var(--infobg); color: var(--info); } .chip.run::before { animation: blink 1.2s ease-in-out infinite; } .chip.wait { background: var(--warnbg); color: var(--warn); } .chip.flag { background: var(--badbg); color: var(--bad); }
+  @keyframes blink { 50% { opacity: .25; } }
+  .board .note { padding: 12px 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  .stats { margin: 20px auto 0; max-width: 980px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: left; }
+  .stats div { background: var(--soft); border-radius: 16px; padding: 20px 22px; transition: background .25s, transform .25s; }
+  .stats div:hover { background: var(--soft2); transform: translateY(-2px); }
+  .stats div:last-child { background: var(--ink); color: #fff; } .stats div:last-child small { color: #A9AFBA; } .stats div:last-child b { color: var(--lime); }
+  .stats b { display: block; font-size: 1.75rem; font-weight: 600; letter-spacing: -.035em; color: var(--ink); line-height: 1.15; }
+  .stats small { display: block; margin-top: 4px; font-size: 13px; color: var(--mut); }
+
+  /* sections */
+  section.sec { padding: 112px 0; }
+  section.tint { background: var(--soft); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ac); background: var(--acbg); border-radius: 999px; padding: 4px 12px 4px 6px; }
+  .eyebrow b { font-family: var(--mono); font-weight: 500; font-size: 11px; background: #fff; border-radius: 999px; padding: 1px 7px; }
+  h2 { font-size: clamp(1.95rem, 3.4vw, 2.85rem); font-weight: 600; letter-spacing: -.028em; line-height: 1.1; color: var(--ink); margin-top: 18px; max-width: 800px; }
+  .intro { margin-top: 20px; font-size: 1.08rem; color: var(--mut); max-width: 720px; }
+  .intro + .intro { margin-top: 14px; }
+  .intro em { font-style: normal; font-weight: 500; color: var(--ink); background: linear-gradient(var(--acline), var(--acline)) 0 92% / 100% .32em no-repeat; }
+  h3 { font-size: 1.08rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.35; color: var(--ink); }
+  .k { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px; transition: border-color .25s, transform .25s, box-shadow .25s; }
+  .card:hover { border-color: var(--line2); transform: translateY(-3px); box-shadow: var(--sh); }
+  .card p { margin-top: 10px; font-size: 15px; color: var(--mut); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 52px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 52px; }
+  .span2 { grid-column: span 2; }
+
+  /* requirements */
+  .req .quote { background: var(--soft); border-radius: 14px; padding: 16px 18px; font-size: 1.06rem; font-weight: 500; letter-spacing: -.015em; color: var(--ink); line-height: 1.4; position: relative; }
+  .req .quote span { display: block; font-family: var(--mono); font-weight: 400; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+  .req p { margin-top: 16px; padding-left: 14px; border-left: 2px solid var(--acline); }
+  .card.dark { background: var(--ink); border-color: var(--ink); color: #fff; display: grid; grid-template-columns: 5fr 7fr; gap: 36px; align-items: center; padding: 36px; }
+  .card.dark:hover { box-shadow: 0 30px 60px -30px rgba(11,12,14,.6); }
+  .card.dark .k { color: var(--lime); } .card.dark h3 { color: #fff; font-size: 1.5rem; letter-spacing: -.03em; line-height: 1.2; margin-top: 10px; } .card.dark p { margin: 0; color: #B4BAC5; }
+
+  /* flow */
+  .track { margin-top: 48px; display: flex; align-items: center; gap: 0; font-size: 13px; font-weight: 500; color: var(--ink); position: relative; justify-content: space-between; }
+  .track::before, .track::after { content: ''; position: absolute; left: 24px; right: 24px; top: 50%; height: 2px; margin-top: -1px; background: var(--line2); }
+  .track::after { background: var(--ac2); transform-origin: 0 50%; transform: scaleX(0); transition: transform 2.2s cubic-bezier(.4,.5,.2,1) .3s; }
+  .track.in::after { transform: scaleX(1); }
+  .track span { position: relative; z-index: 1; background: #fff; border: 1px solid var(--line2); border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+  .track span.you { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .lanes { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .lane { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 10px; }
+  .lane > header { padding: 14px 16px 12px; font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; justify-content: space-between; }
+  .lane > header span { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--dim); }
+  .step { border-radius: 14px; padding: 16px; background: var(--soft); transition: background .25s; }
+  .step + .step { margin-top: 8px; }
+  .step:hover { background: var(--soft2); }
+  .step strong { display: block; font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.4; margin-top: 5px; }
+  .step span { display: block; margin-top: 5px; font-size: 13.5px; color: var(--mut); line-height: 1.5; }
+  .step.gate { background: var(--acbg); box-shadow: inset 0 0 0 1px var(--acline); }
+  .then { margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 24px 28px; }
+  .ticks { list-style: none; padding: 0; margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 32px; font-size: 15px; color: var(--tx); }
+  .ticks li { display: flex; gap: 10px; align-items: flex-start; }
+  .ticks li::before { content: ''; flex: none; margin-top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--acbg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18' fill='none' stroke='%230E9F4E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.2 9.3l2.5 2.5 5-5.4'/%3E%3C/svg%3E") center/18px no-repeat; }
+  .ticks.one { grid-template-columns: 1fr; gap: 11px; }
+
+  /* controls */
+  .split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center; }
+  .feat { list-style: none; padding: 0; margin-top: 28px; display: grid; gap: 4px; font-size: 14.5px; color: var(--mut); }
+  .feat li { padding: 12px 14px; border-radius: 12px; transition: background .2s; }
+  .feat li:hover { background: var(--soft); }
+  .feat b { display: block; color: var(--ink); font-weight: 600; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .panel header { padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--mut); }
+  .panel header b { color: var(--ink); font-weight: 600; font-size: 14px; }
+  .field { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 14px; }
+  .field:first-of-type { border-top: 0; }
+  .field label { color: var(--mut); font-size: 13px; }
+  .field .in { background: var(--soft); border: 1px solid var(--line); border-radius: 9px; padding: 7px 11px; color: var(--ink); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .field .in.m { font-family: var(--mono); font-size: 12.5px; }
+  .sw { width: 36px; height: 21px; border-radius: 999px; background: var(--line2); position: relative; } .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .sw.on { background: var(--ac2); } .sw.on::after { left: 17px; }
+  .field .row { display: flex; align-items: center; gap: 10px; color: var(--mut); font-size: 13px; }
+  .panel .note { padding: 12px 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  /* reliability */
+  .band { background: var(--ink); color: #fff; border-radius: 32px; padding: 72px 56px; position: relative; overflow: hidden; }
+  .band::before { content: ''; position: absolute; right: -200px; top: -260px; width: 640px; height: 640px; background: radial-gradient(closest-side, rgba(124,240,168,.16), transparent); }
+  .band > * { position: relative; }
+  .band .eyebrow { background: rgba(124,240,168,.12); color: var(--lime); } .band .eyebrow b { background: rgba(255,255,255,.1); }
+  .band h2 { color: #fff; }
+  .rel { margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .rel div { padding: 28px 28px 30px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .rel div:not(:nth-child(3n+1)) { padding-left: 28px; border-left: 1px solid rgba(255,255,255,.12); }
+  .rel div:nth-child(n+4) { border-bottom: 0; padding-bottom: 0; }
+  .rel i { font-family: var(--mono); font-style: normal; font-size: 12px; color: var(--lime); }
+  .rel h3 { color: #fff; margin-top: 10px; } .rel p { margin-top: 8px; font-size: 14.5px; color: #A9AFBA; }
+
+  /* milestones */
+  .m { display: flex; flex-direction: column; }
+  .m .top { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--mut); }
+  .m .top b { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+  .m .top span { font-family: var(--mono); font-size: 12px; background: var(--soft); padding: 4px 10px; border-radius: 999px; }
+  .m .prog { margin: 18px 0 20px; height: 4px; border-radius: 999px; background: var(--soft2); overflow: hidden; }
+  .m .prog i { display: block; height: 100%; width: var(--w); background: var(--ac2); border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1.2s cubic-bezier(.3,.7,.2,1) .35s; }
+  .m.in .prog i { transform: scaleX(1); }
+  .m h3 { font-size: 1.25rem; letter-spacing: -.03em; }
+  .see { margin-top: auto; padding: 14px 16px; border-radius: 14px; background: var(--acbg); font-size: 14px; color: var(--tx); }
+  .m p { margin-bottom: 20px; }
+  .see b { display: block; font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); margin-bottom: 4px; }
+
+  /* pricing */
+  .seg { margin-top: 36px; display: inline-flex; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 999px; position: relative; box-shadow: var(--sh); }
+  .seg button { position: relative; z-index: 1; font: inherit; font-size: 14px; font-weight: 500; color: var(--mut); background: none; border: 0; padding: 9px 20px; border-radius: 999px; cursor: pointer; transition: color .25s; }
+  .seg button[aria-pressed="true"] { color: #fff; }
+  .seg i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: var(--sw, 50%); transform: translateX(var(--sx, 0)); background: var(--ink); border-radius: 999px; transition: transform .35s cubic-bezier(.3,.7,.2,1), width .35s cubic-bezier(.3,.7,.2,1); }
+  .price { margin-top: 20px; display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; }
+  .price .card:hover { transform: none; }
+  .plan { display: none; } [data-plan="full"] .plan.full, [data-plan="p1"] .plan.p1 { display: block; animation: fade .45s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+  .big { font-size: clamp(3.6rem, 6.4vw, 5rem); font-weight: 600; letter-spacing: -.055em; line-height: 1; color: var(--ink); }
+  .big + span { color: var(--mut); margin-left: 10px; }
+  .terms { margin-top: 10px; font-size: 14.5px; color: var(--mut); }
+  .ledger { margin-top: 26px; }
+  .ledger div { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+  .ledger strong { font-weight: 500; font-size: 15px; display: block; color: var(--ink); } .ledger small { font-size: 13px; color: var(--mut); } .ledger b { font-family: var(--mono); font-weight: 500; font-size: 14px; background: var(--soft); border-radius: 8px; padding: 4px 10px; color: var(--ink); }
+  .ledger .later { opacity: .6; } .ledger .later b { background: none; border: 1px dashed var(--line2); }
+  [data-plan="p1"] .ticks .p2 { color: var(--dim); text-decoration: line-through; text-decoration-color: var(--line2); } [data-plan="p1"] .ticks .p2::before { filter: grayscale(1); opacity: .45; }
+  .ticks .p1only { display: none; } [data-plan="p1"] .ticks .p1only { display: flex; }
+  .costs { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .costs > header { grid-column: 1 / -1; margin-top: 28px; margin-bottom: 4px; }
+  .costs > div { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+  .costs strong { font-weight: 600; font-size: 14.5px; color: var(--ink); display: block; } .costs code { display: table; margin-top: 8px; font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; white-space: nowrap; } .costs small { display: block; margin-top: 8px; font-size: 13px; color: var(--mut); line-height: 1.5; }
+  .fine { margin-top: 18px; font-size: 13px; color: var(--dim); }
+
+  .tags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; } .tags span { font-size: 12.5px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: var(--soft); color: var(--mut); }
+  .q { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 24px 26px; background: #fff; border: 1px solid var(--line); border-radius: 18px; transition: border-color .25s, transform .25s; }
+  .q + .q { margin-top: 12px; } .q:hover { border-color: var(--line2); transform: translateX(4px); }
+  .q > b { width: 36px; height: 36px; border-radius: 10px; background: var(--acbg); color: var(--ac); font-family: var(--mono); font-weight: 500; font-size: 12.5px; display: grid; place-items: center; }
+  .q p { margin-top: 6px; font-size: 15px; color: var(--mut); }
+  .about { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
+  .who { position: sticky; top: 110px; }
+  .who i { width: 64px; height: 64px; border-radius: 20px; background: var(--ink); color: var(--lime); font-style: normal; font-weight: 600; font-size: 1.5rem; display: grid; place-items: center; }
+  .who b { display: block; margin-top: 16px; font-size: 1.1rem; color: var(--ink); letter-spacing: -.02em; } .who span { font-size: 13.5px; color: var(--mut); display: block; }
+  .about p { color: var(--tx); font-size: 1.08rem; line-height: 1.75; } .about p + p { margin-top: 18px; }
+
+  .final { background: var(--ink); color: #fff; border-radius: 32px; padding: 88px 40px; text-align: center; position: relative; overflow: hidden; }
+  .final::before { content: ''; position: absolute; left: 50%; bottom: -420px; width: 900px; height: 700px; margin-left: -450px; background: radial-gradient(closest-side, rgba(22,184,92,.32), transparent); }
+  .final > * { position: relative; }
+  .final h2 { color: #fff; margin: 0 auto; font-size: clamp(2.3rem, 4.6vw, 3.6rem); }
+  .final p { margin: 20px auto 0; max-width: 640px; color: #B4BAC5; font-size: 1.08rem; }
+  .final .fine { margin-top: 40px; color: #8A919D; font-size: 13.5px; }
+  footer.ft { padding: 28px 0 36px; font-size: 13px; color: var(--dim); }
+  footer.ft .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (max-width: 960px) {
+    .links { display: none; }
+    .split, .price, .about, .card.dark { grid-template-columns: 1fr; gap: 32px; }
+    .lanes, .grid3, .rel { grid-template-columns: 1fr; }
+    .rel div, .rel div:not(:nth-child(3n+1)) { padding: 24px 0; border-left: 0; border-bottom: 1px solid rgba(255,255,255,.12); } .rel div:last-child { border-bottom: 0; padding-bottom: 0; }
+    .costs { grid-template-columns: repeat(2, 1fr); }
+    .track { display: none; } .lanes { margin-top: 44px; }
+    .band { padding: 52px 28px; border-radius: 24px; } .who { position: static; display: flex; gap: 16px; align-items: center; } .who b { margin: 0; }
+    section.sec { padding: 80px 0; }
+  }
+  @media (max-width: 640px) {
+    .grid2, .ticks, .costs { grid-template-columns: 1fr; } .span2 { grid-column: auto; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .hero { padding-top: 116px; } h1 em { white-space: normal; } h1 em svg { display: none; }
+    .board .tabs span:not(.on) { display: none; } .hide-s { display: none; }
+    .field { grid-template-columns: 1fr; gap: 6px; } .final { padding: 60px 24px; border-radius: 24px; }
+    .seg button { padding: 9px 14px; font-size: 13px; }
+    .badge { font-size: 12.5px; padding-right: 12px; text-align: left; border-radius: 16px; } .badge b { white-space: nowrap; }
+    .board th:nth-child(2), .board td:nth-child(2) { display: none; } .board td { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js [data-r] { opacity: 1; transform: none; transition: none; }
+    h1 em path { stroke-dashoffset: 0; transition: none; } .track::after, .m .prog i { transform: none; transition: none; }
+    *, *::before, *::after { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="pill">
+    <a href="#top" class="brand"><span class="bolt"><svg viewBox="0 0 24 24" fill="none" stroke="#7CF0A8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>Flowtive</a>
+    <nav class="links">
+      <a href="#understanding">Understanding</a>
+      <a href="#flow">The pipeline</a>
+      <a href="#controls">Dashboard</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <a href="#contact" class="btn p s">Get in touch</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="badge" data-r><b>Project proposal</b>Prepared for your DIY credit repair brand</div>
+    <h1 data-r style="--d:80ms">Type a topic into Airtable. Get a <em>finished faceless video<svg viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 8 C 60 2, 120 11, 180 6 S 270 3, 298 7"/></svg></em> in Google Drive.</h1>
+    <p class="lede" data-r style="--d:160ms">Airtable, Make.com, ElevenLabs and Claude or GPT-4o, built in your accounts. You approve every script before a cent goes on voice or rendering, and every script is written under a compliance guardrail that keeps score guarantees out of your content.</p>
+    <div class="cta-row" data-r style="--d:240ms">
+      <a href="#flow" class="btn p">See the pipeline <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a href="#pricing" class="btn g">View fixed-price bid</a>
+    </div>
+
+    <div class="board" data-r style="--d:320ms">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><b>Content Pipeline</b><span class="hide-s">Airtable</span><span class="tabs"><span class="on">Topics</span><span>Settings</span><span>Hooks</span><span>Log</span><span>Errors</span></span></div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Topic</th><th>Hook</th><th class="hide-s">Progress</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>3 report errors to dispute first</td><td>Mistake callout</td><td class="hide-s"><div class="meter"><i style="--w:100%"></i></div></td><td><span class="chip ok">Done · 46s</span></td></tr>
+            <tr class="live"><td>Goodwill letters, explained</td><td>Myth vs fact</td><td class="hide-s"><div class="meter"><i id="liveBar"></i></div></td><td><span class="chip" id="liveChip">Write script</span></td></tr>
+            <tr><td>Read your report in 5 minutes</td><td>Number list</td><td class="hide-s"><div class="meter"><i style="--w:34%"></i></div></td><td><span class="chip wait">Needs approval</span></td></tr>
+            <tr><td>"Fix your score in 30 days"</td><td>Question</td><td class="hide-s"><div class="meter"><i style="--w:18%"></i></div></td><td><span class="chip flag">Flagged · timeline claim</span></td></tr>
+            <tr><td>Hard vs soft inquiries</td><td>auto</td><td class="hide-s"><div class="meter"><i style="--w:0%"></i></div></td><td><span class="chip">Write script</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Illustrative. Status is a single-select, so a typo can't stall a video. Interface view available if you'd rather have buttons than a grid.</div>
+    </div>
+
+    <div class="stats" data-stagger>
+      <div><b>&lt; 50s</b><small>Checked on the real audio</small></div>
+      <div><b>1 click</b><small>Your approval, then it runs</small></div>
+      <div><b>3 weeks</b><small>To turnkey</small></div>
+      <div><b>$1,500</b><small>Fixed · start at $500</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="understanding">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>01</b>Understanding</div>
+    <h2 data-r>What you're solving for</h2>
+    <p class="intro" data-r>Your digital product funnel needs a steady stream of short-form videos, and you don't want to be on camera or in an editor. As a non-technical business owner you want a turnkey system: you enter a core topic or angle, and a finished video shows up in a Google Drive folder labelled by date.</p>
+    <p class="intro" data-r>The step most bids skip is assembly. Make.com moves data between apps; it cannot cut video. Pairing the voiceover with visuals needs a cloud render service driven by a template, with captions timed to the voice. That is where most of this build's effort goes, and it is designed in from day one below.</p>
+
+    <div class="grid2" data-stagger>
+      <div class="card req"><div class="quote"><span>You asked for</span>"High-retention video script under 50 seconds using proven hook frameworks"</div><p>A Hook frameworks table in Airtable (myth vs fact, mistake callout, question, number list, pattern interrupt) that you pick from or leave on auto. The script comes back as structured beats with a word cap, and the 50 seconds is checked again on the finished voiceover.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"The approved script"</div><p>Scripts land in Airtable as "Needs approval". Nothing goes to ElevenLabs until you change the status to Approved, so you never pay for a voiceover you'd have rejected. Edit the text in the cell first if you want; the edit is what gets voiced.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"Relevant cinematic visuals" from stock video APIs or Runway</div><p>Each script beat carries its own visual search terms. Make pulls vertical clips per beat from a stock API, never reuses a clip within 30 days, and can send just the hook shot to Runway when you want something no stock library has.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"Organized folders in Google Drive, labeled by date"</div><p>One folder per day (<span class="mono">2026-11-24</span>), one file set per video: the MP4, the script and the voiceover. The Drive link is written back to the Airtable row so you can find any video from the dashboard.</p></div>
+      <div class="card dark span2"><div><div class="k">Not in your brief, but your niche needs it</div><h3>Scripts that stay on the right side of credit repair advertising rules</h3></div><p>Credit repair claims draw US regulator and platform attention (the Credit Repair Organizations Act and the FTC on misleading claims). The script prompt forbids guaranteed score increases, specific point or timeline promises and "remove accurate negative items" language, and a banned-claims list you control in Airtable is checked before a script reaches you. A guardrail, not legal advice, but it means a fast hook never turns into a claim you'd have to take down.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="flow">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>02</b>The build</div>
+    <h2 data-r>Topic to finished video, in one diagram</h2>
+    <p class="intro" data-r>You decide <em>what</em> gets made and <em>whether</em> it ships. Make moves each video along. The render template decides <em>how</em> it looks, the same way every time.</p>
+
+    <div class="track" data-r aria-hidden="true"><span class="you">Topic</span><span>Script</span><span>Check</span><span class="you">Approve</span><span>Voice</span><span>Clips</span><span>Render</span><span>Drive</span></div>
+
+    <div class="lanes" data-stagger>
+      <div class="lane">
+        <header>Airtable · you<span>lane 1</span></header>
+        <div class="step"><div class="k">Input</div><strong>New row: core topic or angle, optional hook framework</strong><span>Status set to "Write script". Leave hook blank and the AI picks.</span></div>
+        <div class="step"><div class="k">Trigger</div><strong>Airtable automation calls the Make webhook</strong><span>Instant, rather than Make polling every 15 minutes.</span></div>
+        <div class="step gate"><div class="k">Approval gate</div><strong>You read the script, edit if you like, set Approved</strong><span>Rejected → back to "Write script" with your note in the prompt.</span></div>
+      </div>
+      <div class="lane">
+        <header>Make · script &amp; voice<span>lane 2</span></header>
+        <div class="step"><div class="k">1 · Claude or GPT-4o</div><strong>Script returned as structured beats</strong><span>Hook, 4–6 beats (voice line + visual search terms), caption text, CTA. Word cap from Settings.</span></div>
+        <div class="step"><div class="k">2 · Compliance check</div><strong>Banned-claims list + a second AI pass</strong><span>Flags appear on the row for you to see. Then status → "Needs approval".</span></div>
+        <div class="step"><div class="k">3 · ElevenLabs</div><strong>Voiceover with word-level timestamps</strong><span>Your chosen voice ID. Over 50s → row back to you with the real length.</span></div>
+      </div>
+      <div class="lane">
+        <header>Make · visuals &amp; render<span>lane 3</span></header>
+        <div class="step"><div class="k">4 · Stock API</div><strong>One vertical clip per beat</strong><span>Pexels by default, a premium library if you have one. Clip log prevents repeats; no match → your backup b-roll folder.</span></div>
+        <div class="step"><div class="k">5 · Render API</div><strong>9:16 template: clips cut to the voice, captions burned in</strong><span>Creatomate by default (Shotstack or JSON2Video also fit). Brand colours, word-by-word captions, CTA end card.</span></div>
+        <div class="step"><div class="k">6 · Google Drive</div><strong>Render-complete webhook → upload to today's folder</strong><span>Folder created if it doesn't exist yet.</span></div>
+      </div>
+    </div>
+
+    <div class="then" data-r>
+      <div class="k">Then, for every video</div>
+      <ul class="ticks">
+        <li><span><span class="mono">/Faceless Videos/2026-11-24/</span> holds the MP4, script and voiceover</span></li>
+        <li>Airtable row set to Done with the Drive link and final length</li>
+        <li>Clips used written to the Clip log, so they aren't repeated next week</li>
+        <li>Vendor cost for that video written to the Log table</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="controls">
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow" data-r><b>03</b>Your dashboard</div>
+      <h2 data-r>You run everything from one Airtable base</h2>
+      <p class="intro" data-r>Make reads your settings on every run, so a change to the voice, the CTA or the banned-claims list applies to the very next video. You never need to open Make after handover.</p>
+      <ul class="feat" data-stagger>
+        <li><b>Topics</b>Your master board: one row per video, status from Write script to Done, script, flags and Drive link.</li>
+        <li><b>Settings</b>Voice ID, word cap, CTA line, caption style, daily render cap.</li>
+        <li><b>Hook frameworks</b>The hook patterns and an example of each. Add your own and the AI uses them.</li>
+        <li><b>Banned claims</b>Phrases no script may contain. Seeded for credit repair, yours to extend.</li>
+        <li><b>Clip log, Log &amp; Errors</b>Which clips were used, what ran, what it cost, and anything that failed, in plain English.</li>
+      </ul>
+    </div>
+    <div class="panel" data-r style="--d:120ms">
+      <header><b>Settings</b><span>Content Pipeline · Airtable</span></header>
+      <div class="field"><label>Voice ID</label><div class="in m">your ElevenLabs voice</div></div>
+      <div class="field"><label>Word cap</label><div class="in m">120 words · under 50s</div></div>
+      <div class="field"><label>CTA line</label><div class="in">Your end-card call to action</div></div>
+      <div class="field"><label>Caption style</label><div class="in">Bold, word by word, lower third</div></div>
+      <div class="field"><label>Daily render cap</label><div class="in m">10 videos</div></div>
+      <div class="field"><label>Hook framework</label><div class="row"><span class="sw on"></span>Auto-pick when left blank</div></div>
+      <div class="field"><label>Runway hook shot</label><div class="row"><span class="sw"></span>Off by default</div></div>
+      <div class="note">Illustrative values. A change here applies to the very next video.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="reliability" style="padding-top:0">
+  <div class="wrap">
+    <div class="band" data-r>
+      <div class="eyebrow"><b>04</b>Reliability</div>
+      <h2>Built so no video fails silently or ships wrong</h2>
+      <div class="rel">
+        <div><i>01</i><h3>You approve before money is spent</h3><p>Script generation costs pennies. Voice and rendering are the paid steps, and neither runs until the row says Approved.</p></div>
+        <div><i>02</i><h3>50 seconds, checked twice</h3><p>A word cap in the prompt, then the real length from the ElevenLabs file. A voice that reads slower than expected can't push a video past your limit unnoticed.</p></div>
+        <div><i>03</i><h3>Compliance guardrail on every script</h3><p>No guaranteed results, no point or day promises, no "erase accurate items". The prompt forbids them, the check flags them, and you see the flag before approving.</p></div>
+        <div><i>04</i><h3>No stale or repeated footage</h3><p>Portrait clips only, a 30-day clip log against repeats, and a fallback to a Drive folder of backup b-roll you choose, so a weak search never leaves a black frame.</p></div>
+        <div><i>05</i><h3>Fails to you, never to silence</h3><p>If ElevenLabs, the stock API or the renderer errors, the row goes to Error with a plain-English reason and you get an email. Fix it, set the status back, and it resumes from that step.</p></div>
+        <div><i>06</i><h3>Your accounts, your keys, a cost cap</h3><p>Airtable, Make, ElevenLabs, the AI key, the renderer and Drive are all under your logins. A daily render cap in Settings stops a runaway batch.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="milestones" style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>05</b>Milestones</div>
+    <h2 data-r>Your three milestones, three weeks</h2>
+    <p class="intro" data-r>Each milestone ends with something you can click on in your own accounts.</p>
+    <div class="grid3" data-stagger>
+      <div class="card m"><div class="top"><b>1</b><span>Days 1–6</span></div><div class="prog"><i style="--w:33%"></i></div><h3>Dashboard, scripts and voiceovers</h3><p>Airtable base with all tables and statuses. Script scenario with hook frameworks, structured beats, word cap and the compliance check. Approval gate. ElevenLabs voiceover with the length check, saved to the dated Drive folder.</p><div class="see"><b>You'll see</b>You type a topic, read the script, click Approved, and a voiceover appears in today's Drive folder.</div></div>
+      <div class="card m"><div class="top"><b>2</b><span>Days 7–15</span></div><div class="prog"><i style="--w:66%"></i></div><h3>Visuals, render and captions</h3><p>Stock clip matching per beat with the clip log and backup folder. 9:16 render template with your brand colours, word-by-word captions timed from the voice, and a CTA end card. Render-complete webhook into Drive. Optional Runway hook shot if you want it.</p><div class="see"><b>You'll see</b>Your first finished, captioned video in Drive, made with nobody touching an editor.</div></div>
+      <div class="card m"><div class="top"><b>3</b><span>Days 16–21</span></div><div class="prog"><i style="--w:100%"></i></div><h3>Ten-topic test run and handover</h3><p>Ten real topics through the whole pipeline, plus the failure cases: a rejected script, an over-length voice, a flagged claim, a clip search with no match, a render timeout. Then the 10-minute Loom on using the dashboard. One month of bug fixes starts at go-live.</p><div class="see"><b>You'll see</b>Ten videos in dated folders, the Error table catching each broken case, and a Loom you can rewatch whenever you need it.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="pricing">
+  <div class="wrap" id="plans" data-plan="full">
+    <div class="eyebrow" data-r><b>06</b>Investment</div>
+    <h2 data-r>Fixed-price bid</h2>
+    <p class="intro" data-r>The full turnkey pipeline is more work than $500 covers, mostly because of the render step. So you can start at your number: milestone 1 is $500 and works on its own, and you decide on the rest once you've used it.</p>
+
+    <div data-r>
+      <div class="seg" id="seg" role="group" aria-label="Choose a scope">
+        <i></i>
+        <button type="button" data-v="full" aria-pressed="true">Full pipeline · $1,500</button>
+        <button type="button" data-v="p1" aria-pressed="false">Start at $500</button>
+      </div>
+    </div>
+
+    <div class="price" data-r>
+      <div class="card">
+        <div class="plan full">
+          <div class="k">Full pipeline</div>
+          <div style="margin-top:10px"><span class="big">$1,500</span><span>USD</span></div>
+          <div class="terms">Fixed price · 3 weeks · paid per milestone</div>
+          <div class="ledger">
+            <div><span><strong>M1 — Dashboard, scripts, voiceovers</strong><small>Due when an approved topic produces a voiceover in Drive</small></span><b>$500</b></div>
+            <div><span><strong>M2 — Visuals, render, captions</strong><small>Due when the first finished video lands in Drive</small></span><b>$600</b></div>
+            <div><span><strong>M3 — Test run, Loom, 1 month support</strong><small>Due on your sign-off of the ten-topic run</small></span><b>$400</b></div>
+          </div>
+        </div>
+        <div class="plan p1">
+          <div class="k">Prefer to start at $500?</div>
+          <div style="margin-top:10px"><span class="big">$500</span><span>USD</span></div>
+          <div class="terms">Phase 1 · 1 week</div>
+          <p style="max-width:560px">Milestone 1 on its own: the dashboard, approved scripts and finished voiceovers in dated Drive folders, with a short handover video. You can drop each voiceover into CapCut yourself while you decide.</p>
+          <div class="ledger">
+            <div><span><strong>Phase 1 — Dashboard, scripts, voiceovers</strong><small>Due when an approved topic produces a voiceover in Drive</small></span><b>$500</b></div>
+            <div class="later"><span><strong>Phase 2, when you're ready · 2 weeks</strong><small>What moves out of phase 1: visual matching, the render template, captions, the ten-topic test run, the 10-minute Loom and the support month. Same total either way.</small></span><b>$1,000</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="k" style="color:var(--mut)">What's included</div>
+        <ul class="ticks one">
+          <li>Bug-tested Make.com scenarios</li>
+          <li>Airtable master dashboard, seven tables</li>
+          <li>Hook frameworks and compliance guardrail</li>
+          <li>ElevenLabs voice with length check</li>
+          <li class="p2">Stock matching, render template, captions</li>
+          <li>Dated Google Drive folders</li>
+          <li class="p1only">Short handover video</li>
+          <li class="p2">10-minute Loom walkthrough</li>
+          <li class="p2">One month of bug fixes after go-live</li>
+          <li>Built entirely in your accounts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="costs" data-stagger>
+      <header><div class="k" style="color:var(--mut)">Running costs after go-live, paid by you to the vendors</div></header>
+      <div><strong>ElevenLabs<code>~$22/mo Creator</code></strong><small>A 50-second script is about 750 characters, so the plan covers 100+ videos a month. Commercial use needs a paid plan.</small></div>
+      <div><strong>Render API<code>~$40–60/mo entry tier</code></strong><small>Creatomate, Shotstack or JSON2Video. I'll size the tier to your weekly volume in milestone 2.</small></div>
+      <div><strong>Make.com<code>~$11/mo Core</code></strong><small>About 40–60 operations per video, so a few hundred videos a month fit the base tier.</small></div>
+      <div><strong>Claude or GPT-4o<code>~$0.01–0.03 per script</code></strong><small>Including the compliance pass. Under $3 for a hundred scripts.</small></div>
+      <div><strong>Stock footage<code>$0 with Pexels</code></strong><small>A premium library is priced on its own plan if you want a deeper catalogue.</small></div>
+      <div><strong>Runway (optional)<code>Per-second credits</code></strong><small>Only if you turn on AI hook shots. Off by default.</small></div>
+    </div>
+    <p class="fine">Prices are vendor list prices as I understand them today and will be confirmed against your volume at kickoff. Airtable and Google Drive add nothing at this volume.</p>
+  </div>
+</section>
+
+<section class="sec" id="examples">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>07</b>The same pattern, elsewhere</div>
+    <h2 data-r>Two worked examples of this architecture</h2>
+    <p class="intro" data-r>Illustrative scenarios, not client case studies. They show how the same building blocks, a topic board, structured AI scripts, an approval gate and a template renderer, bend to different businesses.</p>
+    <div class="grid2" data-stagger>
+      <div class="card"><div class="k">Worked example · Budgeting course creator</div><h3 style="margin-top:12px;font-size:1.3rem;letter-spacing:-.03em">Three money-tip shorts a day, each pointing to the course</h3><p>The creator drops a week of angles into Airtable on Sunday night. Scripts come back by morning in a myth-vs-fact format, with a guardrail against investment-return promises. She approves on her phone over coffee; voice and render run while she works. Each video ends on the same CTA card, and the clip log keeps the footage from looking recycled by week three.</p><div class="tags"><span>Batch-and-approve</span><span>Claims guardrail</span><span>Clip log</span></div></div>
+      <div class="card"><div class="k">Worked example · Home-improvement installer</div><h3 style="margin-top:12px;font-size:1.3rem;letter-spacing:-.03em">"Before you hire a roofer" explainers for local ads</h3><p>The owner lists the questions customers ask on site visits. Each becomes a 40-second faceless explainer: question hook, three beats, a "get a free quote" end card. Stock roofing footage is matched per beat, with the company's own job-site clips as the backup folder. Finished files land in dated Drive folders that the ads manager pulls from each Monday.</p><div class="tags"><span>Question hooks</span><span>Own-footage fallback</span><span>Dated delivery</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="kickoff">
+  <div class="wrap narrow">
+    <div class="eyebrow" data-r><b>08</b>Before kickoff</div>
+    <h2 data-r style="margin-bottom:40px">Three things I'll confirm on our first call</h2>
+    <div data-stagger>
+      <div class="q"><b>Q1</b><div><h3>Stock library, Runway, or InVideo?</h3><p>I'd build on a stock API plus a render service, because both are driven cleanly from Make. InVideo is built around its own editor, so if you have a reason to use it I'll check what its API allows before committing. Default: Pexels, with Runway available for hook shots.</p></div></div>
+      <div class="q"><b>Q2</b><div><h3>Which voice, and which look?</h3><p>Pick an ElevenLabs voice (or let me shortlist three) and send your brand colours and font. Default: one voice, bold word-by-word captions in the lower third, 1080×1920.</p></div></div>
+      <div class="q"><b>Q3</b><div><h3>What's the CTA, and what can your product claim?</h3><p>The end card and the banned-claims list both depend on it. Default: one CTA line in Settings, and a banned list seeded with guarantees, point and day promises, and deleting accurate items. Posting to TikTok or Instagram isn't in scope; Drive is the finish line, as briefed.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>09</b>Who's building it</div>
+    <h2 data-r style="margin-bottom:44px">A short note on me</h2>
+    <div class="about">
+      <div class="who" data-r><i>K</i><div><b>Kristof</b><span>Flowtive</span><span>Claude Certified Architect</span></div></div>
+      <div>
+        <p data-r>I'm Kristof. I build Make.com automations with AI at the centre for owners who'd rather not think about them once they're running. Your brief is that pattern exactly: a record in, Make in the middle, an AI model doing the writing, and a finished file out.</p>
+        <p data-r>I work with the Claude and OpenAI APIs directly, using structured outputs so every script arrives as clean beats Make can act on, not a paragraph someone has to cut up. A past build of mine, an AI report pipeline, works the same way: raw data in, finished output out, with no hand editing. I write the limits down before building, which is why the render step, the length check and the compliance guardrail are on this page now rather than discovered in week two.</p>
+        <p data-r>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="padding:0 0 24px">
+  <div class="wrap">
+    <div class="final" data-r>
+      <h2>Ready to move forward?</h2>
+      <p>Send five topics you'd like as your first videos, your brand colours, and access to Airtable, Make, ElevenLabs and your Google Drive. I'll come back inside 48 hours with the kickoff date and the day your first voiceover lands in Drive.</p>
+      <div class="cta-row">
+        <a href="mailto:kristof@getflowtive.com" class="btn w">Email Kristof <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a href="#milestones" class="btn o">Re-read the milestones</a>
+      </div>
+      <div class="fine">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </div>
+</section>
+
+<footer class="ft"><div class="wrap"><span>© 2026 Flowtive · Prepared for your DIY credit repair brand</span><span>Faceless Video Pipeline Proposal</span></div></footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('[data-stagger]').forEach(function (g) {
+    Array.prototype.forEach.call(g.children, function (c, i) { c.setAttribute('data-r', ''); c.style.setProperty('--d', (i * 70) + 'ms'); });
+  });
+  var els = document.querySelectorAll('[data-r]');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  } else { els.forEach(function (el) { el.classList.add('in'); }); }
+
+  // nav state
+  var nav = document.getElementById('nav'), links = document.querySelectorAll('.links a');
+  var secs = Array.prototype.map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    var cur = -1; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 150) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // pricing toggle
+  var seg = document.getElementById('seg'), plans = document.getElementById('plans'), thumb = seg.querySelector('i');
+  function place(btn) { thumb.style.setProperty('--sw', btn.offsetWidth + 'px'); thumb.style.setProperty('--sx', (btn.offsetLeft - 4) + 'px'); }
+  seg.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      seg.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      plans.setAttribute('data-plan', b.getAttribute('data-v')); place(b);
+    });
+  });
+  function init() { place(seg.querySelector('[aria-pressed="true"]')); }
+  init(); window.addEventListener('resize', init); if (document.fonts && document.fonts.ready) document.fonts.ready.then(init);
+
+  // hero board: one row moves through the statuses
+  var chip = document.getElementById('liveChip'), bar = document.getElementById('liveBar');
+  var states = [['Write script', '', 6], ['Needs approval', 'wait', 30], ['Approved', 'ok', 44], ['Voicing', 'run', 62], ['Rendering', 'run', 84], ['Done · 44s', 'ok', 100]];
+  function show(i) { chip.textContent = states[i][0]; chip.className = 'chip ' + states[i][1]; bar.style.setProperty('--w', states[i][2] + '%'); }
+  if (reduce) { show(4); return; }
+  var i = 0; show(0);
+  (function tick() { setTimeout(function () { i = (i + 1) % states.length; show(i); tick(); }, i === states.length - 1 ? 3800 : 1900); })();
+})();
+</script>
+</body>
+</html>
