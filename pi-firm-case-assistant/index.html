@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Case assistant for a PI firm</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">The assistant</a>
+        <a href="#controls" class="hover:text-white transition">Records tracker</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your personal injury firm
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        An AI assistant for your team of four that <span class="text-accent-400">chases medical records</span> and never loses a deadline.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Built on Casepeer, Zapier, Google Docs and Google Calendar. Deadlines come from your Casepeer dates, never from the AI. The AI writes the summaries and drafts the follow-up emails, and a person on your team presses send.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the assistant</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">3 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">To handover</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">0 AI dates</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Deadlines from Casepeer only</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Drafts only</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Your team sends</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,000</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed price</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 UNDERSTANDING -->
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">Four people are carrying a caseload where the dates matter, the records come in slowly, and every file needs someone to remember to chase it. You want an assistant that helps manage deadlines, creates summaries, drafts emails and follows up with medical records, working inside Casepeer and your Google tools rather than beside them.</p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Manage deadlines"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Key dates in Casepeer become Google Calendar events with reminders, and each morning your team gets one email listing everything due in the next 14 days, overdue first. The AI never calculates a date; it only reads the ones your team entered.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Follow up with medical records"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Every open records request is tracked with the provider and the date it went out. On your cadence, a polite follow-up is drafted in Gmail with the case details filled in, ready for a person to send. After the third chase it's flagged for a phone call.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Create summaries"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">A one-page case summary in Google Docs on demand: parties, incident, treatment so far, outstanding records, upcoming dates and next steps, written from the case data and notes in Casepeer and saved to the case folder.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Your brief</div>
+          <h3 class="font-semibold text-lg">"Draft emails"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Drafts, not sends. In phase 1 that's records follow-ups; client status updates and other letters follow in phase 2 once the first drafts have earned your trust.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 FLOW -->
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The assistant</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Three jobs, one set of rules</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Casepeer holds the facts, Zapier moves them, Claude writes, and your team decides what goes out.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Deadline watch</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Casepeer</div>
+            <div class="font-medium">A key date is added or changed</div>
+            <div class="text-xs text-slate-400 mt-1">Through Casepeer's Zapier trigger or API</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Google Calendar</div>
+            <div class="font-medium">Event created or moved, with reminders</div>
+            <div class="text-xs text-slate-400 mt-1">Reminder lead times from your settings, e.g. 30, 7 and 1 day</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Every morning</div>
+            <div class="font-medium">Digest email: next 14 days</div>
+            <div class="text-xs text-slate-400 mt-1">Overdue first, then by date, each line linked to the case</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Records follow-up</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Tracker</div>
+            <div class="font-medium">Request logged: provider, date sent</div>
+            <div class="text-xs text-slate-400 mt-1">From Casepeer where it holds the request, otherwise one row added by your team</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude</div>
+            <div class="font-medium">Follow-up drafted in Gmail on your cadence</div>
+            <div class="text-xs text-slate-400 mt-1">Firmer wording on each chase; your authorization reattached if you keep it on file</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300 mb-1">Escalate</div>
+            <div class="font-medium">Third chase unanswered: call task</div>
+            <div class="text-xs text-slate-400 mt-1">Marked received when your team ticks it, and the chasing stops</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Case summary</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Ask</div>
+            <div class="font-medium">Team member requests a summary</div>
+            <div class="text-xs text-slate-400 mt-1">One click from the tracker or a Casepeer tag</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude</div>
+            <div class="font-medium">One page from the case data and notes</div>
+            <div class="text-xs text-slate-400 mt-1">Fixed headings, and "not in the file" where something is missing</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Google Docs</div>
+            <div class="font-medium">Saved to the case folder, dated</div>
+            <div class="text-xs text-slate-400 mt-1">Earlier summaries kept, so you can see what changed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, in every case</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Nothing goes to a provider, client or insurer without a person sending it</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Every action logged against the case, so you can see what the assistant did</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Medical record contents stay out of Zapier; only provider, dates and status move</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>If a step fails, the morning digest says so</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 CONTROLS -->
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Records tracker</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Your team sees every open request in one sheet</h2>
+        <p class="text-slate-400 leading-relaxed">A Google Sheet your team already knows how to use. It's read on every run, so changing the cadence or the wording of a follow-up is editing a cell, not opening Zapier.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Requests</strong> — case, provider, date sent, chases so far, status</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Settings</strong> — chase cadence, reminder lead times, digest recipients</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Wording</strong> — the instructions Claude follows for each draft</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Log</strong> — every draft, calendar change and summary, with time</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex flex-wrap gap-2 items-center justify-between">
+          <span>Records tracker · Google Sheets</span>
+          <span class="flex gap-3"><span class="text-white">Requests</span><span>Settings</span><span>Wording</span><span>Log</span></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm font-mono min-w-[480px]">
+            <thead class="text-xs text-slate-500">
+              <tr><th class="text-left px-4 py-2 font-normal">Case</th><th class="text-left px-4 py-2 font-normal">Provider</th><th class="text-left px-4 py-2 font-normal">Sent</th><th class="text-left px-4 py-2 font-normal">Status</th></tr>
+            </thead>
+            <tbody>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">2026-0412</td><td class="px-4 py-2 text-slate-400">Orthopedic group</td><td class="px-4 py-2 text-slate-400">Oct 14</td><td class="px-4 py-2 text-amber-300">chase 2 drafted</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">2026-0412</td><td class="px-4 py-2 text-slate-400">Imaging center</td><td class="px-4 py-2 text-slate-400">Oct 14</td><td class="px-4 py-2 text-accent-400">received</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">2026-0437</td><td class="px-4 py-2 text-slate-400">Hospital ER</td><td class="px-4 py-2 text-slate-400">Sep 30</td><td class="px-4 py-2 text-red-400">call needed</td></tr>
+              <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">2026-0451</td><td class="px-4 py-2 text-slate-400">Physical therapy</td><td class="px-4 py-2 text-slate-400">Nov 3</td><td class="px-4 py-2 text-slate-400">waiting</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative. Settings tab example: chase_days = 10, 20, 30 · reminders = 30, 7, 1 · digest_time = 8:00am ET.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 RELIABILITY -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Reliability</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so nothing slips quietly</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">The AI doesn't do dates</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Calendar entries are copied from Casepeer by fixed rules. If a date is missing or looks wrong, the digest flags it for a person instead of guessing.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">A daily check on the sync</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Each morning the digest compares Casepeer's upcoming dates with the calendar. Any mismatch is listed at the top, so a failed Zap can't hide a deadline.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">Drafts stay drafts</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Claude writes into Gmail drafts and Google Docs only. It has no ability to send, and summaries say "not in the file" rather than fill a gap.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">Your accounts, your data</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Zapier, the Claude API key and the Google files are all in the firm's accounts. Record contents stay out of phase 1 entirely.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 MILESTONES -->
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Your three milestones, three weeks</h2>
+      <p class="mt-4 text-slate-400">Each milestone ends with something you can click on in your own accounts.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Deadline watch</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–7</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Confirm what Casepeer's API and Zapier triggers expose, then Casepeer dates to Google Calendar with reminders, and the morning digest with the sync check.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your real cases on the calendar and the first digest in your inbox.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Records follow-up</h3>
+            <span class="text-xs font-mono text-slate-500">Days 8–14</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">The Records tracker, the chase cadence, Claude drafting follow-ups into Gmail in your firm's wording, and the call escalation.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> follow-up drafts waiting in Gmail for your open requests.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Case summaries and handover</h3>
+            <span class="text-xs font-mono text-slate-500">Days 15–21</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">One-page summaries into Google Docs, tested on five of your cases with your feedback. Short written guide and a walkthrough video for the team, then one month of bug fixes.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a summary for any case in under a minute, saved in its folder.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 PRICING -->
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid</h2>
+      <p class="mt-4 text-slate-400">One number, paid against your three milestones.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Phase 1</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,000</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 3 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Deadline watch</div><div class="text-xs text-slate-500">Due on the first digest from your cases</div></div>
+              <div class="font-mono text-accent-400">$400</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Records follow-up</div><div class="text-xs text-slate-500">Due when drafts appear for open requests</div></div>
+              <div class="font-mono text-accent-400">$350</div>
+            </div>
+            <div class="flex justify-between gap-4 pb-1">
+              <div><div class="font-medium">M3 — Case summaries and handover</div><div class="text-xs text-slate-500">Due on handover and walkthrough</div></div>
+              <div class="font-mono text-accent-400">$250</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+            <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">What's included</div>
+            <ul class="space-y-2 text-sm text-slate-300">
+              <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Casepeer to Calendar sync and daily digest</span></li>
+              <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Records tracker and follow-up drafts</span></li>
+              <li class="flex gap-2"><span class="text-accent-400">✓</span><span>One-page case summaries in Google Docs</span></li>
+              <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Guide, walkthrough video, one month of fixes</span></li>
+            </ul>
+          </div>
+          <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+            <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Phase 2, optional</div>
+            <div class="mt-1 text-3xl font-bold">$1,200</div>
+            <p class="mt-2 text-sm text-slate-400">Summaries of the medical records themselves, client status update drafts and intake summaries. Needs a decision on where record contents can be processed first.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Zapier</div><div class="text-accent-400 font-mono mt-1">~$20–50 / month</div><div class="text-xs text-slate-500 mt-1">A paid plan for multi-step Zaps; tier depends on task volume.</div></div>
+          <div><div class="font-medium">Claude API</div><div class="text-accent-400 font-mono mt-1">~$0.02–0.10 per draft or summary</div><div class="text-xs text-slate-500 mt-1">Likely under $20 a month for a team of four.</div></div>
+          <div><div class="font-medium">Google Workspace and Casepeer</div><div class="text-accent-400 font-mono mt-1">Your current plans</div><div class="text-xs text-slate-500 mt-1">API access on your Casepeer plan to confirm.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 WORKED EXAMPLES -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks bend to other document-heavy practices.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Workers' comp practice</div>
+          <h3 class="text-lg font-semibold mb-3">Hearing dates and missing paperwork, chased daily</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Hearing dates from the case system land on the shared calendar, and a tracker lists outstanding employer and doctor forms. Follow-ups are drafted on a fixed cadence for a paralegal to send, and the morning digest shows what's due and what's stuck.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Dates from the system</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Chase cadence</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Drafts only</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Insurance claims consultancy</div>
+          <h3 class="text-lg font-semibold mb-3">A one-page file summary before every adjuster call</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Before a scheduled call, Claude writes a summary of the claim from the file notes into a dated Doc in the claim folder, with fixed headings and "not in the file" where information is missing.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Summary on demand</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Fixed headings</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Saved to the file</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 BEFORE KICKOFF -->
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Which dates in Casepeer count as deadlines, and who enters them?</div><div class="text-sm text-slate-400 mt-1">Statute dates, court dates, treatment milestones and internal tasks may live in different fields. Default: we sync the date fields you name, and anything unnamed stays out of the calendar.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Are records requests logged in Casepeer today?</div><div class="text-sm text-slate-400 mt-1">If yes, the tracker fills itself. Default: if not, your team adds one row per request and the chasing runs from there.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Does the firm email from Google Workspace, and how should follow-ups sound?</div><div class="text-sm text-slate-400 mt-1">Default: Gmail drafts from a shared records mailbox, using your current follow-up letter as the starting wording.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 NOTE -->
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build automation systems for people who'd rather not think about them: small teams whose time goes on chasing and copying instead of the work they're paid for.</p>
+        <p>I'm not a lawyer and the assistant isn't one either, which is why it's designed the way it is. Facts and dates come from Casepeer, Claude writes from them, and a person on your team stays the one who decides and sends. Every setting your team might change lives in a sheet, so nobody has to open Zapier after handover.</p>
+        <p>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send your current records follow-up letter and a 20-minute slot to show me how deadlines are entered in Casepeer. I'll come back inside 48 hours with the kickoff date, and your first deadline digest arrives within the first week.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your personal injury firm</div>
+      <div>Case assistant: deadlines, summaries, records follow-up</div>
+    </div>
+  </footer>
+
+</body>
+</html>
