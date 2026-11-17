@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Agency automation test project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">Test project</a>
+        <a href="#controls" class="hover:text-white transition">Dashboard</a>
+        <a href="#roadmap" class="hover:text-white transition">After the test</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your marketing agency
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        A paid test project that runs through <span class="text-accent-400">your whole stack</span> in two weeks.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Campaign data into Supabase every morning through Make.com and Python on Railway, a Claude-written weekly note per client, and a dashboard your team and your clients can open. All in your accounts and your GitHub, so you judge fit on something you keep.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the test project</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">2 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Test project</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,200</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Fixed, agreed upfront</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">7 of 7</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Stack items exercised</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">Daily</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Data refresh</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">You want your team to "handle more clients with less operational drag", and you've got a list: an AI Website Generator, data pipelines, campaign dashboards, fulfilment agents, onboarding and off-boarding. You also want to find out whether a developer is any good before committing. A test project should answer that, and should leave you with something you'd have built anyway.</p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Test tasks, scope and fixed project price agreed upfront"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">So here is one, scoped and priced. If you'd rather hand me your own test brief, the same rate and milestone structure apply and I'll price it within a day of reading it.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Data pipelines into our database and related dashboards"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">The test is exactly that: ad platform data into Supabase on a schedule, then internal and client-facing views on top. It's the base most of your other projects will read from.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Routers, webhooks, API calls, error handling"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Make.com runs the schedule and routes by client. Where a Make connector is thin, a small Python job on Railway calls the API directly. Every failure lands in an errors table and a Slack message, not in a scenario history nobody opens.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"GitHub for version control"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Python, SQL migrations and the Make blueprints all live in your GitHub from the first commit, written with Claude Code, so the next developer can read how it works.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The test project</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ad accounts to client dashboard, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Make decides when, Python decides how the numbers are cleaned, Supabase holds the truth, Claude writes the words.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Make.com · schedule</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Trigger</div>
+            <div class="font-medium">06:00 daily, one run per client</div>
+            <div class="text-xs text-slate-400 mt-1">Client list and ad account ids read from Supabase</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Router</div>
+            <div class="font-medium">Meta Ads and Google Ads branches</div>
+            <div class="text-xs text-slate-400 mt-1">Yesterday plus a 7-day look-back, since platforms restate conversions</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Webhook</div>
+            <div class="font-medium">Raw rows posted to the Railway job</div>
+            <div class="text-xs text-slate-400 mt-1">Error route: retry twice, then errors table + Slack</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Python on Railway · Supabase</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Normalise</div>
+            <div class="font-medium">One shape for every platform</div>
+            <div class="text-xs text-slate-400 mt-1">client, date, platform, campaign, spend, clicks, conversions, revenue</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Upsert</div>
+            <div class="font-medium">Into campaign_daily, keyed by client + date + campaign</div>
+            <div class="text-xs text-slate-400 mt-1">Re-running a day overwrites, never duplicates</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Claude · Mondays</div>
+            <div class="font-medium">Weekly note per client into client_notes</div>
+            <div class="text-xs text-slate-400 mt-1">What moved, the likely reason, one thing to check. Numbers come from SQL, not the model.</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Dashboard · Lovable on Supabase</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Internal</div>
+            <div class="font-medium">All clients, flagged by pacing and CPA change</div>
+            <div class="text-xs text-slate-400 mt-1">Your team sees who needs attention first</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Client-facing</div>
+            <div class="font-medium">One client, their numbers and this week's note</div>
+            <div class="text-xs text-slate-400 mt-1">Row-level security, so a client can only read their own rows</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Health</div>
+            <div class="font-medium">"Last refreshed" on every view</div>
+            <div class="text-xs text-slate-400 mt-1">A stale client shows amber, not old numbers passed off as today's</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">What the test proves, item by item</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Make.com: router, webhook, API calls, error route</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Claude Code writing the Python, with tests</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Supabase schema, upserts and row-level security</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>APIs read from the docs, not from a tutorial</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Script deployed on Railway with logs</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>Everything in your GitHub, plus a no-code dashboard</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Your controls</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">Adding a client is a row, not a ticket</h2>
+        <p class="text-slate-400 leading-relaxed">Your account managers add or pause clients in one Supabase table. The next morning's run picks it up. Nobody opens Make.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>clients</strong>: name, ad account ids, target CPA, active</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>campaign_daily</strong>: one row per client, day, campaign</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>client_notes</strong>: the weekly Claude note, editable before a client sees it</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>errors</strong>: what failed, for which client, and whether the retry worked</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex flex-wrap gap-2 items-center justify-between">
+          <span>clients · Supabase</span>
+          <span class="flex gap-3"><span class="text-white">clients</span><span>daily</span><span>notes</span><span>errors</span></span>
+        </div>
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">client</th><th class="text-left px-4 py-2 font-normal">platforms</th><th class="text-left px-4 py-2 font-normal">target_cpa</th><th class="text-left px-4 py-2 font-normal">active</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">dental-group</td><td class="px-4 py-2 text-slate-400">meta · google</td><td class="px-4 py-2 text-slate-400">45</td><td class="px-4 py-2 text-accent-400">true</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">gym-chain</td><td class="px-4 py-2 text-slate-400">meta</td><td class="px-4 py-2 text-slate-400">18</td><td class="px-4 py-2 text-accent-400">true</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">solar-installer</td><td class="px-4 py-2 text-slate-400">google</td><td class="px-4 py-2 text-slate-400">120</td><td class="px-4 py-2 text-accent-400">true</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">law-firm</td><td class="px-4 py-2 text-slate-400">google</td><td class="px-4 py-2 text-slate-400">210</td><td class="px-4 py-2 text-slate-500">false</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative rows. If your team lives in Airtable, the clients table can sit there and sync to Supabase instead.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Three milestones, two weeks</h2>
+      <p class="mt-4 text-slate-400">Each one ends with something you can open in your own accounts.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Data lands in Supabase</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–5</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Schema and migrations in GitHub, Make scenario with router and error route, Railway job normalising and upserting, backfill of the last 30 days for up to 5 clients.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> campaign_daily filling each morning, and a forced failure showing up in Slack.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Dashboards</h3>
+            <span class="text-xs font-mono text-slate-500">Days 6–10</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Internal all-clients view and the client-facing view in Lovable on Supabase, with row-level security and the "last refreshed" health flag.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> both dashboards live with real numbers, and a client login that can't see anyone else.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Claude notes and handover</h3>
+            <span class="text-xs font-mono text-slate-500">Days 11–14</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Weekly Claude note per client, editable before it shows to the client. README, a 10-minute Loom of how it works, and a month of bug fixes.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> Monday's notes in client_notes and on each client's dashboard, and a handover your team can follow without me.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="roadmap" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — After the test</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">How the rest of your list builds on it</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">The order I'd suggest, each scoped and priced from your written brief before it starts.</p>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 mb-3">NEXT · indicative $2,500</div>
+          <h3 class="font-semibold mb-2">AI Website Generator Workflow</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Intake form to a structured brief, Claude drafts page copy and layout per section, output pushed into your site builder for a designer to finish. Priced once I've seen your site stack and a sample brief.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 mb-3">THEN</div>
+          <h3 class="font-semibold mb-2">Onboarding and off-boarding</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Signed client in, folders, accounts, access requests and the clients row created. Off-boarding reverses it and checks nothing is left with access.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 mb-3">THEN</div>
+          <h3 class="font-semibold mb-2">Fulfilment agents in Claude Code</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Agents that read the same Supabase data to draft reports, ad copy variants and audit notes for your team to approve.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price test project</h2>
+      <p class="mt-4 text-slate-400">One number, paid against the three milestones, nothing up front.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Test project</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,200</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 2 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Data lands in Supabase</div><div class="text-xs text-slate-500">Due when the daily run fills campaign_daily</div></div>
+              <div class="font-mono text-accent-400">$500</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Dashboards</div><div class="text-xs text-slate-500">Due when both views are live</div></div>
+              <div class="font-mono text-accent-400">$400</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M3 — Claude notes and handover</div><div class="text-xs text-slate-500">Due at handover</div></div>
+              <div class="font-mono text-accent-400">$300</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">After the test</div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Each project from your list scoped and fixed-priced from your brief</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Or a monthly build retainer, indicatively $3,000/month for a standing slot: about one new automation or two improvements a month, set once the test shows the pace</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Sync calls every 1–2 weeks, as you described</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Make.com</div><div class="text-accent-400 font-mono mt-1">existing plan</div><div class="text-xs text-slate-500 mt-1">Roughly 20–40 operations per client per day; 5 clients fits a Core plan.</div></div>
+          <div><div class="font-medium">Railway + Supabase</div><div class="text-accent-400 font-mono mt-1">~$5–30/month</div><div class="text-xs text-slate-500 mt-1">Small Railway service; Supabase free tier or your existing Pro plan.</div></div>
+          <div><div class="font-medium">Claude API</div><div class="text-accent-400 font-mono mt-1">~$0.02 per note</div><div class="text-xs text-slate-500 mt-1">One weekly note per client: well under $5 a month at 50 clients.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">Which platforms do your clients' numbers come from?</div><div class="text-sm text-slate-400 mt-1">Default: Meta Ads and Google Ads for the test. GA4, TikTok or LinkedIn Ads come after, through the same normalise step.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Is Supabase already set up, and where does the client list live today?</div><div class="text-sm text-slate-400 mt-1">Default: a new schema in your existing project, with the clients table seeded from whatever list your team uses now.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Do you have a test brief of your own in mind?</div><div class="text-sm text-slate-400 mt-1">If so, I'll price it the same way within a day. Default: this reporting pipeline, since your other projects read from it.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I run Flowtive, building AI-enabled automation for service businesses on Make.com, Python and the Claude API, with Claude Code as my daily development environment.</p>
+        <p>I work as a retained contractor rather than an employee, which suits a list like yours: a standing build slot, one project at a time, every one in your accounts and your GitHub so nothing depends on me staying. My Loom covers a past build of mine that turns raw client data into a finished report with no hand editing, which is close to what this test does.</p>
+        <p>Happy to walk you through that build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send access to Make, Supabase, GitHub and two or three clients' ad accounts, or your own test brief. I'll come back inside 48 hours with the kickoff date, and data lands in Supabase by day 5.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your marketing agency</div>
+      <div>Agency automation test project</div>
+    </div>
+  </footer>
+
+</body>
+</html>
