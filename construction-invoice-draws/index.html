@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal — Invoice tracking and construction draws</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 900: '#0B0F17', 800: '#121826', 700: '#1B2332', 600: '#2A3447' },
+            accent: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.14), transparent 60%); }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .step-line::before {
+      content: ''; position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px;
+      background: linear-gradient(to bottom, #22C55E, transparent);
+    }
+    .step-line:last-child::before { display: none; }
+    .flow-arrow { width: 2px; height: 28px; margin: 0 auto; background: linear-gradient(to bottom, rgba(74,222,128,0.6), rgba(74,222,128,0.15)); }
+    .sheet-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-ink-900 text-slate-100">
+
+  <header class="sticky top-0 z-50 backdrop-blur bg-ink-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-ink-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold tracking-tight">Flowtive</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm text-slate-400">
+        <a href="#understanding" class="hover:text-white transition">Understanding</a>
+        <a href="#flow" class="hover:text-white transition">The build</a>
+        <a href="#controls" class="hover:text-white transition">Your sheets</a>
+        <a href="#milestones" class="hover:text-white transition">Milestones</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+      </nav>
+      <a href="#contact" class="text-sm bg-white text-ink-900 px-4 py-2 rounded-lg font-medium hover:bg-accent-400 transition">Get in touch</a>
+    </div>
+  </header>
+
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-slate-300 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-400 pulse"></span>
+        Project Proposal · Prepared for your custom home building company
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-4xl">
+        Invoices from Gmail into your trackers, and monthly draws that <span class="text-accent-400">never bill an invoice twice</span>.
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+        Built in Make.com, Google Sheets and Apps Script, on your existing invoice trackers and draw templates. Your admin stops typing and starts reviewing the handful of invoices that actually need a person.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#flow" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-5 py-3 rounded-lg transition">See the build</a>
+        <a href="#pricing" class="border border-white/15 hover:bg-white/5 px-5 py-3 rounded-lg transition">View fixed-price bid</a>
+      </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">150–200</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Invoices a month, hands-off</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">$1,000</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Phase 1, fixed</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">3 weeks</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Both phases live</div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <div class="text-2xl font-bold text-accent-400">0 re-billed</div>
+          <div class="text-xs text-slate-400 mt-1 uppercase tracking-wide">Draw ledger per invoice</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="understanding" class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">01 — Understanding</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">What you're solving for</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl leading-relaxed">About 10 projects, 15–20 invoices each a month, all landing in Gmail. Your admin keys every one into Google Sheets, files the PDF, and at month end builds each draw request from your templates while checking nothing was already billed. Reading the invoice is the easy part to automate. Knowing which project it belongs to, and which draw it has already been in, is where the time and the risk sit.</p>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Vendor, invoice number, date, amount, and project"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">The first four are printed on the invoice. Project usually isn't. It's matched from the job site address, a PO or job number, or the vendor's usual projects, using a Projects tab you control. When the match isn't certain, the invoice goes to review, never into a guessed tracker.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Excluding invoices already included in prior approved draws"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Every invoice row gets a Draw column. Preparing a draw marks its invoices "pending"; approving it stamps the draw number. The next draw only picks up invoices with an empty Draw column, so nothing is billed twice and nothing is forgotten.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Some containing links to online invoices"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">If the link serves a PDF, it's downloaded and treated like an attachment. If it opens a vendor portal behind a login, the email goes to review as "download manually" with the link, rather than half-read.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-2">Requirement</div>
+          <h3 class="font-semibold text-lg">"Detect duplicate invoices and flag missing or questionable information"</h3>
+          <p class="mt-2 text-slate-400 text-sm leading-relaxed">Duplicates are caught on vendor + invoice number, then on vendor + amount + date for resent invoices with a new number. Missing fields, low confidence and amounts far above that vendor's usual all go to one Review tab.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-900 to-ink-800">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">02 — The build</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Inbox to draw request, in one diagram</h2>
+      <p class="mt-5 text-slate-400 text-lg max-w-3xl">Gmail decides what arrives, Claude reads it, your Projects tab decides where it goes, and your admin decides what's approved.</p>
+
+      <div class="mt-14 grid lg:grid-cols-3 gap-6">
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Gmail → Make.com</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Trigger</div>
+            <div class="font-medium">New email in the invoices inbox or label</div>
+            <div class="text-xs text-slate-400 mt-1">Checked every 15 minutes; processed emails get a "logged" label</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Classify</div>
+            <div class="font-medium">Invoice, statement, quote or not-an-invoice</div>
+            <div class="text-xs text-slate-400 mt-1">Statements and quotes are logged, not added to trackers</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Get the PDF</div>
+            <div class="font-medium">Attachment, or the PDF behind the link</div>
+            <div class="text-xs text-slate-400 mt-1">Portal link behind a login → review, "download manually"</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Claude · checks</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Extract</div>
+            <div class="font-medium">Vendor, number, date, amount, tax, job address, PO</div>
+            <div class="text-xs text-slate-400 mt-1">Structured output with a confidence per field</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Match</div>
+            <div class="font-medium">Project from address, PO/job number or vendor history</div>
+            <div class="text-xs text-slate-400 mt-1">Two projects possible? Review, with both suggested</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Check</div>
+            <div class="font-medium">Duplicate, missing field, unusual amount</div>
+            <div class="text-xs text-slate-400 mt-1">Any flag → Review tab; clean → straight to the tracker</div>
+          </div>
+        </div>
+
+        <div class="bg-ink-800/60 border border-white/10 rounded-2xl p-5">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Google Sheets · Drive · Apps Script</div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Write</div>
+            <div class="font-medium">Row in that project's existing tracker</div>
+            <div class="text-xs text-slate-400 mt-1">Your columns, plus Draw and a link to the PDF</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">File</div>
+            <div class="font-medium">PDF saved to the project's Drive folder</div>
+            <div class="text-xs text-slate-400 mt-1">Named Vendor_Invoice#_Date so it sorts</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="bg-ink-700 border border-white/10 rounded-xl p-4">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-accent-400 mb-1">Month end · phase 2</div>
+            <div class="font-medium">"Prepare draw" menu fills your template</div>
+            <div class="text-xs text-slate-400 mt-1">Only invoices with an empty Draw column. "Mark approved" stamps the draw number.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-3">Then, for every email</div>
+        <div class="grid md:grid-cols-2 gap-3 text-sm">
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>It ends in a tracker row or a Review row. Never nowhere.</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>The Log tab records what was read and where it went.</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>A daily email lists anything waiting in Review.</span></div>
+          <div class="flex gap-2"><span class="text-accent-400">✓</span><span>The Gmail label shows it was handled.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="controls" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">03 — Your sheets</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-5">A new project is a row, not a new scenario</h2>
+        <p class="text-slate-400 leading-relaxed">One control sheet sits beside your trackers. Make reads it on every invoice, so a new project or vendor takes effect on the next email. Nobody opens Make after handover.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Projects</strong>: name, job site address, job number, tracker, Drive folder</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Vendors</strong>: known vendors, usual projects, usual amount range</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Review</strong>: flagged invoices, with the reason and a one-click "send to tracker"</span></li>
+          <li class="flex gap-3"><span class="text-accent-400">▸</span><span><strong>Log</strong> and <strong>Errors</strong>: every email handled, every step that failed</span></li>
+        </ul>
+      </div>
+      <div class="bg-ink-900 border border-white/10 rounded-2xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-white/10 text-xs text-slate-400 font-mono flex flex-wrap gap-2 items-center justify-between">
+          <span>Invoice control · Google Sheets</span>
+          <span class="flex gap-3"><span>Projects</span><span>Vendors</span><span class="text-white">Review</span><span>Log</span></span>
+        </div>
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm font-mono">
+          <thead class="text-xs text-slate-500">
+            <tr><th class="text-left px-4 py-2 font-normal">Vendor</th><th class="text-left px-4 py-2 font-normal">Inv #</th><th class="text-left px-4 py-2 font-normal">Amount</th><th class="text-left px-4 py-2 font-normal">Flag</th></tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Ridge Lumber</td><td class="px-4 py-2 text-slate-400">88412</td><td class="px-4 py-2 text-slate-400">$14,280</td><td class="px-4 py-2 text-amber-300">2 projects match</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Coastal Electric</td><td class="px-4 py-2 text-slate-400">2291</td><td class="px-4 py-2 text-slate-400">$6,950</td><td class="px-4 py-2 text-amber-300">duplicate of 11/03</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Stone Supply Co</td><td class="px-4 py-2 text-slate-400">—</td><td class="px-4 py-2 text-slate-400">$3,410</td><td class="px-4 py-2 text-amber-300">no invoice number</td></tr>
+            <tr class="sheet-row"><td class="px-4 py-2 text-slate-300">Glass &amp; Glazing</td><td class="px-4 py-2 text-slate-400">portal link</td><td class="px-4 py-2 text-slate-400">—</td><td class="px-4 py-2 text-amber-300">download manually</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="px-4 py-3 text-xs text-slate-500 border-t border-white/10">Illustrative rows. Tracker columns follow your existing sheets; the control sheet is the only new file.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">04 — Reliability</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Built so no invoice is lost or billed twice silently</h2>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">01</div>
+          <h3 class="font-semibold mb-2">The wrong project</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The costliest error in a draw. Below the confidence threshold, the invoice waits in Review with the suggested projects. Your admin's choice is remembered for that vendor and address next time.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">02</div>
+          <h3 class="font-semibold mb-2">The same invoice sent twice</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Vendors resend, CC two people, or send a reminder with the PDF attached. Exact and near-match duplicate checks run before anything is written.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">03</div>
+          <h3 class="font-semibold mb-2">An invoice in two draws</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">The Draw column is the record. A prepared-but-unapproved draw holds its invoices as "pending" so a second draw can't take them.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">04</div>
+          <h3 class="font-semibold mb-2">A misread amount</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Line items are checked against the total, and the amount is compared with that vendor's usual range. A mismatch goes to Review rather than into a draw.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">05</div>
+          <h3 class="font-semibold mb-2">Make or Google has a bad hour</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Failed steps retry, then land in the Errors tab with the email link. The email keeps its unprocessed label so the next run picks it up.</p>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <div class="text-xs font-mono text-slate-500 mb-3">06</div>
+          <h3 class="font-semibold mb-2">Ownership</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Built in your Make, Google and Claude accounts. If we part ways, nothing stops working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="milestones" class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">05 — Milestones</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Four milestones, three weeks</h2>
+      <p class="mt-4 text-slate-400">Phase 1 is three milestones in two weeks. Phase 2, the draws, is one more week.</p>
+      <div class="mt-12 space-y-10">
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">1</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Reading invoices</h3>
+            <span class="text-xs font-mono text-slate-500">Days 1–5</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Gmail watch, classification and extraction, tested on your sample invoices including the linked ones. Control sheet with Projects and Vendors filled from your trackers.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> your sample invoices read into the Log tab, with an accuracy count field by field.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">2</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Into your trackers and Drive</h3>
+            <span class="text-xs font-mono text-slate-500">Days 6–10</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Project matching, duplicate and exception checks, rows into your existing trackers, PDFs into the right Drive folders, the Review tab and the daily digest.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> real invoices landing in the right tracker and folder, with a planted duplicate caught in Review.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">3</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Live, side by side</h3>
+            <span class="text-xs font-mono text-slate-500">Days 11–14</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">A few days running alongside your admin's manual entry, differences fixed, then switch over. Handover video and notes.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> a comparison of automated vs manual rows, and your admin reviewing instead of typing.</span>
+          </div>
+        </div>
+        <div class="relative pl-14 step-line">
+          <div class="absolute left-0 top-0 w-10 h-10 rounded-full bg-accent-500 text-ink-900 font-bold flex items-center justify-center">4</div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h3 class="text-xl font-semibold">Phase 2: draw requests</h3>
+            <span class="text-xs font-mono text-slate-500">Days 15–21</span>
+          </div>
+          <p class="mt-3 text-slate-400 leading-relaxed">Apps Script menu in your trackers: "Prepare draw" copies your template and fills eligible invoices; "Mark approved" stamps the draw number. Past draws back-filled so the first automated draw excludes them.</p>
+          <div class="mt-4 bg-ink-900 border border-white/10 rounded-lg p-4 text-sm">
+            <span class="text-accent-400 font-medium">You'll see</span>
+            <span class="text-slate-300"> this month's draw for one project built from your template in a click, matching what your admin would have prepared.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="border-t border-white/5 py-20 md:py-28 bg-gradient-to-b from-ink-800 to-ink-900">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">06 — Investment</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Fixed-price bid</h2>
+      <p class="mt-4 text-slate-400">Your $1,000 covers phase 1 in full. The draw requests are a separate, smaller phase so you can see phase 1 working first.</p>
+
+      <div class="mt-12 grid lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 bg-white/[0.03] border border-accent-500/30 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Phase 1 · invoices in</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-6xl font-bold text-accent-400">$1,000</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">Fixed price · 2 weeks · paid per milestone</div>
+          <div class="mt-8 space-y-3 text-sm">
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M1 — Reading invoices</div><div class="text-xs text-slate-500">Due when your samples read correctly</div></div>
+              <div class="font-mono text-accent-400">$400</div>
+            </div>
+            <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
+              <div><div class="font-medium">M2 — Into your trackers and Drive</div><div class="text-xs text-slate-500">Due when real invoices land correctly</div></div>
+              <div class="font-mono text-accent-400">$350</div>
+            </div>
+            <div class="flex justify-between gap-4">
+              <div><div class="font-medium">M3 — Live, side by side</div><div class="text-xs text-slate-500">Due at switch-over</div></div>
+              <div class="font-mono text-accent-400">$250</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+          <div class="text-xs font-mono uppercase tracking-wide text-slate-400">Phase 2 · draw requests</div>
+          <div class="mt-2 flex items-baseline gap-2"><span class="text-4xl font-bold text-accent-400">$600</span><span class="text-slate-400">USD</span></div>
+          <div class="mt-2 text-sm text-slate-400">1 week · one milestone</div>
+          <ul class="mt-6 space-y-2 text-sm text-slate-300">
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>"Prepare draw" and "Mark approved" menu</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Your existing draw templates</span></li>
+            <li class="flex gap-2"><span class="text-accent-400">✓</span><span>Past draws back-filled</span></li>
+          </ul>
+          <div class="mt-6 text-xs text-slate-500">Both phases include one month of bug fixes after go-live, the control sheet, and a handover video.</div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-ink-800 border border-white/10 rounded-2xl p-6">
+        <div class="text-xs font-mono uppercase tracking-wide text-slate-400 mb-4">Running costs after go-live, paid by you to the vendors</div>
+        <div class="grid md:grid-cols-3 gap-5 text-sm">
+          <div><div class="font-medium">Claude API</div><div class="text-accent-400 font-mono mt-1">~$0.01–0.03 per invoice</div><div class="text-xs text-slate-500 mt-1">About $2–6 a month at 200 invoices.</div></div>
+          <div><div class="font-medium">Make.com</div><div class="text-accent-400 font-mono mt-1">~$11/month</div><div class="text-xs text-slate-500 mt-1">Core plan covers roughly 200 invoices at 15–25 operations each, plus inbox checks.</div></div>
+          <div><div class="font-medium">Google Workspace</div><div class="text-accent-400 font-mono mt-1">$0 extra</div><div class="text-xs text-slate-500 mt-1">Your existing Gmail, Sheets, Drive and Apps Script.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">07 — The same pattern, elsewhere</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Two worked examples of this architecture</h2>
+      <p class="mt-4 text-slate-400 max-w-3xl">Illustrative scenarios, not client case studies. They show how the same building blocks bend to different businesses.</p>
+      <div class="mt-12 grid md:grid-cols-2 gap-6">
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Commercial fit-out contractor</div>
+          <h3 class="text-lg font-semibold mb-3">Subcontractor bills matched to jobs and valuations</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Subcontractor invoices arrive with site names spelled three ways. A Jobs tab of addresses and job codes does the matching, uncertain ones go to review, and the monthly valuation to the main contractor only pulls costs not already claimed.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Job matching</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Claimed ledger</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Review tab</span>
+          </div>
+        </div>
+        <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-7">
+          <div class="text-xs font-mono text-accent-400 uppercase tracking-wide mb-3">Worked example · Property management</div>
+          <h3 class="text-lg font-semibold mb-3">Maintenance invoices billed back to the right owner</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">Contractor invoices for 40 rental units arrive in one inbox. Each is read, matched to a unit by address, filed in that owner's Drive folder, and pulled into the owner's monthly statement once, with duplicates from resent reminders caught first.</p>
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Address matching</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Duplicate checks</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Template output</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/5 py-20 md:py-28 bg-ink-800">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">08 — Before kickoff</div>
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-8">Three things I'll confirm on our first call</h2>
+      <div class="space-y-4">
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q1</div>
+          <div><div class="font-medium">How do your vendors identify the project today?</div><div class="text-sm text-slate-400 mt-1">Job site address, a job number you give them, or nothing at all. Default: address first, then job number, then vendor history, with anything else to Review.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q2</div>
+          <div><div class="font-medium">Which past draws are already approved, and where is that recorded?</div><div class="text-sm text-slate-400 mt-1">The first automated draw is only as good as that history. Default: I back-fill the Draw column from your last approved draw request per project.</div></div>
+        </div>
+        <div class="bg-ink-900 border border-white/10 rounded-xl p-5 flex gap-4">
+          <div class="font-mono text-accent-400 text-sm shrink-0">Q3</div>
+          <div><div class="font-medium">Does an invoice need approval before it's eligible for a draw?</div><div class="text-sm text-slate-400 mt-1">Some builders only draw on invoices a PM has signed off. Default: a simple "Approved" checkbox in the tracker that the draw respects.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/5 py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-xs uppercase tracking-[0.2em] text-accent-400 font-semibold mb-3">09 — Who's building it</div>
+      <h2 class="text-3xl font-bold tracking-tight">A short note on me</h2>
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>I'm Kristof. I build automation systems for people who'd rather not think about them, mostly on Make.com, Google Workspace and the Claude API.</p>
+        <p>For this job that means writing the hard rules down before building: how a project is recognised, what counts as a duplicate, when an invoice is eligible for a draw. A constraint found in scoping costs a sentence; one found in your first automated draw costs a phone call with your lender.</p>
+        <p>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="border-t border-white/5 py-20 md:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 glow"></div>
+    <div class="relative max-w-3xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Ready to move forward?</h2>
+      <p class="mt-5 text-slate-400 text-lg">
+        Send 15–20 sample invoices (including a couple of the linked ones), one project's tracker and your draw template. I'll come back inside 48 hours with the kickoff date, and your samples read into the Log by day 5.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <a href="mailto:kristof@getflowtive.com" class="bg-accent-500 hover:bg-accent-400 text-ink-900 font-semibold px-6 py-3 rounded-lg transition">Email Kristof</a>
+        <a href="#milestones" class="border border-white/15 hover:bg-white/5 px-6 py-3 rounded-lg transition">Re-read the milestones</a>
+      </div>
+      <div class="mt-12 text-sm text-slate-500">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div>© 2026 Flowtive · Prepared for your custom home building company</div>
+      <div>Invoice tracking and construction draws</div>
+    </div>
+  </footer>
+
+</body>
+</html>
