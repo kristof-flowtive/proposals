@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Proposal — AI video scheduling system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+  :root {
+    --bg: #FFFFFF; --soft: #F5F6F8; --soft2: #EEF0F3; --ink: #0B0C0E; --tx: #1A1C20; --mut: #5F6672; --dim: #9097A3;
+    --line: #E6E8EC; --line2: #D3D7DE;
+    --ac: #0E9F4E; --ac2: #16B85C; --acbg: #E8F8EE; --acline: #BFE9CF; --lime: #7CF0A8;
+    --warn: #9A6400; --warnbg: #FFF3D6; --bad: #B4322B; --badbg: #FDE8E6; --info: #2B5BD7; --infobg: #E7EEFF;
+    --sans: 'DM Sans', Inter, system-ui, -apple-system, sans-serif; --mono: 'DM Mono', ui-monospace, monospace;
+    --sh: 0 1px 2px rgba(11,12,14,.04), 0 8px 24px -12px rgba(11,12,14,.1);
+    --sh2: 0 1px 2px rgba(11,12,14,.05), 0 30px 70px -30px rgba(11,12,14,.28);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+  body { background: var(--bg); color: var(--tx); font-family: var(--sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2 { text-wrap: balance; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .narrow { max-width: 800px; }
+  .mono { font-family: var(--mono); font-size: .88em; }
+
+  .js [data-r] { opacity: 0; transform: translateY(14px); transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+  .js [data-r].in { opacity: 1; transform: none; }
+
+  /* nav */
+  .nav { position: fixed; top: 14px; left: 0; right: 0; z-index: 50; padding: 0 16px; pointer-events: none; }
+  .nav .pill { pointer-events: auto; max-width: 860px; margin: 0 auto; height: 54px; padding: 0 8px 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(255,255,255,.94); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--sh); transition: box-shadow .3s; }
+  .nav.scrolled .pill { box-shadow: 0 1px 2px rgba(11,12,14,.05), 0 16px 40px -18px rgba(11,12,14,.22); }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
+  .bolt { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); display: grid; place-items: center; }
+  .bolt svg { width: 14px; height: 14px; }
+  .links { display: flex; gap: 2px; font-size: 14px; color: var(--mut); }
+  .links a { padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+  .links a:hover { color: var(--ink); }
+  .links a.on { color: var(--ink); background: var(--soft2); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 15px; padding: 12px 22px; border-radius: 999px; transition: transform .2s, background .2s, border-color .2s, box-shadow .2s; }
+  .btn svg { width: 15px; height: 15px; transition: transform .2s; } .btn:hover svg { transform: translateX(3px); }
+  .btn.p { background: var(--ink); color: #fff; box-shadow: 0 8px 20px -10px rgba(11,12,14,.6); } .btn.p:hover { background: #24272D; transform: translateY(-1px); }
+  .btn.g { background: #fff; border: 1px solid var(--line2); color: var(--ink); } .btn.g:hover { border-color: var(--ink); }
+  .btn.s { font-size: 14px; padding: 9px 16px; }
+  .btn.w { background: #fff; color: var(--ink); } .btn.w:hover { background: var(--lime); transform: translateY(-1px); }
+  .btn.o { border: 1px solid rgba(255,255,255,.22); color: #fff; } .btn.o:hover { background: rgba(255,255,255,.08); }
+
+  /* hero */
+  .hero { position: relative; padding: 148px 0 0; text-align: center; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; background: radial-gradient(60% 55% at 50% 0%, rgba(22,184,92,.13), transparent 70%), radial-gradient(circle, rgba(11,12,14,.09) 1px, transparent 1.2px) 0 0 / 22px 22px; -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); pointer-events: none; }
+  .hero > .wrap { position: relative; }
+  .badge { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--mut); background: #fff; border: 1px solid var(--line); padding: 6px 14px 6px 8px; border-radius: 999px; box-shadow: var(--sh); }
+  .badge b { font-weight: 500; font-size: 11.5px; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; }
+  h1 { font-size: clamp(2.4rem, 5.4vw, 4.3rem); font-weight: 600; letter-spacing: -.032em; line-height: 1.05; color: var(--ink); max-width: 940px; margin: 26px auto 0; }
+  h1 em { font-style: normal; color: var(--ac); position: relative; white-space: nowrap; }
+  h1 em svg { position: absolute; left: 0; bottom: -.14em; width: 100%; height: .22em; overflow: visible; }
+  h1 em path { fill: none; stroke: var(--ac2); stroke-width: 3; stroke-linecap: round; opacity: .55; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s cubic-bezier(.3,.7,.2,1) .6s; }
+  h1.in em path { stroke-dashoffset: 0; }
+  .lede { margin: 26px auto 0; font-size: 1.16rem; color: var(--mut); max-width: 680px; line-height: 1.6; }
+  .cta-row { margin-top: 34px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+  /* board */
+  .board { margin: 64px auto 0; max-width: 980px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .board .bar { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--mut); background: linear-gradient(#fff, #FBFBFC); }
+  .board .dots { display: flex; gap: 6px; } .board .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--soft2); border: 1px solid var(--line2); }
+  .board .bar b { color: var(--ink); font-weight: 600; }
+  .board .tabs { margin-left: auto; display: flex; gap: 2px; } .board .tabs span { padding: 4px 11px; border-radius: 8px; } .board .tabs .on { background: var(--soft2); color: var(--ink); font-weight: 500; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-family: var(--mono); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); padding: 12px 18px; background: var(--soft); border-bottom: 1px solid var(--line); }
+  td { padding: 13px 18px; border-top: 1px solid var(--line); white-space: nowrap; color: var(--tx); }
+  td:nth-child(2) { color: var(--mut); }
+  tbody tr:first-child td { border-top: 0; }
+  tbody tr { transition: background .2s; } tbody tr:hover { background: #FAFBFC; }
+  tr.live { background: linear-gradient(90deg, rgba(232,248,238,.7), transparent 70%); }
+  .meter { width: 96px; height: 6px; border-radius: 999px; background: var(--soft2); overflow: hidden; } .meter i { display: block; height: 100%; width: var(--w, 0%); background: var(--ac2); border-radius: inherit; transition: width .9s cubic-bezier(.3,.7,.2,1); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 3px 11px 3px 9px; border-radius: 999px; background: var(--soft2); color: var(--mut); transition: background .4s, color .4s; }
+  .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .chip.ok { background: var(--acbg); color: var(--ac); } .chip.run { background: var(--infobg); color: var(--info); } .chip.run::before { animation: blink 1.2s ease-in-out infinite; } .chip.wait { background: var(--warnbg); color: var(--warn); } .chip.flag { background: var(--badbg); color: var(--bad); }
+  @keyframes blink { 50% { opacity: .25; } }
+  .board .note { padding: 12px 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  .stats { margin: 20px auto 0; max-width: 980px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: left; }
+  .stats div { background: var(--soft); border-radius: 16px; padding: 20px 22px; transition: background .25s, transform .25s; }
+  .stats div:hover { background: var(--soft2); transform: translateY(-2px); }
+  .stats div:last-child { background: var(--ink); color: #fff; } .stats div:last-child small { color: #A9AFBA; } .stats div:last-child b { color: var(--lime); }
+  .stats b { display: block; font-size: 1.75rem; font-weight: 600; letter-spacing: -.035em; color: var(--ink); line-height: 1.15; }
+  .stats small { display: block; margin-top: 4px; font-size: 13px; color: var(--mut); }
+
+  /* sections */
+  section.sec { padding: 112px 0; }
+  section.tint { background: var(--soft); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ac); background: var(--acbg); border-radius: 999px; padding: 4px 12px 4px 6px; }
+  .eyebrow b { font-family: var(--mono); font-weight: 500; font-size: 11px; background: #fff; border-radius: 999px; padding: 1px 7px; }
+  h2 { font-size: clamp(1.95rem, 3.4vw, 2.85rem); font-weight: 600; letter-spacing: -.028em; line-height: 1.1; color: var(--ink); margin-top: 18px; max-width: 800px; }
+  .intro { margin-top: 20px; font-size: 1.08rem; color: var(--mut); max-width: 720px; }
+  .intro + .intro { margin-top: 14px; }
+  .intro em { font-style: normal; font-weight: 500; color: var(--ink); background: linear-gradient(var(--acline), var(--acline)) 0 92% / 100% .32em no-repeat; }
+  h3 { font-size: 1.08rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.35; color: var(--ink); }
+  .k { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px; transition: border-color .25s, transform .25s, box-shadow .25s; }
+  .card:hover { border-color: var(--line2); transform: translateY(-3px); box-shadow: var(--sh); }
+  .card p { margin-top: 10px; font-size: 15px; color: var(--mut); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 52px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 52px; }
+  .span2 { grid-column: span 2; }
+
+  /* requirements */
+  .req .quote { background: var(--soft); border-radius: 14px; padding: 16px 18px; font-size: 1.06rem; font-weight: 500; letter-spacing: -.015em; color: var(--ink); line-height: 1.4; position: relative; }
+  .req .quote span { display: block; font-family: var(--mono); font-weight: 400; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+  .req p { margin-top: 16px; padding-left: 14px; border-left: 2px solid var(--acline); }
+  .card.dark { background: var(--ink); border-color: var(--ink); color: #fff; display: grid; grid-template-columns: 5fr 7fr; gap: 36px; align-items: center; padding: 36px; }
+  .card.dark:hover { box-shadow: 0 30px 60px -30px rgba(11,12,14,.6); }
+  .card.dark .k { color: var(--lime); } .card.dark h3 { color: #fff; font-size: 1.5rem; letter-spacing: -.03em; line-height: 1.2; margin-top: 10px; } .card.dark p { margin: 0; color: #B4BAC5; }
+
+  /* flow */
+  .track { margin-top: 48px; display: flex; align-items: center; gap: 0; font-size: 13px; font-weight: 500; color: var(--ink); position: relative; justify-content: space-between; }
+  .track::before, .track::after { content: ''; position: absolute; left: 24px; right: 24px; top: 50%; height: 2px; margin-top: -1px; background: var(--line2); }
+  .track::after { background: var(--ac2); transform-origin: 0 50%; transform: scaleX(0); transition: transform 2.2s cubic-bezier(.4,.5,.2,1) .3s; }
+  .track.in::after { transform: scaleX(1); }
+  .track span { position: relative; z-index: 1; background: #fff; border: 1px solid var(--line2); border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+  .track span.you { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .lanes { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .lane { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 10px; }
+  .lane > header { padding: 14px 16px 12px; font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; justify-content: space-between; }
+  .lane > header span { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--dim); }
+  .step { border-radius: 14px; padding: 16px; background: var(--soft); transition: background .25s; }
+  .step + .step { margin-top: 8px; }
+  .step:hover { background: var(--soft2); }
+  .step strong { display: block; font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.4; margin-top: 5px; }
+  .step span { display: block; margin-top: 5px; font-size: 13.5px; color: var(--mut); line-height: 1.5; }
+  .step.gate { background: var(--acbg); box-shadow: inset 0 0 0 1px var(--acline); }
+  .then { margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 24px 28px; }
+  .ticks { list-style: none; padding: 0; margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 32px; font-size: 15px; color: var(--tx); }
+  .ticks li { display: flex; gap: 10px; align-items: flex-start; }
+  .ticks li::before { content: ''; flex: none; margin-top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--acbg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18' fill='none' stroke='%230E9F4E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.2 9.3l2.5 2.5 5-5.4'/%3E%3C/svg%3E") center/18px no-repeat; }
+  .ticks.one { grid-template-columns: 1fr; gap: 11px; }
+
+  /* controls */
+  .split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center; }
+  .feat { list-style: none; padding: 0; margin-top: 28px; display: grid; gap: 4px; font-size: 14.5px; color: var(--mut); }
+  .feat li { padding: 12px 14px; border-radius: 12px; transition: background .2s; }
+  .feat li:hover { background: var(--soft); }
+  .feat b { display: block; color: var(--ink); font-weight: 600; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .panel header { padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--mut); }
+  .panel header b { color: var(--ink); font-weight: 600; font-size: 14px; }
+  .field { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 14px; }
+  .field:first-of-type { border-top: 0; }
+  .field label { color: var(--mut); font-size: 13px; }
+  .field .in { background: var(--soft); border: 1px solid var(--line); border-radius: 9px; padding: 7px 11px; color: var(--ink); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .field .in.m { font-family: var(--mono); font-size: 12.5px; }
+  .sw { width: 36px; height: 21px; border-radius: 999px; background: var(--line2); position: relative; } .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .sw.on { background: var(--ac2); } .sw.on::after { left: 17px; }
+  .field .row { display: flex; align-items: center; gap: 10px; color: var(--mut); font-size: 13px; }
+  .panel .note { padding: 12px 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  /* reliability */
+  .band { background: var(--ink); color: #fff; border-radius: 32px; padding: 72px 56px; position: relative; overflow: hidden; }
+  .band::before { content: ''; position: absolute; right: -200px; top: -260px; width: 640px; height: 640px; background: radial-gradient(closest-side, rgba(124,240,168,.16), transparent); }
+  .band > * { position: relative; }
+  .band .eyebrow { background: rgba(124,240,168,.12); color: var(--lime); } .band .eyebrow b { background: rgba(255,255,255,.1); }
+  .band h2 { color: #fff; }
+  .rel { margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .rel div { padding: 28px 28px 30px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .rel div:not(:nth-child(3n+1)) { padding-left: 28px; border-left: 1px solid rgba(255,255,255,.12); }
+  .rel div:nth-child(n+4) { border-bottom: 0; padding-bottom: 0; }
+  .rel i { font-family: var(--mono); font-style: normal; font-size: 12px; color: var(--lime); }
+  .rel h3 { color: #fff; margin-top: 10px; } .rel p { margin-top: 8px; font-size: 14.5px; color: #A9AFBA; }
+
+  /* milestones */
+  .m { display: flex; flex-direction: column; }
+  .m .top { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--mut); }
+  .m .top b { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+  .m .top span { font-family: var(--mono); font-size: 12px; background: var(--soft); padding: 4px 10px; border-radius: 999px; }
+  .m .prog { margin: 18px 0 20px; height: 4px; border-radius: 999px; background: var(--soft2); overflow: hidden; }
+  .m .prog i { display: block; height: 100%; width: var(--w); background: var(--ac2); border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1.2s cubic-bezier(.3,.7,.2,1) .35s; }
+  .m.in .prog i { transform: scaleX(1); }
+  .m h3 { font-size: 1.25rem; letter-spacing: -.03em; }
+  .see { margin-top: auto; padding: 14px 16px; border-radius: 14px; background: var(--acbg); font-size: 14px; color: var(--tx); }
+  .m p { margin-bottom: 20px; }
+  .see b { display: block; font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); margin-bottom: 4px; }
+
+  /* pricing */
+  .seg { margin-top: 36px; display: inline-flex; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 999px; position: relative; box-shadow: var(--sh); }
+  .seg button { position: relative; z-index: 1; font: inherit; font-size: 14px; font-weight: 500; color: var(--mut); background: none; border: 0; padding: 9px 20px; border-radius: 999px; cursor: pointer; transition: color .25s; }
+  .seg button[aria-pressed="true"] { color: #fff; }
+  .seg i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: var(--sw, 50%); transform: translateX(var(--sx, 0)); background: var(--ink); border-radius: 999px; transition: transform .35s cubic-bezier(.3,.7,.2,1), width .35s cubic-bezier(.3,.7,.2,1); }
+  .price { margin-top: 20px; display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; }
+  .price .card:hover { transform: none; }
+  .plan { display: none; } [data-plan="full"] .plan.full, [data-plan="p1"] .plan.p1 { display: block; animation: fade .45s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+  .big { font-size: clamp(3.6rem, 6.4vw, 5rem); font-weight: 600; letter-spacing: -.055em; line-height: 1; color: var(--ink); }
+  .big + span { color: var(--mut); margin-left: 10px; }
+  .terms { margin-top: 10px; font-size: 14.5px; color: var(--mut); }
+  .ledger { margin-top: 26px; }
+  .ledger div { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+  .ledger strong { font-weight: 500; font-size: 15px; display: block; color: var(--ink); } .ledger small { font-size: 13px; color: var(--mut); } .ledger b { font-family: var(--mono); font-weight: 500; font-size: 14px; background: var(--soft); border-radius: 8px; padding: 4px 10px; color: var(--ink); }
+  .ledger .later { opacity: .6; } .ledger .later b { background: none; border: 1px dashed var(--line2); }
+  [data-plan="p1"] .ticks .p2 { color: var(--dim); text-decoration: line-through; text-decoration-color: var(--line2); } [data-plan="p1"] .ticks .p2::before { filter: grayscale(1); opacity: .45; }
+  .ticks .p1only { display: none; } [data-plan="p1"] .ticks .p1only { display: flex; }
+  .costs { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .costs > header { grid-column: 1 / -1; margin-top: 28px; margin-bottom: 4px; }
+  .costs > div { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+  .costs strong { font-weight: 600; font-size: 14.5px; color: var(--ink); display: block; } .costs code { display: table; margin-top: 8px; font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; white-space: nowrap; } .costs small { display: block; margin-top: 8px; font-size: 13px; color: var(--mut); line-height: 1.5; }
+  .fine { margin-top: 18px; font-size: 13px; color: var(--dim); }
+
+  .tags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; } .tags span { font-size: 12.5px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: var(--soft); color: var(--mut); }
+  .q { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 24px 26px; background: #fff; border: 1px solid var(--line); border-radius: 18px; transition: border-color .25s, transform .25s; }
+  .q + .q { margin-top: 12px; } .q:hover { border-color: var(--line2); transform: translateX(4px); }
+  .q > b { width: 36px; height: 36px; border-radius: 10px; background: var(--acbg); color: var(--ac); font-family: var(--mono); font-weight: 500; font-size: 12.5px; display: grid; place-items: center; }
+  .q p { margin-top: 6px; font-size: 15px; color: var(--mut); }
+  .about { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
+  .who { position: sticky; top: 110px; }
+  .who i { width: 64px; height: 64px; border-radius: 20px; background: var(--ink); color: var(--lime); font-style: normal; font-weight: 600; font-size: 1.5rem; display: grid; place-items: center; }
+  .who b { display: block; margin-top: 16px; font-size: 1.1rem; color: var(--ink); letter-spacing: -.02em; } .who span { font-size: 13.5px; color: var(--mut); display: block; }
+  .about p { color: var(--tx); font-size: 1.08rem; line-height: 1.75; } .about p + p { margin-top: 18px; }
+
+  .final { background: var(--ink); color: #fff; border-radius: 32px; padding: 88px 40px; text-align: center; position: relative; overflow: hidden; }
+  .final::before { content: ''; position: absolute; left: 50%; bottom: -420px; width: 900px; height: 700px; margin-left: -450px; background: radial-gradient(closest-side, rgba(22,184,92,.32), transparent); }
+  .final > * { position: relative; }
+  .final h2 { color: #fff; margin: 0 auto; font-size: clamp(2.3rem, 4.6vw, 3.6rem); }
+  .final p { margin: 20px auto 0; max-width: 640px; color: #B4BAC5; font-size: 1.08rem; }
+  .final .fine { margin-top: 40px; color: #8A919D; font-size: 13.5px; }
+  footer.ft { padding: 28px 0 36px; font-size: 13px; color: var(--dim); }
+  footer.ft .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (max-width: 960px) {
+    .links { display: none; }
+    .split, .price, .about, .card.dark { grid-template-columns: 1fr; gap: 32px; }
+    .lanes, .grid3, .rel { grid-template-columns: 1fr; }
+    .rel div, .rel div:not(:nth-child(3n+1)) { padding: 24px 0; border-left: 0; border-bottom: 1px solid rgba(255,255,255,.12); } .rel div:last-child { border-bottom: 0; padding-bottom: 0; }
+    .costs { grid-template-columns: repeat(2, 1fr); }
+    .track { display: none; } .lanes { margin-top: 44px; }
+    .band { padding: 52px 28px; border-radius: 24px; } .who { position: static; display: flex; gap: 16px; align-items: center; } .who b { margin: 0; }
+    section.sec { padding: 80px 0; }
+  }
+  @media (max-width: 640px) {
+    .grid2, .ticks, .costs { grid-template-columns: 1fr; } .span2 { grid-column: auto; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .hero { padding-top: 116px; } h1 em { white-space: normal; } h1 em svg { display: none; }
+    .board .tabs span:not(.on) { display: none; } .hide-s { display: none; }
+    .field { grid-template-columns: 1fr; gap: 6px; } .final { padding: 60px 24px; border-radius: 24px; }
+    .seg button { padding: 9px 14px; font-size: 13px; }
+    .badge { font-size: 12.5px; padding-right: 12px; text-align: left; border-radius: 16px; } .badge b { white-space: nowrap; }
+    .board th:nth-child(2), .board td:nth-child(2) { display: none; } .board td { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js [data-r] { opacity: 1; transform: none; transition: none; }
+    h1 em path { stroke-dashoffset: 0; transition: none; } .track::after, .m .prog i { transform: none; transition: none; }
+    *, *::before, *::after { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="pill">
+    <a href="#top" class="brand"><span class="bolt"><svg viewBox="0 0 24 24" fill="none" stroke="#7CF0A8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>Flowtive</a>
+    <nav class="links">
+      <a href="#understanding">Understanding</a>
+      <a href="#flow">The build</a>
+      <a href="#controls">Calendar</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <a href="#contact" class="btn p s">Get in touch</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="badge" data-r><b>Project proposal</b>Prepared for your offshoring company</div>
+
+    <h1 data-r style="--d:80ms">Drop a finished video in the folder, <em>approve it once<svg viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 8 C 60 2, 120 11, 180 6 S 270 3, 298 7"/></svg></em>, and it's scheduled to all four channels.</h1>
+    <p class="lede" data-r style="--d:160ms">AI watches your shared folder, listens to each video, and writes the captions, titles, descriptions and hashtags in your brand voice for LinkedIn, YouTube, Facebook and Instagram. Your team approves in a simple content calendar, and everything is handed over in your own accounts.</p>
+    <div class="cta-row" data-r style="--d:240ms">
+      <a href="#flow" class="btn p">See the build <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a href="#pricing" class="btn g">View fixed-price bid</a>
+    </div>
+
+    <div class="board" data-r style="--d:320ms">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><b>Content calendar</b><span class="hide-s">Airtable</span><span class="tabs"><span class="on">This week</span><span>Brand voice</span><span>Settings</span><span>Errors</span></span></div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Video</th><th>Type · channels</th><th class="hide-s">Progress</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Client story · first year with the team</td><td>Client story · YouTube, LinkedIn</td><td class="hide-s"><div class="meter"><i style="--w:100%"></i></div></td><td><span class="chip ok">Posted · Tue 09:00</span></td></tr>
+            <tr class="live"><td>Founder · AI and the offshore team</td><td>Founder · LinkedIn, YouTube</td><td class="hide-s"><div class="meter"><i id="liveBar"></i></div></td><td><span class="chip" id="liveChip">New in folder</span></td></tr>
+            <tr><td>Friday team night</td><td>Culture · Instagram, Facebook</td><td class="hide-s"><div class="meter"><i style="--w:55%"></i></div></td><td><span class="chip wait">Waiting for approval</span></td></tr>
+            <tr><td>Office tour, landscape only</td><td>Culture · all four</td><td class="hide-s"><div class="meter"><i style="--w:40%"></i></div></td><td><span class="chip flag">Held · no vertical cut for Reels</span></td></tr>
+            <tr><td>Client story · finance team</td><td>Client story · YouTube, LinkedIn</td><td class="hide-s"><div class="meter"><i style="--w:10%"></i></div></td><td><span class="chip run">Transcribing</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Illustrative. Nothing publishes until someone on your team approves it, and a video that doesn't fit a channel is held, not cropped.</div>
+    </div>
+
+    <div class="stats" data-stagger>
+      <div><b>4 channels</b><small>Copy written for each one</small></div>
+      <div><b>1 click</b><small>Approve, and it's scheduled</small></div>
+      <div><b>3 weeks</b><small>Including SOP and live training</small></div>
+      <div><b>$1,000</b><small>Fixed · paid per milestone</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="understanding">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>01</b>Understanding</div>
+    <h2 data-r>What you're solving for</h2>
+    <p class="intro" data-r>You're about to publish <em>tons of finished videos</em>: client stories, culture content and AI thought-leadership pieces from your founder. Writing four sets of copy per video and posting each one by hand would eat a person's week. You want a system where AI does the heavy lifting, your team runs it every week, and you own all of it.</p>
+    <p class="intro" data-r>The detail that decides the quality: AI can't write a good caption for a client story from a file name. So every video is transcribed first, and Claude writes from what is actually said, the kind of video it is, and your brand voice. And one video rarely fits all four channels the same way. A landscape client story is a YouTube video and a LinkedIn post; a vertical cut is a Reel. The system reads each video's shape and proposes the right channels, and your team can change them before approving.</p>
+
+    <div class="grid2" data-stagger>
+      <div class="card req"><div class="quote"><span>You asked for</span>"Pull videos from a shared folder"</div><p>One shared Google Drive folder with a subfolder per content type: <span class="mono">Client stories</span>, <span class="mono">Culture</span>, <span class="mono">Founder</span>. Your editors drop finished files in; the folder they choose tells the AI what kind of video it is. Nothing else to fill in.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"Generate captions, titles, descriptions, and hashtags in our brand voice"</div><p>A <span class="mono">Brand voice</span> table holds your tone, words to use and avoid, approved hashtags and a few example posts you like. Claude writes one version per channel: a LinkedIn post, a YouTube title and description, a Facebook post, an Instagram caption with hashtags.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"A simple content calendar and approval step before publishing"</div><p>An Airtable calendar with a review screen for your team: watch the video, edit any line of copy, pick the slot, click Approve. Nothing posts without that click.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"A written SOP, a recorded walkthrough, a live training session, and full ownership of all accounts, workflows, and logins"</div><p>Handover is a milestone of its own, not a last-day extra. Everything is built in accounts you own from day one, and the SOP covers the weekly routine and the two things that need a human: reconnecting a channel and fixing a failed post.</p></div>
+      <div class="card dark span2"><div><div class="k">Not in your brief, but it shapes the schedule</div><h3>Each platform has its own limits on automated posting</h3></div><p>On a default Google API quota, YouTube allows roughly six uploads a day per project, so a big backlog is queued across days rather than pushed at once. LinkedIn and Meta connections expire or need re-approval from time to time. The calendar plans around the quota, and an expired connection raises an alert with a two-minute fix in the SOP instead of failing quietly.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="flow">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>02</b>The build</div>
+    <h2 data-r>Finished video to scheduled post, in one diagram</h2>
+    <p class="intro" data-r><em>AI drafts</em> everything, <em>your team approves</em>, and Make <em>publishes on schedule</em>.</p>
+
+    <div class="track" data-r aria-hidden="true"><span class="you">Drop</span><span>Transcribe</span><span>Draft</span><span>Calendar</span><span class="you">Approve</span><span>Publish</span><span>Log</span></div>
+
+    <div class="lanes" data-stagger>
+      <div class="lane">
+        <header>Your shared folder<span>lane 1</span></header>
+        <div class="step"><div class="k">Trigger</div><strong>New video lands in a content-type subfolder</strong><span>Make checks the folder every 15 minutes.</span></div>
+        <div class="step"><div class="k">Read</div><strong>Length and shape (landscape or vertical) recorded</strong><span>Shape decides which channels are proposed.</span></div>
+        <div class="step"><div class="k">Transcribe</div><strong>Speech turned into a transcript</strong><span>Music-only culture clips skip this and use the file name plus a one-line note.</span></div>
+      </div>
+      <div class="lane">
+        <header>Make.com + Claude · Airtable<span>lane 2</span></header>
+        <div class="step"><div class="k">Claude</div><strong>Writes copy for each proposed channel</strong><span>From the transcript, the content type and your Brand voice table.</span></div>
+        <div class="step"><div class="k">Calendar</div><strong>Record created with copy and a suggested slot</strong><span>Slots come from your posting rhythm in Settings.</span></div>
+        <div class="step gate"><div class="k">Approval</div><strong>Your team reviews, edits and clicks Approve</strong><span>"Needs edit" sends it back to Claude with your note for a second draft.</span></div>
+      </div>
+      <div class="lane">
+        <header>Your channels<span>lane 3</span></header>
+        <div class="step"><div class="k">YouTube</div><strong>Uploaded privately with the publish time set</strong><span>Goes public on schedule; shows as Scheduled in your YouTube Studio.</span></div>
+        <div class="step"><div class="k">LinkedIn · Facebook · Instagram</div><strong>Posted by Make at the approved slot</strong><span>Instagram takes vertical video as a Reel.</span></div>
+        <div class="step"><div class="k">Write back</div><strong>Post link and time saved to the calendar</strong><span>A failure is marked with the reason and an alert.</span></div>
+      </div>
+    </div>
+
+    <div class="then" data-r>
+      <div class="k">Then, in every case</div>
+      <ul class="ticks">
+        <li>Each video has one calendar record with every channel's status</li>
+        <li>Links to the live posts saved next to the copy</li>
+        <li>Failed posts listed in Errors with the reason, plus an email alert</li>
+        <li>All of it in your Google, Airtable, Make and social accounts</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="controls">
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow" data-r><b>03</b>Your calendar</div>
+      <h2 data-r>Your team runs the week from one Airtable base</h2>
+      <p class="intro" data-r>Make reads these tables on every run, so a new hashtag, a changed posting time or a paused channel applies to the next video. Nobody on your team needs to open Make.</p>
+      <ul class="feat" data-stagger>
+        <li><b>Calendar</b>Every video, its copy per channel, the slot and the status. Calendar and list views.</li>
+        <li><b>Brand voice</b>Tone, words to use and avoid, approved hashtags, example posts.</li>
+        <li><b>Settings</b>Posting days and times per channel, channels on or off, who gets alerts.</li>
+        <li><b>Log</b>Every run: video in, drafted, approved by whom, posted where.</li>
+        <li><b>Errors</b>Any post that failed, the reason, and a Retry button.</li>
+      </ul>
+    </div>
+    <div class="panel" data-r style="--d:120ms">
+      <header><b>Settings</b><span>Content calendar · Airtable</span></header>
+      <div class="field"><label>LinkedIn slots</label><div class="in">Tue, Thu · 08:00 Manila</div></div>
+      <div class="field"><label>YouTube slots</label><div class="in">Wed · 18:00 Manila</div></div>
+      <div class="field"><label>Instagram + Facebook</label><div class="in">Mon, Wed, Fri · 12:00 Manila</div></div>
+      <div class="field"><label>Max per day</label><div class="in m">3 posts per channel</div></div>
+      <div class="field"><label>Alerts to</label><div class="in m">marketing@yourdomain.com</div></div>
+      <div class="field"><label>Auto-approve</label><div class="row"><span class="sw"></span>Off · every post needs a click</div></div>
+      <div class="note">Illustrative values. A change applies from the next video drafted.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="reliability" style="padding-top:0">
+  <div class="wrap">
+    <div class="band" data-r>
+      <div class="eyebrow"><b>04</b>Reliability</div>
+      <h2>Built so no post fails, or doubles, without you knowing</h2>
+      <div class="rel">
+        <div><i>01</i><h3>A post fails</h3><p>The channel is marked Failed with the platform's reason, an alert goes out, and Retry is one click once it's fixed. The other channels for that video carry on.</p></div>
+        <div><i>02</i><h3>A connection expires</h3><p>Social platforms ask for reconnection from time to time. The alert names the channel, and the SOP shows the two-minute reconnect, done by your team in your account.</p></div>
+        <div><i>03</i><h3>Nothing posts twice</h3><p>Once a channel is marked Posted it is locked. A video moved or re-uploaded to the folder is matched by file ID and not drafted again.</p></div>
+        <div><i>04</i><h3>A video doesn't fit a channel</h3><p>A landscape-only video is held for Reels rather than cropped badly, and your team can drop the channel or add a vertical cut.</p></div>
+        <div><i>05</i><h3>The AI gets something wrong</h3><p>It writes only from the transcript and your Brand voice table, never names a client unless the folder note says it's approved, and every post passes your approval first.</p></div>
+        <div><i>06</i><h3>You own everything</h3><p>Drive, Airtable, Make, the AI keys and every channel connection are in your accounts, with logins in your password manager. If we part ways, nothing stops working.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="milestones" style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>05</b>Milestones</div>
+    <h2 data-r>Your three milestones, three weeks</h2>
+    <p class="intro" data-r>Each milestone ends with something you can click on in your own accounts.</p>
+    <div class="grid3" data-stagger>
+      <div class="card m"><div class="top"><b>1</b><span>Days 1–5</span></div><div class="prog"><i style="--w:33%"></i></div><h3>Folder to drafts</h3><p>Shared folder, transcription, Brand voice table and Claude drafting per channel into the Airtable calendar.</p><div class="see"><b>You'll see</b>Five of your real videos in the calendar with copy for each channel, ready to judge.</div></div>
+      <div class="card m"><div class="top"><b>2</b><span>Days 6–11</span></div><div class="prog"><i style="--w:66%"></i></div><h3>Approve to published</h3><p>Review screen, approval and "Needs edit", scheduled publishing to YouTube, LinkedIn, Facebook and Instagram, post links and Errors.</p><div class="see"><b>You'll see</b>A video you approve going live on all four channels at its slot.</div></div>
+      <div class="card m"><div class="top"><b>3</b><span>Days 12–18</span></div><div class="prog"><i style="--w:100%"></i></div><h3>Handover</h3><p>Written SOP, recorded walkthrough, live training session, ownership checklist, and your team runs the first live week with me watching. Then a month of bug fixes.</p><div class="see"><b>You'll see</b>Your team scheduling a week of videos without me.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="pricing">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>06</b>Investment</div>
+    <h2 data-r>Fixed-price bid</h2>
+    <p class="intro" data-r>One number, at your budget, paid against your three milestones.</p>
+
+    <div class="price" data-r style="margin-top:36px">
+      <div class="card">
+        <div class="k">Total project</div>
+        <div style="margin-top:10px"><span class="big">$1,000</span><span>USD</span></div>
+        <div class="terms">Fixed price · 3 weeks · paid per milestone</div>
+        <div class="ledger">
+          <div><span><strong>M1 — Folder to drafts</strong><small>Due when your videos have drafted copy in the calendar</small></span><b>$400</b></div>
+          <div><span><strong>M2 — Approve to published</strong><small>Due when an approved video posts to all four channels</small></span><b>$350</b></div>
+          <div><span><strong>M3 — Handover</strong><small>Due after the live training and your first live week</small></span><b>$250</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="k" style="color:var(--mut)">What's included</div>
+        <ul class="ticks one">
+          <li>Shared folder watch and transcription</li>
+          <li>Per-channel AI copy in your brand voice</li>
+          <li>Airtable content calendar with approval</li>
+          <li>Scheduled publishing to LinkedIn, YouTube, Facebook and Instagram</li>
+          <li>Log, Errors and alerts</li>
+          <li>Written SOP, recorded walkthrough and live training</li>
+          <li>Full ownership of every account and login</li>
+          <li>One month of bug fixes after go-live</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="costs" data-stagger>
+      <header><div class="k" style="color:var(--mut)">Running costs after go-live, paid by you to the vendors</div></header>
+      <div><strong>Make.com<code>~$11–19/month</code></strong><small>Core or Pro plan depending on how many videos a month and how large the files are.</small></div>
+      <div><strong>Claude API<code>~$0.02 per video</code></strong><small>Four channel versions per video. Around $2 a month at 100 videos.</small></div>
+      <div><strong>Transcription<code>cents per video</code></strong><small>Priced per minute of audio; a few dollars a month at your volume.</small></div>
+      <div><strong>Airtable<code>free to start</code></strong><small>The free plan covers the calendar; a paid seat only if many people edit it.</small></div>
+      <div><strong>Google Drive<code>$0 extra</code></strong><small>Your existing shared folder and storage.</small></div>
+      <div><strong>Social platforms<code>$0</code></strong><small>Posting through the official connections costs nothing.</small></div>
+    </div>
+    <p class="fine">Vendor prices are approximate and confirmed at kickoff once I know your monthly volume and file sizes. The fixed price above does not change.</p>
+  </div>
+</section>
+
+<section class="sec" id="examples">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>07</b>The same pattern, elsewhere</div>
+    <h2 data-r>Two worked examples of this architecture</h2>
+    <p class="intro" data-r>Illustrative scenarios, not client case studies. They show how the same building blocks bend to different businesses.</p>
+    <div class="grid2" data-stagger>
+      <div class="card"><div class="k">Worked example · Recruitment agency</div><h3 style="margin-top:12px;font-size:1.3rem;letter-spacing:-.03em">Candidate and client testimonials out every week</h3><p>Recruiters record short testimonial clips on their phones and drop them in a shared folder. Each is transcribed, Claude drafts a LinkedIn post for the agency page and a Reel caption, and the marketing lead approves the week's batch on Monday morning. Clips that mention a client by name wait until the client signs off.</p><div class="tags"><span>Folder to calendar</span><span>Per-channel copy</span><span>Approval gate</span></div></div>
+      <div class="card"><div class="k">Worked example · Accounting firm</div><h3 style="margin-top:12px;font-size:1.3rem;letter-spacing:-.03em">Partner explainer videos without a social media hire</h3><p>Partners record tax-season explainers in batches. The system writes YouTube titles and descriptions from the transcript, a LinkedIn post in the firm's careful tone, and spreads the backlog over the quarter within YouTube's daily upload limit. An admin approves each one in the calendar in under a minute.</p><div class="tags"><span>Transcript-led copy</span><span>Backlog scheduling</span><span>Team handover</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="kickoff">
+  <div class="wrap narrow">
+    <div class="eyebrow" data-r><b>08</b>Before kickoff</div>
+    <h2 data-r style="margin-bottom:40px">Three things I'll confirm on our first call</h2>
+    <div data-stagger>
+      <div class="q"><b>Q1</b><div><h3>Should the founder's videos post to the company page, the founder's own LinkedIn, or both?</h3><p>Thought leadership usually lands better from a personal profile, but that needs its own connection, signed in by the founder. Default: company page from day one, the founder's profile added once they connect it.</p></div></div>
+      <div class="q"><b>Q2</b><div><h3>Do your editors export vertical cuts as well as landscape?</h3><p>It decides what goes to Instagram as a Reel. Default: landscape goes to YouTube, LinkedIn and Facebook; vertical cuts go to Instagram and Facebook; anything else is held for a decision.</p></div></div>
+      <div class="q"><b>Q3</b><div><h3>Roughly how many videos a week, and how large are the files?</h3><p>Volume sets the posting rhythm and the Make plan; very large masters may need a compressed export for posting. Default: up to 15 videos a week, files under a few hundred MB.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>09</b>Who's building it</div>
+    <h2 data-r style="margin-bottom:44px">A short note on me</h2>
+    <div class="about">
+      <div class="who" data-r><i>K</i><div><b>Kristof</b><span>Flowtive</span><span>Claude Certified Architect</span></div></div>
+      <div>
+        <p data-r>I'm Kristof. I build automation systems for teams who'd rather run them than think about them: Make.com, the Claude API and the tools you already use, with a person approving wherever judgement matters.</p>
+        <p data-r>For this job that means copy written from what's actually said in each video, a calendar your team can run on a Monday morning without opening Make, and a handover that leaves you owning every account and login. I write the platform limits down before building, so the schedule plans around them.</p>
+        <p data-r>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="padding:0 0 24px">
+  <div class="wrap">
+    <div class="final" data-r>
+      <h2>Ready to move forward?</h2>
+      <p>Send me five finished videos (a mix of client stories, culture and founder), any brand guidelines or posts you like, and who on your team will run it. I'll come back inside 48 hours with the kickoff date, and you'll see drafted copy for your own videos by day 5.</p>
+      <div class="cta-row">
+        <a href="mailto:kristof@getflowtive.com" class="btn w">Email Kristof <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a href="#milestones" class="btn o">Re-read the milestones</a>
+      </div>
+      <div class="fine">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </div>
+</section>
+
+<footer class="ft"><div class="wrap"><span>© 2026 Flowtive · Prepared for your offshoring company</span><span>AI video scheduling system</span></div></footer>
+
+<!-- ===== SCRIPT (fixed chrome). The only thing to edit is the STATES list. ===== -->
+<script>
+(function () {
+  // EDIT: the statuses the live hero row cycles through, in order.
+  // Each is [label, chip class, meter %]. Chip class is '', 'wait', 'ok', 'run' or 'flag'.
+  // Use the client's own status names. Ignored when the page has no live row.
+  var STATES = [
+    ['New in folder', '', 6],
+    ['Transcribing', 'run', 25],
+    ['Drafted · 2 channels', 'ok', 45],
+    ['Waiting for approval', 'wait', 60],
+    ['Scheduled · Thu 08:00', 'run', 85],
+    ['Posted · LinkedIn, YouTube', 'ok', 100]
+  ];
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll reveal
+  document.querySelectorAll('[data-stagger]').forEach(function (g) {
+    Array.prototype.forEach.call(g.children, function (c, i) { c.setAttribute('data-r', ''); c.style.setProperty('--d', (i * 70) + 'ms'); });
+  });
+  var els = document.querySelectorAll('[data-r]');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  } else { els.forEach(function (el) { el.classList.add('in'); }); }
+
+  // nav state
+  var nav = document.getElementById('nav'), links = document.querySelectorAll('.links a');
+  var secs = Array.prototype.map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    var cur = -1; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 150) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // pricing toggle (only present when snippet-phased-pricing.html is used)
+  var seg = document.getElementById('seg'), plans = document.getElementById('plans');
+  if (seg && plans) {
+    var thumb = seg.querySelector('i');
+    var place = function (btn) { thumb.style.setProperty('--sw', btn.offsetWidth + 'px'); thumb.style.setProperty('--sx', (btn.offsetLeft - 4) + 'px'); };
+    seg.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        seg.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        plans.setAttribute('data-plan', b.getAttribute('data-v')); place(b);
+      });
+    });
+    var init = function () { place(seg.querySelector('[aria-pressed="true"]')); };
+    init(); window.addEventListener('resize', init); if (document.fonts && document.fonts.ready) document.fonts.ready.then(init);
+  }
+
+  // hero board: the live row moves through STATES
+  var chip = document.getElementById('liveChip'), bar = document.getElementById('liveBar');
+  if (chip && STATES.length) {
+    var show = function (i) { chip.textContent = STATES[i][0]; chip.className = 'chip ' + STATES[i][1]; if (bar) bar.style.setProperty('--w', STATES[i][2] + '%'); };
+    if (reduce) { show(Math.max(0, STATES.length - 2)); return; }
+    var n = 0; show(0);
+    (function tick() { setTimeout(function () { n = (n + 1) % STATES.length; show(n); tick(); }, n === STATES.length - 1 ? 3800 : 1900); })();
+  }
+})();
+</script>
+</body>
+</html>
