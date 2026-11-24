@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Proposal — CRM and customer journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+  :root {
+    --bg: #FFFFFF; --soft: #F5F6F8; --soft2: #EEF0F3; --ink: #0B0C0E; --tx: #1A1C20; --mut: #5F6672; --dim: #9097A3;
+    --line: #E6E8EC; --line2: #D3D7DE;
+    --ac: #0E9F4E; --ac2: #16B85C; --acbg: #E8F8EE; --acline: #BFE9CF; --lime: #7CF0A8;
+    --warn: #9A6400; --warnbg: #FFF3D6; --bad: #B4322B; --badbg: #FDE8E6; --info: #2B5BD7; --infobg: #E7EEFF;
+    --sans: 'DM Sans', Inter, system-ui, -apple-system, sans-serif; --mono: 'DM Mono', ui-monospace, monospace;
+    --sh: 0 1px 2px rgba(11,12,14,.04), 0 8px 24px -12px rgba(11,12,14,.1);
+    --sh2: 0 1px 2px rgba(11,12,14,.05), 0 30px 70px -30px rgba(11,12,14,.28);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+  body { background: var(--bg); color: var(--tx); font-family: var(--sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2 { text-wrap: balance; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .narrow { max-width: 800px; }
+  .mono { font-family: var(--mono); font-size: .88em; }
+
+  .js [data-r] { opacity: 0; transform: translateY(14px); transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+  .js [data-r].in { opacity: 1; transform: none; }
+
+  /* nav */
+  .nav { position: fixed; top: 14px; left: 0; right: 0; z-index: 50; padding: 0 16px; pointer-events: none; }
+  .nav .pill { pointer-events: auto; max-width: 860px; margin: 0 auto; height: 54px; padding: 0 8px 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(255,255,255,.94); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--sh); transition: box-shadow .3s; }
+  .nav.scrolled .pill { box-shadow: 0 1px 2px rgba(11,12,14,.05), 0 16px 40px -18px rgba(11,12,14,.22); }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
+  .bolt { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); display: grid; place-items: center; }
+  .bolt svg { width: 14px; height: 14px; }
+  .links { display: flex; gap: 2px; font-size: 14px; color: var(--mut); }
+  .links a { padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+  .links a:hover { color: var(--ink); }
+  .links a.on { color: var(--ink); background: var(--soft2); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 15px; padding: 12px 22px; border-radius: 999px; transition: transform .2s, background .2s, border-color .2s, box-shadow .2s; }
+  .btn svg { width: 15px; height: 15px; transition: transform .2s; } .btn:hover svg { transform: translateX(3px); }
+  .btn.p { background: var(--ink); color: #fff; box-shadow: 0 8px 20px -10px rgba(11,12,14,.6); } .btn.p:hover { background: #24272D; transform: translateY(-1px); }
+  .btn.g { background: #fff; border: 1px solid var(--line2); color: var(--ink); } .btn.g:hover { border-color: var(--ink); }
+  .btn.s { font-size: 14px; padding: 9px 16px; }
+  .btn.w { background: #fff; color: var(--ink); } .btn.w:hover { background: var(--lime); transform: translateY(-1px); }
+  .btn.o { border: 1px solid rgba(255,255,255,.22); color: #fff; } .btn.o:hover { background: rgba(255,255,255,.08); }
+
+  /* hero */
+  .hero { position: relative; padding: 148px 0 0; text-align: center; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; background: radial-gradient(60% 55% at 50% 0%, rgba(22,184,92,.13), transparent 70%), radial-gradient(circle, rgba(11,12,14,.09) 1px, transparent 1.2px) 0 0 / 22px 22px; -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); pointer-events: none; }
+  .hero > .wrap { position: relative; }
+  .badge { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--mut); background: #fff; border: 1px solid var(--line); padding: 6px 14px 6px 8px; border-radius: 999px; box-shadow: var(--sh); }
+  .badge b { font-weight: 500; font-size: 11.5px; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; }
+  h1 { font-size: clamp(2.4rem, 5.4vw, 4.3rem); font-weight: 600; letter-spacing: -.032em; line-height: 1.05; color: var(--ink); max-width: 940px; margin: 26px auto 0; }
+  h1 em { font-style: normal; color: var(--ac); position: relative; white-space: nowrap; }
+  h1 em svg { position: absolute; left: 0; bottom: -.14em; width: 100%; height: .22em; overflow: visible; }
+  h1 em path { fill: none; stroke: var(--ac2); stroke-width: 3; stroke-linecap: round; opacity: .55; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s cubic-bezier(.3,.7,.2,1) .6s; }
+  h1.in em path { stroke-dashoffset: 0; }
+  .lede { margin: 26px auto 0; font-size: 1.16rem; color: var(--mut); max-width: 680px; line-height: 1.6; }
+  .cta-row { margin-top: 34px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+  /* board */
+  .board { margin: 64px auto 0; max-width: 980px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .board .bar { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--mut); background: linear-gradient(#fff, #FBFBFC); }
+  .board .dots { display: flex; gap: 6px; } .board .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--soft2); border: 1px solid var(--line2); }
+  .board .bar b { color: var(--ink); font-weight: 600; }
+  .board .tabs { margin-left: auto; display: flex; gap: 2px; } .board .tabs span { padding: 4px 11px; border-radius: 8px; } .board .tabs .on { background: var(--soft2); color: var(--ink); font-weight: 500; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-family: var(--mono); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); padding: 12px 18px; background: var(--soft); border-bottom: 1px solid var(--line); }
+  td { padding: 13px 18px; border-top: 1px solid var(--line); white-space: nowrap; color: var(--tx); }
+  td:nth-child(2) { color: var(--mut); }
+  tbody tr:first-child td { border-top: 0; }
+  tbody tr { transition: background .2s; } tbody tr:hover { background: #FAFBFC; }
+  tr.live { background: linear-gradient(90deg, rgba(232,248,238,.7), transparent 70%); }
+  .meter { width: 96px; height: 6px; border-radius: 999px; background: var(--soft2); overflow: hidden; } .meter i { display: block; height: 100%; width: var(--w, 0%); background: var(--ac2); border-radius: inherit; transition: width .9s cubic-bezier(.3,.7,.2,1); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 3px 11px 3px 9px; border-radius: 999px; background: var(--soft2); color: var(--mut); transition: background .4s, color .4s; }
+  .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .chip.ok { background: var(--acbg); color: var(--ac); } .chip.run { background: var(--infobg); color: var(--info); } .chip.run::before { animation: blink 1.2s ease-in-out infinite; } .chip.wait { background: var(--warnbg); color: var(--warn); } .chip.flag { background: var(--badbg); color: var(--bad); }
+  @keyframes blink { 50% { opacity: .25; } }
+  .board .note { padding: 12px 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  .stats { margin: 20px auto 0; max-width: 980px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: left; }
+  .stats div { background: var(--soft); border-radius: 16px; padding: 20px 22px; transition: background .25s, transform .25s; }
+  .stats div:hover { background: var(--soft2); transform: translateY(-2px); }
+  .stats div:last-child { background: var(--ink); color: #fff; } .stats div:last-child small { color: #A9AFBA; } .stats div:last-child b { color: var(--lime); }
+  .stats b { display: block; font-size: 1.75rem; font-weight: 600; letter-spacing: -.035em; color: var(--ink); line-height: 1.15; }
+  .stats small { display: block; margin-top: 4px; font-size: 13px; color: var(--mut); }
+
+  /* sections */
+  section.sec { padding: 112px 0; }
+  section.tint { background: var(--soft); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ac); background: var(--acbg); border-radius: 999px; padding: 4px 12px 4px 6px; }
+  .eyebrow b { font-family: var(--mono); font-weight: 500; font-size: 11px; background: #fff; border-radius: 999px; padding: 1px 7px; }
+  h2 { font-size: clamp(1.95rem, 3.4vw, 2.85rem); font-weight: 600; letter-spacing: -.028em; line-height: 1.1; color: var(--ink); margin-top: 18px; max-width: 800px; }
+  .intro { margin-top: 20px; font-size: 1.08rem; color: var(--mut); max-width: 720px; }
+  .intro + .intro { margin-top: 14px; }
+  .intro em { font-style: normal; font-weight: 500; color: var(--ink); background: linear-gradient(var(--acline), var(--acline)) 0 92% / 100% .32em no-repeat; }
+  h3 { font-size: 1.08rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.35; color: var(--ink); }
+  .k { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px; transition: border-color .25s, transform .25s, box-shadow .25s; }
+  .card:hover { border-color: var(--line2); transform: translateY(-3px); box-shadow: var(--sh); }
+  .card p { margin-top: 10px; font-size: 15px; color: var(--mut); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 52px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 52px; }
+  .span2 { grid-column: span 2; }
+
+  /* requirements */
+  .req .quote { background: var(--soft); border-radius: 14px; padding: 16px 18px; font-size: 1.06rem; font-weight: 500; letter-spacing: -.015em; color: var(--ink); line-height: 1.4; position: relative; }
+  .req .quote span { display: block; font-family: var(--mono); font-weight: 400; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+  .req p { margin-top: 16px; padding-left: 14px; border-left: 2px solid var(--acline); }
+  .card.dark { background: var(--ink); border-color: var(--ink); color: #fff; display: grid; grid-template-columns: 5fr 7fr; gap: 36px; align-items: center; padding: 36px; }
+  .card.dark:hover { box-shadow: 0 30px 60px -30px rgba(11,12,14,.6); }
+  .card.dark .k { color: var(--lime); } .card.dark h3 { color: #fff; font-size: 1.5rem; letter-spacing: -.03em; line-height: 1.2; margin-top: 10px; } .card.dark p { margin: 0; color: #B4BAC5; }
+
+  /* flow */
+  .track { margin-top: 48px; display: flex; align-items: center; gap: 0; font-size: 13px; font-weight: 500; color: var(--ink); position: relative; justify-content: space-between; }
+  .track::before, .track::after { content: ''; position: absolute; left: 24px; right: 24px; top: 50%; height: 2px; margin-top: -1px; background: var(--line2); }
+  .track::after { background: var(--ac2); transform-origin: 0 50%; transform: scaleX(0); transition: transform 2.2s cubic-bezier(.4,.5,.2,1) .3s; }
+  .track.in::after { transform: scaleX(1); }
+  .track span { position: relative; z-index: 1; background: #fff; border: 1px solid var(--line2); border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+  .track span.you { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .lanes { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .lane { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 10px; }
+  .lane > header { padding: 14px 16px 12px; font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; justify-content: space-between; }
+  .lane > header span { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--dim); }
+  .step { border-radius: 14px; padding: 16px; background: var(--soft); transition: background .25s; }
+  .step + .step { margin-top: 8px; }
+  .step:hover { background: var(--soft2); }
+  .step strong { display: block; font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.4; margin-top: 5px; }
+  .step span { display: block; margin-top: 5px; font-size: 13.5px; color: var(--mut); line-height: 1.5; }
+  .step.gate { background: var(--acbg); box-shadow: inset 0 0 0 1px var(--acline); }
+  .then { margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 24px 28px; }
+  .ticks { list-style: none; padding: 0; margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 32px; font-size: 15px; color: var(--tx); }
+  .ticks li { display: flex; gap: 10px; align-items: flex-start; }
+  .ticks li::before { content: ''; flex: none; margin-top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--acbg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18' fill='none' stroke='%230E9F4E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.2 9.3l2.5 2.5 5-5.4'/%3E%3C/svg%3E") center/18px no-repeat; }
+  .ticks.one { grid-template-columns: 1fr; gap: 11px; }
+
+  /* controls */
+  .split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center; }
+  .feat { list-style: none; padding: 0; margin-top: 28px; display: grid; gap: 4px; font-size: 14.5px; color: var(--mut); }
+  .feat li { padding: 12px 14px; border-radius: 12px; transition: background .2s; }
+  .feat li:hover { background: var(--soft); }
+  .feat b { display: block; color: var(--ink); font-weight: 600; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .panel header { padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--mut); }
+  .panel header b { color: var(--ink); font-weight: 600; font-size: 14px; }
+  .field { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 14px; }
+  .field:first-of-type { border-top: 0; }
+  .field label { color: var(--mut); font-size: 13px; }
+  .field .in { background: var(--soft); border: 1px solid var(--line); border-radius: 9px; padding: 7px 11px; color: var(--ink); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .field .in.m { font-family: var(--mono); font-size: 12.5px; }
+  .sw { width: 36px; height: 21px; border-radius: 999px; background: var(--line2); position: relative; } .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .sw.on { background: var(--ac2); } .sw.on::after { left: 17px; }
+  .field .row { display: flex; align-items: center; gap: 10px; color: var(--mut); font-size: 13px; }
+  .panel .note { padding: 12px 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  /* reliability */
+  .band { background: var(--ink); color: #fff; border-radius: 32px; padding: 72px 56px; position: relative; overflow: hidden; }
+  .band::before { content: ''; position: absolute; right: -200px; top: -260px; width: 640px; height: 640px; background: radial-gradient(closest-side, rgba(124,240,168,.16), transparent); }
+  .band > * { position: relative; }
+  .band .eyebrow { background: rgba(124,240,168,.12); color: var(--lime); } .band .eyebrow b { background: rgba(255,255,255,.1); }
+  .band h2 { color: #fff; }
+  .rel { margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .rel div { padding: 28px 28px 30px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .rel div:not(:nth-child(3n+1)) { padding-left: 28px; border-left: 1px solid rgba(255,255,255,.12); }
+  .rel div:nth-child(n+4) { border-bottom: 0; padding-bottom: 0; }
+  .rel i { font-family: var(--mono); font-style: normal; font-size: 12px; color: var(--lime); }
+  .rel h3 { color: #fff; margin-top: 10px; } .rel p { margin-top: 8px; font-size: 14.5px; color: #A9AFBA; }
+
+  /* milestones */
+  .m { display: flex; flex-direction: column; }
+  .m .top { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--mut); }
+  .m .top b { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+  .m .top span { font-family: var(--mono); font-size: 12px; background: var(--soft); padding: 4px 10px; border-radius: 999px; }
+  .m .prog { margin: 18px 0 20px; height: 4px; border-radius: 999px; background: var(--soft2); overflow: hidden; }
+  .m .prog i { display: block; height: 100%; width: var(--w); background: var(--ac2); border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1.2s cubic-bezier(.3,.7,.2,1) .35s; }
+  .m.in .prog i { transform: scaleX(1); }
+  .m h3 { font-size: 1.25rem; letter-spacing: -.03em; }
+  .see { margin-top: auto; padding: 14px 16px; border-radius: 14px; background: var(--acbg); font-size: 14px; color: var(--tx); }
+  .m p { margin-bottom: 20px; }
+  .see b { display: block; font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); margin-bottom: 4px; }
+
+  /* pricing */
+  .seg { margin-top: 36px; display: inline-flex; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 999px; position: relative; box-shadow: var(--sh); }
+  .seg button { position: relative; z-index: 1; font: inherit; font-size: 14px; font-weight: 500; color: var(--mut); background: none; border: 0; padding: 9px 20px; border-radius: 999px; cursor: pointer; transition: color .25s; }
+  .seg button[aria-pressed="true"] { color: #fff; }
+  .seg i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: var(--sw, 50%); transform: translateX(var(--sx, 0)); background: var(--ink); border-radius: 999px; transition: transform .35s cubic-bezier(.3,.7,.2,1), width .35s cubic-bezier(.3,.7,.2,1); }
+  .price { margin-top: 20px; display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; }
+  .price .card:hover { transform: none; }
+  .plan { display: none; } [data-plan="full"] .plan.full, [data-plan="p1"] .plan.p1 { display: block; animation: fade .45s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+  .big { font-size: clamp(3.6rem, 6.4vw, 5rem); font-weight: 600; letter-spacing: -.055em; line-height: 1; color: var(--ink); }
+  .big + span { color: var(--mut); margin-left: 10px; }
+  .terms { margin-top: 10px; font-size: 14.5px; color: var(--mut); }
+  .ledger { margin-top: 26px; }
+  .ledger div { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+  .ledger strong { font-weight: 500; font-size: 15px; display: block; color: var(--ink); } .ledger small { font-size: 13px; color: var(--mut); } .ledger b { font-family: var(--mono); font-weight: 500; font-size: 14px; background: var(--soft); border-radius: 8px; padding: 4px 10px; color: var(--ink); }
+  .ledger .later { opacity: .6; } .ledger .later b { background: none; border: 1px dashed var(--line2); }
+  [data-plan="p1"] .ticks .p2 { color: var(--dim); text-decoration: line-through; text-decoration-color: var(--line2); } [data-plan="p1"] .ticks .p2::before { filter: grayscale(1); opacity: .45; }
+  .ticks .p1only { display: none; } [data-plan="p1"] .ticks .p1only { display: flex; }
+  .costs { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .costs > header { grid-column: 1 / -1; margin-top: 28px; margin-bottom: 4px; }
+  .costs > div { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+  .costs strong { font-weight: 600; font-size: 14.5px; color: var(--ink); display: block; } .costs code { display: table; margin-top: 8px; font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; white-space: nowrap; } .costs small { display: block; margin-top: 8px; font-size: 13px; color: var(--mut); line-height: 1.5; }
+  .fine { margin-top: 18px; font-size: 13px; color: var(--dim); }
+
+  .tags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; } .tags span { font-size: 12.5px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: var(--soft); color: var(--mut); }
+  .q { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 24px 26px; background: #fff; border: 1px solid var(--line); border-radius: 18px; transition: border-color .25s, transform .25s; }
+  .q + .q { margin-top: 12px; } .q:hover { border-color: var(--line2); transform: translateX(4px); }
+  .q > b { width: 36px; height: 36px; border-radius: 10px; background: var(--acbg); color: var(--ac); font-family: var(--mono); font-weight: 500; font-size: 12.5px; display: grid; place-items: center; }
+  .q p { margin-top: 6px; font-size: 15px; color: var(--mut); }
+  .about { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
+  .who { position: sticky; top: 110px; }
+  .who i { width: 64px; height: 64px; border-radius: 20px; background: var(--ink); color: var(--lime); font-style: normal; font-weight: 600; font-size: 1.5rem; display: grid; place-items: center; }
+  .who b { display: block; margin-top: 16px; font-size: 1.1rem; color: var(--ink); letter-spacing: -.02em; } .who span { font-size: 13.5px; color: var(--mut); display: block; }
+  .about p { color: var(--tx); font-size: 1.08rem; line-height: 1.75; } .about p + p { margin-top: 18px; }
+
+  .final { background: var(--ink); color: #fff; border-radius: 32px; padding: 88px 40px; text-align: center; position: relative; overflow: hidden; }
+  .final::before { content: ''; position: absolute; left: 50%; bottom: -420px; width: 900px; height: 700px; margin-left: -450px; background: radial-gradient(closest-side, rgba(22,184,92,.32), transparent); }
+  .final > * { position: relative; }
+  .final h2 { color: #fff; margin: 0 auto; font-size: clamp(2.3rem, 4.6vw, 3.6rem); }
+  .final p { margin: 20px auto 0; max-width: 640px; color: #B4BAC5; font-size: 1.08rem; }
+  .final .fine { margin-top: 40px; color: #8A919D; font-size: 13.5px; }
+  footer.ft { padding: 28px 0 36px; font-size: 13px; color: var(--dim); }
+  footer.ft .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (max-width: 960px) {
+    .links { display: none; }
+    .split, .price, .about, .card.dark { grid-template-columns: 1fr; gap: 32px; }
+    .lanes, .grid3, .rel { grid-template-columns: 1fr; }
+    .rel div, .rel div:not(:nth-child(3n+1)) { padding: 24px 0; border-left: 0; border-bottom: 1px solid rgba(255,255,255,.12); } .rel div:last-child { border-bottom: 0; padding-bottom: 0; }
+    .costs { grid-template-columns: repeat(2, 1fr); }
+    .track { display: none; } .lanes { margin-top: 44px; }
+    .band { padding: 52px 28px; border-radius: 24px; } .who { position: static; display: flex; gap: 16px; align-items: center; } .who b { margin: 0; }
+    section.sec { padding: 80px 0; }
+  }
+  @media (max-width: 640px) {
+    .grid2, .ticks, .costs { grid-template-columns: 1fr; } .span2 { grid-column: auto; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .hero { padding-top: 116px; } h1 em { white-space: normal; } h1 em svg { display: none; }
+    .board .tabs span:not(.on) { display: none; } .hide-s { display: none; }
+    .field { grid-template-columns: 1fr; gap: 6px; } .final { padding: 60px 24px; border-radius: 24px; }
+    .seg button { padding: 9px 14px; font-size: 13px; }
+    .badge { font-size: 12.5px; padding-right: 12px; text-align: left; border-radius: 16px; } .badge b { white-space: nowrap; }
+    .board th:nth-child(2), .board td:nth-child(2) { display: none; } .board td { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js [data-r] { opacity: 1; transform: none; transition: none; }
+    h1 em path { stroke-dashoffset: 0; transition: none; } .track::after, .m .prog i { transform: none; transition: none; }
+    *, *::before, *::after { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="pill">
+    <a href="#top" class="brand"><span class="bolt"><svg viewBox="0 0 24 24" fill="none" stroke="#7CF0A8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>Flowtive</a>
+    <nav class="links">
+      <a href="#understanding">Understanding</a>
+      <a href="#flow">The journey</a>
+      <a href="#controls">Your CRM</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <a href="#contact" class="btn p s">Get in touch</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="badge" data-r><b>Project proposal</b>Prepared for your B2B consultancy</div>
+    <h1 data-r style="--d:80ms">LinkedIn, your website and your newsletter, joined into <em>one simple journey<svg viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 8 C 60 2, 120 11, 180 6 S 270 3, 298 7"/></svg></em> from first post to consultancy assignment.</h1>
+    <p class="lede" data-r style="--d:160ms">A customer journey designed for a new firm, one CRM that fits your budget, lead capture with UK consent handled properly, and a proportionate amount of automation, with AI drafting the routine writing so your time goes on conversations. "Good enough" by design, built to grow.</p>
+    <div class="cta-row" data-r style="--d:240ms">
+      <a href="#flow" class="btn p">See the journey <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a href="#pricing" class="btn g">View fixed-price bid</a>
+    </div>
+
+    <div class="board" data-r style="--d:320ms">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><b>Contacts · journey view</b><span class="hide-s">HubSpot</span><span class="tabs"><span class="on">Contacts</span><span>Pipeline</span><span>Newsletter</span><span>Reports</span></span></div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Contact</th><th>Source</th><th class="hide-s">Journey</th><th>Stage</th></tr></thead>
+          <tbody>
+            <tr><td>Operations Director · logistics firm</td><td>LinkedIn post → guide download</td><td class="hide-s"><div class="meter"><i style="--w:100%"></i></div></td><td><span class="chip ok">Opportunity · proposal sent</span></td></tr>
+            <tr class="live"><td>Head of Strategy · housing association</td><td>Newsletter sign-up</td><td class="hide-s"><div class="meter"><i id="liveBar"></i></div></td><td><span class="chip" id="liveChip">Subscriber</span></td></tr>
+            <tr><td>CEO · regional charity</td><td>Met at event · quick-add</td><td class="hide-s"><div class="meter"><i style="--w:50%"></i></div></td><td><span class="chip wait">Follow-up draft ready to approve</span></td></tr>
+            <tr><td>Partner · two-person practice</td><td>Website contact form</td><td class="hide-s"><div class="meter"><i style="--w:25%"></i></div></td><td><span class="chip flag">Sole trader · consent needed first</span></td></tr>
+            <tr><td>Programme Manager · local authority</td><td>LinkedIn lead form</td><td class="hide-s"><div class="meter"><i style="--w:10%"></i></div></td><td><span class="chip">Subscriber</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Illustrative. Every contact shows where they came from and where they are in the journey, so the next step is always obvious.</div>
+    </div>
+
+    <div class="stats" data-stagger>
+      <div><b>4 objectives</b><small>Journey, CRM, capture, engagement</small></div>
+      <div><b>You approve</b><small>Every AI-drafted email</small></div>
+      <div><b>4 weeks</b><small>To a working system</small></div>
+      <div><b>$4,200</b><small>Fixed · paid per milestone</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="understanding">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>01</b>Understanding</div>
+    <h2 data-r>What you're solving for</h2>
+    <p class="intro" data-r>Your LinkedIn activity, website, contact management and email marketing <em>are not currently integrated</em>. You want a more systematic way of attracting prospective clients, capturing their interest, keeping them engaged and converting the relevant ones into consultancy assignments, with "good enough" tools that suit a new firm's budget.</p>
+    <p class="intro" data-r>The catch most journeys miss: LinkedIn is where your attention goes, but LinkedIn doesn't hand over contact details. Followers, people who react to posts and LinkedIn newsletter subscribers can't be exported to a CRM. So the journey's central job is to give people a reason to move from LinkedIn to something you own, and everything else is built around that hand-off.</p>
+
+    <div class="grid2" data-stagger>
+      <div class="card req"><div class="quote"><span>You asked for</span>"Design the customer journey"</div><p>Five plain stages: <span class="mono">Discover</span> (LinkedIn, referrals, events), <span class="mono">Subscribe</span> (newsletter or a useful resource on your site), <span class="mono">Engage</span> (opens, replies, event sign-ups), <span class="mono">Conversation</span>, <span class="mono">Opportunity</span>. Each stage has one owner action and one thing the system does for you.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"whether this should sit within our existing website infrastructure or on a separate platform"</div><p>A separate platform. Contacts held inside the website are tied to that build, and the next redesign puts your list at risk. My recommendation is HubSpot: the free CRM to start, Starter when you want branded newsletters and simple automation. Your website keeps its job, with embedded forms feeding the CRM.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"capture contacts through LinkedIn, the website, newsletter registrations and other relevant channels, with appropriate consent"</div><p>Website and newsletter forms with consent wording, LinkedIn posts pointing to an owned sign-up, LinkedIn lead forms synced if you run ads, and a quick-add route for people you meet. Every contact carries its source and its consent basis.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"an efficient process for managing newsletter subscribers, distributing communications and supporting follow-up"</div><p>A welcome email for new subscribers, a newsletter template, and follow-up tasks when someone engages. AI drafts the routine writing (the monthly newsletter from your recent posts, follow-up emails) and you approve before anything is sent.</p></div>
+      <div class="card dark span2"><div><div class="k">Not in your brief, but it decides who you can email</div><h3>UK consent rules split your B2B contacts in two</h3></div><p>Under PECR, people at limited companies can be sent relevant marketing email under legitimate interests with a clear opt-out, but sole traders and some partnerships count as individuals and need consent first. A consultancy selling to both needs a lawful-basis field on every contact from day one, so your newsletter only goes to people it legally can. That's built into the forms and the import, not left as a policy document.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="flow">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>02</b>The journey</div>
+    <h2 data-r>From LinkedIn post to consultancy assignment, in one diagram</h2>
+    <p class="intro" data-r>You <em>write the posts and have the conversations</em>. The CRM records, the automations nudge, and AI drafts the routine emails for you to approve.</p>
+
+    <div class="track" data-r aria-hidden="true"><span class="you">Post</span><span>Sign-up</span><span>Welcome</span><span>Newsletter</span><span>Engage</span><span class="you">Talk</span><span class="you">Propose</span></div>
+
+    <div class="lanes" data-stagger>
+      <div class="lane">
+        <header>Where people find you<span>lane 1</span></header>
+        <div class="step"><div class="k">LinkedIn</div><strong>Posts point to one owned next step</strong><span>Newsletter sign-up or a useful resource on your site, never just "DM me".</span></div>
+        <div class="step"><div class="k">Website</div><strong>Sign-up and contact forms, embedded</strong><span>Consent wording and a company / sole-trader question on each.</span></div>
+        <div class="step"><div class="k">Events and referrals</div><strong>Two-minute quick-add from your phone</strong><span>Source and how you met captured, so nobody is a mystery later.</span></div>
+        <div class="step"><div class="k">LinkedIn lead forms</div><strong>Synced automatically, if you run ads</strong><span>Optional; HubSpot connects to LinkedIn Ads directly.</span></div>
+      </div>
+      <div class="lane">
+        <header>Your CRM · HubSpot<span>lane 2</span></header>
+        <div class="step"><div class="k">Record</div><strong>One contact, matched on email, never duplicated</strong><span>Source, lawful basis and journey stage set on arrival.</span></div>
+        <div class="step"><div class="k">AI note</div><strong>Claude adds a short note on who they are</strong><span>Role, organisation, why they might need you. Public information only.</span></div>
+        <div class="step"><div class="k">Stage rules</div><strong>Engagement moves them along the journey</strong><span>Replies, repeat opens and event sign-ups mark a contact as engaged.</span></div>
+        <div class="step"><div class="k">Pipeline</div><strong>Conversations become deals with a value and next step</strong><span>Simple: Conversation, Proposal, Won, Not now.</span></div>
+      </div>
+      <div class="lane">
+        <header>Engagement · you approve<span>lane 3</span></header>
+        <div class="step"><div class="k">Welcome</div><strong>New subscribers get a short welcome email</strong><span>Written once with you, sent automatically.</span></div>
+        <div class="step"><div class="k">Newsletter</div><strong>Monthly draft assembled from your recent posts</strong><span>Claude drafts in your voice; you edit and send.</span></div>
+        <div class="step gate"><div class="k">Follow-up</div><strong>Engaged contacts get a follow-up draft and a task</strong><span>You approve, edit or skip. Nothing personal goes out unseen.</span></div>
+        <div class="step"><div class="k">Not now</div><strong>Lost deals return to the newsletter</strong><span>Re-surfaced as a task after six months.</span></div>
+      </div>
+    </div>
+
+    <div class="then" data-r>
+      <div class="k">Then, in every case</div>
+      <ul class="ticks">
+        <li>Every contact has a source, a lawful basis and a journey stage</li>
+        <li>Unsubscribes and objections honoured everywhere, at once</li>
+        <li>A one-page dashboard: new contacts, engaged contacts, open deals</li>
+        <li>A written journey map and SOP you can hand to a future hire</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="controls">
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow" data-r><b>03</b>Your CRM</div>
+      <h2 data-r>Set up for a small firm, so you'll actually keep using it</h2>
+      <p class="intro" data-r>Few fields, clear stages, nothing you have to maintain by hand. If a field isn't used in a report or an automation, it isn't created.</p>
+      <ul class="feat" data-stagger>
+        <li><b>Contacts</b>With source, lawful basis, journey stage and the AI note.</li>
+        <li><b>Companies</b>Linked automatically by email domain, so you see every contact at an organisation.</li>
+        <li><b>Pipeline</b>Four stages from conversation to won, each with a next step and a date.</li>
+        <li><b>Forms</b>Newsletter, resource download, contact and quick-add, each tagged by source.</li>
+        <li><b>Emails</b>Welcome email, newsletter template, follow-up drafts.</li>
+        <li><b>Dashboard</b>New, engaged and in-pipeline counts, by source, monthly.</li>
+        <li><b>Log and errors</b>Every automation run and anything that failed, emailed to you, so nothing is dropped silently.</li>
+      </ul>
+    </div>
+    <div class="panel" data-r style="--d:120ms">
+      <header><b>Journey settings</b><span>Contact properties · HubSpot</span></header>
+      <div class="field"><label>Journey stages</label><div class="in">Subscriber · Engaged · Conversation · Opportunity</div></div>
+      <div class="field"><label>Lawful basis</label><div class="in m">legitimate_interest | consent</div></div>
+      <div class="field"><label>Source</label><div class="in">LinkedIn · Website · Event · Referral · Lead form</div></div>
+      <div class="field"><label>Engaged when</label><div class="in">Replies, or opens 3 of the last 4 emails</div></div>
+      <div class="field"><label>Newsletter</label><div class="in">Monthly · first Tuesday · draft 5 days before</div></div>
+      <div class="field"><label>AI follow-ups</label><div class="row"><span class="sw on"></span>Drafted for approval, never auto-sent</div></div>
+      <div class="field"><label>Not-now re-surface</label><div class="row"><span class="sw on"></span>Task after 6 months</div></div>
+      <div class="note">Illustrative values. We set the real rules together in week 1.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="reliability" style="padding-top:0">
+  <div class="wrap">
+    <div class="band" data-r>
+      <div class="eyebrow"><b>04</b>Data and safeguards</div>
+      <h2>Built so a contact is never lost, duplicated or emailed without a basis</h2>
+      <div class="rel">
+        <div><i>01</i><h3>Your existing contacts</h3><p>Exported from wherever they live now (LinkedIn connections export, inboxes, spreadsheets), cleaned, deduplicated and imported with a lawful basis assigned, not guessed.</p></div>
+        <div><i>02</i><h3>The same person signs up twice</h3><p>Matched on email, so a second form fill updates the record and adds the new source instead of creating a duplicate.</p></div>
+        <div><i>03</i><h3>An automation fails</h3><p>The failure is logged and emailed to you with the contact it affected. Nothing fails silently.</p></div>
+        <div><i>04</i><h3>AI writes something wrong</h3><p>Every AI draft is a draft. Follow-ups and newsletters wait for your approval; the AI note is clearly marked as AI and uses public information only.</p></div>
+        <div><i>05</i><h3>Someone unsubscribes or objects</h3><p>Opt-outs are honoured across every list and automation at once, and kept on record so they are never re-imported.</p></div>
+        <div><i>06</i><h3>You outgrow it</h3><p>Everything is in your own accounts. Moving from the free tier to Starter, or adding a colleague, changes nothing about the setup.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="milestones" style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>05</b>Milestones</div>
+    <h2 data-r>Four objectives, four weekly milestones</h2>
+    <p class="intro" data-r>One milestone per objective in your brief, each ending in something you can see and use.</p>
+    <div class="grid2" data-stagger>
+      <div class="card m"><div class="top"><b>1</b><span>Week 1</span></div><div class="prog"><i style="--w:25%"></i></div><h3>Customer journey and tool decision</h3><p>A working session with you, your Terms of Reference worked through, the journey mapped stage by stage, the CRM choice confirmed with costs, and consent wording drafted.</p><div class="see"><b>You'll see</b>A one-page journey map and a short recommendation you can say yes or no to.</div></div>
+      <div class="card m"><div class="top"><b>2</b><span>Week 2</span></div><div class="prog"><i style="--w:50%"></i></div><h3>CRM set up and contacts in</h3><p>HubSpot configured: properties, journey stages, pipeline, companies. Existing contacts cleaned, deduplicated and imported with a lawful basis.</p><div class="see"><b>You'll see</b>Your contacts in one place, each with a source, stage and basis.</div></div>
+      <div class="card m"><div class="top"><b>3</b><span>Week 3</span></div><div class="prog"><i style="--w:75%"></i></div><h3>Lead capture live</h3><p>Website forms embedded, newsletter sign-up, a resource download if you have one, the quick-add route, and LinkedIn lead form sync if you run ads.</p><div class="see"><b>You'll see</b>A test sign-up on your website appearing in the CRM within a minute, tagged correctly.</div></div>
+      <div class="card m"><div class="top"><b>4</b><span>Week 4</span></div><div class="prog"><i style="--w:100%"></i></div><h3>Engagement automation and handover</h3><p>Welcome email, newsletter template, the AI newsletter and follow-up drafts, stage rules, dashboard, a written SOP, and a training session.</p><div class="see"><b>You'll see</b>Your first AI-drafted newsletter in your voice, waiting for your approval.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="pricing">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>06</b>Investment</div>
+    <h2 data-r>Fixed-price bid</h2>
+    <p class="intro" data-r>One number, paid against your four milestones, inside your budget with room for the unexpected.</p>
+
+    <div class="price" data-r style="margin-top:36px">
+      <div class="card">
+        <div class="k">Total project</div>
+        <div style="margin-top:10px"><span class="big">$4,200</span><span>USD</span></div>
+        <div class="terms">Fixed price · 4 weeks · paid per milestone</div>
+        <div class="ledger">
+          <div><span><strong>M1 — Customer journey and tool decision</strong><small>Due when you approve the journey map and recommendation</small></span><b>$1,100</b></div>
+          <div><span><strong>M2 — CRM set up and contacts in</strong><small>Due when your contacts are imported and checked</small></span><b>$1,100</b></div>
+          <div><span><strong>M3 — Lead capture live</strong><small>Due when test sign-ups land correctly from every channel</small></span><b>$1,000</b></div>
+          <div><span><strong>M4 — Engagement automation and handover</strong><small>Due after the training session</small></span><b>$1,000</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="k" style="color:var(--mut)">What's included</div>
+        <ul class="ticks one">
+          <li>Customer journey design and written journey map</li>
+          <li>CRM recommendation, set-up and contact import</li>
+          <li>Website, newsletter, LinkedIn and event lead capture</li>
+          <li>Consent wording and lawful-basis tracking</li>
+          <li>Welcome email, newsletter template, stage rules</li>
+          <li>AI newsletter and follow-up drafts, approved by you</li>
+          <li>Dashboard, SOP, training session</li>
+          <li>One month of support after handover</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="costs" data-stagger>
+      <header><div class="k" style="color:var(--mut)">Running costs after handover, paid by you to the vendors</div></header>
+      <div><strong>HubSpot<code>£0 to start</code></strong><small>Free CRM covers contacts, forms and pipeline. Starter, roughly £15–20 per seat a month, adds branded newsletters and simple automation.</small></div>
+      <div><strong>Make<code>~£9/month</code></strong><small>Runs the AI steps and anything HubSpot can't connect natively. Free plan may be enough at first.</small></div>
+      <div><strong>Claude API<code>pennies per draft</code></strong><small>A newsletter draft or contact note costs a few pence. Under £5 a month at your volumes.</small></div>
+    </div>
+    <p class="fine">Vendor prices as published in November 2026; confirmed in week 1 before you sign up to anything. Optional after handover: about $500 a month for up to four hours of improvements.</p>
+  </div>
+</section>
+
+<section class="sec" id="examples">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>07</b>The same pattern, elsewhere</div>
+    <h2 data-r>Two worked examples of this approach</h2>
+    <p class="intro" data-r>Illustrative scenarios, not client case studies. They show how the same building blocks bend to different firms.</p>
+    <div class="grid2" data-stagger>
+      <div class="card"><div class="k">Worked example · Independent HR consultancy</div><h3 style="margin-top:12px;font-size:1.3rem;letter-spacing:-.03em">LinkedIn posts that turn into a list of 400 HR directors</h3><p>A two-partner HR consultancy posts on LinkedIn three times a week. Each post ends with a link to a monthly employment-law briefing sign-up on their site. Sign-ups land in the CRM with a lawful basis; replies to the briefing mark contacts as engaged and create a follow-up draft. Within a quarter their pipeline comes from their own list rather than referrals alone.</p><div class="tags"><span>LinkedIn to owned list</span><span>Newsletter as engine</span><span>Engagement-based follow-up</span></div></div>
+      <div class="card"><div class="k">Worked example · Sustainability advisory</div><h3 style="margin-top:12px;font-size:1.3rem;letter-spacing:-.03em">Event contacts that don't vanish after the conference</h3><p>A small advisory firm meets most prospects at sector events. A phone quick-add form captures each one with how they met, and Claude adds a short note on the organisation. A welcome email goes out the next morning, and anyone who engages gets a follow-up draft the founder approves in a minute. Lost deals return to the newsletter and re-surface after six months.</p><div class="tags"><span>Quick-add capture</span><span>AI research note</span><span>Approved follow-ups</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="kickoff">
+  <div class="wrap narrow">
+    <div class="eyebrow" data-r><b>08</b>Before kickoff</div>
+    <h2 data-r style="margin-bottom:40px">Three things I'll confirm on our first call</h2>
+    <div data-stagger>
+      <div class="q"><b>Q1</b><div><h3>What does your Terms of Reference add to the posting?</h3><p>This proposal is built from the posting. If the Terms of Reference asks for a written report, workshops or extra channels, I'll show what changes before you commit. Default: the four objectives as written, delivered as above.</p></div></div>
+      <div class="q"><b>Q2</b><div><h3>What is your website built on, and who maintains it?</h3><p>It decides how forms are embedded and who adds them. Default: I embed HubSpot forms myself, or hand your web person a two-line snippet.</p></div></div>
+      <div class="q"><b>Q3</b><div><h3>Where do your current contacts live?</h3><p>LinkedIn connections, inboxes, a spreadsheet, an existing newsletter tool. Default: all of them are exported, cleaned and imported in week 2, each with a lawful basis.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>09</b>Who's building it</div>
+    <h2 data-r style="margin-bottom:44px">A short note on me</h2>
+    <div class="about">
+      <div class="who" data-r><i>K</i><div><b>Kristof</b><span>Flowtive · UK</span><span>Claude Certified Architect</span></div></div>
+      <div>
+        <p data-r>I'm Kristof, based in the UK. I build lead capture, follow-up and CRM systems for small firms, with AI doing the routine writing and admin so the people in the business spend their time on clients.</p>
+        <p data-r>For your firm that means a proportionate system, not an enterprise one: a journey you can explain in a sentence, a CRM you'll keep using because it has only what you need, UK consent handled from day one, and AI drafts that save you hours without anything going out unseen.</p>
+        <p data-r>Happy to walk you through a past build on a call before you commit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="padding:0 0 24px">
+  <div class="wrap">
+    <div class="final" data-r>
+      <h2>Ready to move forward?</h2>
+      <p>Send your Terms of Reference notes, your website address and where your contacts live today. I'll come back inside 48 hours with the kickoff date, and your journey map will be ready for your sign-off at the end of week 1.</p>
+      <div class="cta-row">
+        <a href="mailto:kristof@getflowtive.com" class="btn w">Email Kristof <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a href="#milestones" class="btn o">Re-read the milestones</a>
+      </div>
+      <div class="fine">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </div>
+</section>
+
+<footer class="ft"><div class="wrap"><span>© 2026 Flowtive · Prepared for your B2B consultancy</span><span>CRM and customer journey</span></div></footer>
+
+<script>
+(function () {
+  var STATES = [
+    ['Subscriber', '', 10],
+    ['Welcome email sent', 'run', 25],
+    ['Engaged · replied to newsletter', 'ok', 50],
+    ['Follow-up draft ready to approve', 'wait', 65],
+    ['Conversation · call booked', 'ok', 80]
+  ];
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll reveal
+  document.querySelectorAll('[data-stagger]').forEach(function (g) {
+    Array.prototype.forEach.call(g.children, function (c, i) { c.setAttribute('data-r', ''); c.style.setProperty('--d', (i * 70) + 'ms'); });
+  });
+  var els = document.querySelectorAll('[data-r]');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  } else { els.forEach(function (el) { el.classList.add('in'); }); }
+
+  // nav state
+  var nav = document.getElementById('nav'), links = document.querySelectorAll('.links a');
+  var secs = Array.prototype.map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    var cur = -1; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 150) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // pricing toggle (only present when snippet-phased-pricing.html is used)
+  var seg = document.getElementById('seg'), plans = document.getElementById('plans');
+  if (seg && plans) {
+    var thumb = seg.querySelector('i');
+    var place = function (btn) { thumb.style.setProperty('--sw', btn.offsetWidth + 'px'); thumb.style.setProperty('--sx', (btn.offsetLeft - 4) + 'px'); };
+    seg.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        seg.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        plans.setAttribute('data-plan', b.getAttribute('data-v')); place(b);
+      });
+    });
+    var init = function () { place(seg.querySelector('[aria-pressed="true"]')); };
+    init(); window.addEventListener('resize', init); if (document.fonts && document.fonts.ready) document.fonts.ready.then(init);
+  }
+
+  // hero board: the live row moves through STATES
+  var chip = document.getElementById('liveChip'), bar = document.getElementById('liveBar');
+  if (chip && STATES.length) {
+    var show = function (i) { chip.textContent = STATES[i][0]; chip.className = 'chip ' + STATES[i][1]; if (bar) bar.style.setProperty('--w', STATES[i][2] + '%'); };
+    if (reduce) { show(Math.max(0, STATES.length - 2)); return; }
+    var n = 0; show(0);
+    (function tick() { setTimeout(function () { n = (n + 1) % STATES.length; show(n); tick(); }, n === STATES.length - 1 ? 3800 : 1900); })();
+  }
+})();
+</script>
+</body>
+</html>
