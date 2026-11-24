@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Proposal — AI-guided self-assessment app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+  :root {
+    --bg: #FFFFFF; --soft: #F5F6F8; --soft2: #EEF0F3; --ink: #0B0C0E; --tx: #1A1C20; --mut: #5F6672; --dim: #9097A3;
+    --line: #E6E8EC; --line2: #D3D7DE;
+    --ac: #0E9F4E; --ac2: #16B85C; --acbg: #E8F8EE; --acline: #BFE9CF; --lime: #7CF0A8;
+    --warn: #9A6400; --warnbg: #FFF3D6; --bad: #B4322B; --badbg: #FDE8E6; --info: #2B5BD7; --infobg: #E7EEFF;
+    --sans: 'DM Sans', Inter, system-ui, -apple-system, sans-serif; --mono: 'DM Mono', ui-monospace, monospace;
+    --sh: 0 1px 2px rgba(11,12,14,.04), 0 8px 24px -12px rgba(11,12,14,.1);
+    --sh2: 0 1px 2px rgba(11,12,14,.05), 0 30px 70px -30px rgba(11,12,14,.28);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+  body { background: var(--bg); color: var(--tx); font-family: var(--sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2 { text-wrap: balance; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .narrow { max-width: 800px; }
+  .mono { font-family: var(--mono); font-size: .88em; }
+
+  .js [data-r] { opacity: 0; transform: translateY(14px); transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+  .js [data-r].in { opacity: 1; transform: none; }
+
+  /* nav */
+  .nav { position: fixed; top: 14px; left: 0; right: 0; z-index: 50; padding: 0 16px; pointer-events: none; }
+  .nav .pill { pointer-events: auto; max-width: 860px; margin: 0 auto; height: 54px; padding: 0 8px 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(255,255,255,.94); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--sh); transition: box-shadow .3s; }
+  .nav.scrolled .pill { box-shadow: 0 1px 2px rgba(11,12,14,.05), 0 16px 40px -18px rgba(11,12,14,.22); }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
+  .bolt { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); display: grid; place-items: center; }
+  .bolt svg { width: 14px; height: 14px; }
+  .links { display: flex; gap: 2px; font-size: 14px; color: var(--mut); }
+  .links a { padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+  .links a:hover { color: var(--ink); }
+  .links a.on { color: var(--ink); background: var(--soft2); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 15px; padding: 12px 22px; border-radius: 999px; transition: transform .2s, background .2s, border-color .2s, box-shadow .2s; }
+  .btn svg { width: 15px; height: 15px; transition: transform .2s; } .btn:hover svg { transform: translateX(3px); }
+  .btn.p { background: var(--ink); color: #fff; box-shadow: 0 8px 20px -10px rgba(11,12,14,.6); } .btn.p:hover { background: #24272D; transform: translateY(-1px); }
+  .btn.g { background: #fff; border: 1px solid var(--line2); color: var(--ink); } .btn.g:hover { border-color: var(--ink); }
+  .btn.s { font-size: 14px; padding: 9px 16px; }
+  .btn.w { background: #fff; color: var(--ink); } .btn.w:hover { background: var(--lime); transform: translateY(-1px); }
+  .btn.o { border: 1px solid rgba(255,255,255,.22); color: #fff; } .btn.o:hover { background: rgba(255,255,255,.08); }
+
+  /* hero */
+  .hero { position: relative; padding: 148px 0 0; text-align: center; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; background: radial-gradient(60% 55% at 50% 0%, rgba(22,184,92,.13), transparent 70%), radial-gradient(circle, rgba(11,12,14,.09) 1px, transparent 1.2px) 0 0 / 22px 22px; -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); pointer-events: none; }
+  .hero > .wrap { position: relative; }
+  .badge { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--mut); background: #fff; border: 1px solid var(--line); padding: 6px 14px 6px 8px; border-radius: 999px; box-shadow: var(--sh); }
+  .badge b { font-weight: 500; font-size: 11.5px; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; }
+  h1 { font-size: clamp(2.4rem, 5.4vw, 4.3rem); font-weight: 600; letter-spacing: -.032em; line-height: 1.05; color: var(--ink); max-width: 940px; margin: 26px auto 0; }
+  h1 em { font-style: normal; color: var(--ac); position: relative; white-space: nowrap; }
+  h1 em svg { position: absolute; left: 0; bottom: -.14em; width: 100%; height: .22em; overflow: visible; }
+  h1 em path { fill: none; stroke: var(--ac2); stroke-width: 3; stroke-linecap: round; opacity: .55; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s cubic-bezier(.3,.7,.2,1) .6s; }
+  h1.in em path { stroke-dashoffset: 0; }
+  .lede { margin: 26px auto 0; font-size: 1.16rem; color: var(--mut); max-width: 680px; line-height: 1.6; }
+  .cta-row { margin-top: 34px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+  /* board */
+  .board { margin: 64px auto 0; max-width: 980px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .board .bar { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--mut); background: linear-gradient(#fff, #FBFBFC); }
+  .board .dots { display: flex; gap: 6px; } .board .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--soft2); border: 1px solid var(--line2); }
+  .board .bar b { color: var(--ink); font-weight: 600; }
+  .board .tabs { margin-left: auto; display: flex; gap: 2px; } .board .tabs span { padding: 4px 11px; border-radius: 8px; } .board .tabs .on { background: var(--soft2); color: var(--ink); font-weight: 500; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-family: var(--mono); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); padding: 12px 18px; background: var(--soft); border-bottom: 1px solid var(--line); }
+  td { padding: 13px 18px; border-top: 1px solid var(--line); white-space: nowrap; color: var(--tx); }
+  td:nth-child(2) { color: var(--mut); }
+  tbody tr:first-child td { border-top: 0; }
+  tbody tr { transition: background .2s; } tbody tr:hover { background: #FAFBFC; }
+  tr.live { background: linear-gradient(90deg, rgba(232,248,238,.7), transparent 70%); }
+  .meter { width: 96px; height: 6px; border-radius: 999px; background: var(--soft2); overflow: hidden; } .meter i { display: block; height: 100%; width: var(--w, 0%); background: var(--ac2); border-radius: inherit; transition: width .9s cubic-bezier(.3,.7,.2,1); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 3px 11px 3px 9px; border-radius: 999px; background: var(--soft2); color: var(--mut); transition: background .4s, color .4s; }
+  .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .chip.ok { background: var(--acbg); color: var(--ac); } .chip.run { background: var(--infobg); color: var(--info); } .chip.run::before { animation: blink 1.2s ease-in-out infinite; } .chip.wait { background: var(--warnbg); color: var(--warn); } .chip.flag { background: var(--badbg); color: var(--bad); }
+  @keyframes blink { 50% { opacity: .25; } }
+  .board .note { padding: 12px 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  .stats { margin: 20px auto 0; max-width: 980px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: left; }
+  .stats div { background: var(--soft); border-radius: 16px; padding: 20px 22px; transition: background .25s, transform .25s; }
+  .stats div:hover { background: var(--soft2); transform: translateY(-2px); }
+  .stats div:last-child { background: var(--ink); color: #fff; } .stats div:last-child small { color: #A9AFBA; } .stats div:last-child b { color: var(--lime); }
+  .stats b { display: block; font-size: 1.75rem; font-weight: 600; letter-spacing: -.035em; color: var(--ink); line-height: 1.15; }
+  .stats small { display: block; margin-top: 4px; font-size: 13px; color: var(--mut); }
+
+  /* sections */
+  section.sec { padding: 112px 0; }
+  section.tint { background: var(--soft); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ac); background: var(--acbg); border-radius: 999px; padding: 4px 12px 4px 6px; }
+  .eyebrow b { font-family: var(--mono); font-weight: 500; font-size: 11px; background: #fff; border-radius: 999px; padding: 1px 7px; }
+  h2 { font-size: clamp(1.95rem, 3.4vw, 2.85rem); font-weight: 600; letter-spacing: -.028em; line-height: 1.1; color: var(--ink); margin-top: 18px; max-width: 800px; }
+  .intro { margin-top: 20px; font-size: 1.08rem; color: var(--mut); max-width: 720px; }
+  .intro + .intro { margin-top: 14px; }
+  .intro em { font-style: normal; font-weight: 500; color: var(--ink); background: linear-gradient(var(--acline), var(--acline)) 0 92% / 100% .32em no-repeat; }
+  h3 { font-size: 1.08rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.35; color: var(--ink); }
+  .k { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px; transition: border-color .25s, transform .25s, box-shadow .25s; }
+  .card:hover { border-color: var(--line2); transform: translateY(-3px); box-shadow: var(--sh); }
+  .card p { margin-top: 10px; font-size: 15px; color: var(--mut); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 52px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 52px; }
+  .span2 { grid-column: span 2; }
+
+  /* requirements */
+  .req .quote { background: var(--soft); border-radius: 14px; padding: 16px 18px; font-size: 1.06rem; font-weight: 500; letter-spacing: -.015em; color: var(--ink); line-height: 1.4; position: relative; }
+  .req .quote span { display: block; font-family: var(--mono); font-weight: 400; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+  .req p { margin-top: 16px; padding-left: 14px; border-left: 2px solid var(--acline); }
+  .card.dark { background: var(--ink); border-color: var(--ink); color: #fff; display: grid; grid-template-columns: 5fr 7fr; gap: 36px; align-items: center; padding: 36px; }
+  .card.dark:hover { box-shadow: 0 30px 60px -30px rgba(11,12,14,.6); }
+  .card.dark .k { color: var(--lime); } .card.dark h3 { color: #fff; font-size: 1.5rem; letter-spacing: -.03em; line-height: 1.2; margin-top: 10px; } .card.dark p { margin: 0; color: #B4BAC5; }
+
+  /* flow */
+  .track { margin-top: 48px; display: flex; align-items: center; gap: 0; font-size: 13px; font-weight: 500; color: var(--ink); position: relative; justify-content: space-between; }
+  .track::before, .track::after { content: ''; position: absolute; left: 24px; right: 24px; top: 50%; height: 2px; margin-top: -1px; background: var(--line2); }
+  .track::after { background: var(--ac2); transform-origin: 0 50%; transform: scaleX(0); transition: transform 2.2s cubic-bezier(.4,.5,.2,1) .3s; }
+  .track.in::after { transform: scaleX(1); }
+  .track span { position: relative; z-index: 1; background: #fff; border: 1px solid var(--line2); border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+  .track span.you { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .lanes { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .lane { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 10px; }
+  .lane > header { padding: 14px 16px 12px; font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; justify-content: space-between; }
+  .lane > header span { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--dim); }
+  .step { border-radius: 14px; padding: 16px; background: var(--soft); transition: background .25s; }
+  .step + .step { margin-top: 8px; }
+  .step:hover { background: var(--soft2); }
+  .step strong { display: block; font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.4; margin-top: 5px; }
+  .step span { display: block; margin-top: 5px; font-size: 13.5px; color: var(--mut); line-height: 1.5; }
+  .step.gate { background: var(--acbg); box-shadow: inset 0 0 0 1px var(--acline); }
+  .then { margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 24px 28px; }
+  .ticks { list-style: none; padding: 0; margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 32px; font-size: 15px; color: var(--tx); }
+  .ticks li { display: flex; gap: 10px; align-items: flex-start; }
+  .ticks li::before { content: ''; flex: none; margin-top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--acbg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18' fill='none' stroke='%230E9F4E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.2 9.3l2.5 2.5 5-5.4'/%3E%3C/svg%3E") center/18px no-repeat; }
+  .ticks.one { grid-template-columns: 1fr; gap: 11px; }
+
+  /* controls */
+  .split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 64px; align-items: center; }
+  .feat { list-style: none; padding: 0; margin-top: 28px; display: grid; gap: 4px; font-size: 14.5px; color: var(--mut); }
+  .feat li { padding: 12px 14px; border-radius: 12px; transition: background .2s; }
+  .feat li:hover { background: var(--soft); }
+  .feat b { display: block; color: var(--ink); font-weight: 600; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--sh2); overflow: hidden; }
+  .panel header { padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--mut); }
+  .panel header b { color: var(--ink); font-weight: 600; font-size: 14px; }
+  .field { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 14px; }
+  .field:first-of-type { border-top: 0; }
+  .field label { color: var(--mut); font-size: 13px; }
+  .field .in { background: var(--soft); border: 1px solid var(--line); border-radius: 9px; padding: 7px 11px; color: var(--ink); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .field .in.m { font-family: var(--mono); font-size: 12.5px; }
+  .sw { width: 36px; height: 21px; border-radius: 999px; background: var(--line2); position: relative; } .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .sw.on { background: var(--ac2); } .sw.on::after { left: 17px; }
+  .field .row { display: flex; align-items: center; gap: 10px; color: var(--mut); font-size: 13px; }
+  .panel .note { padding: 12px 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); background: var(--soft); }
+
+  /* reliability */
+  .band { background: var(--ink); color: #fff; border-radius: 32px; padding: 72px 56px; position: relative; overflow: hidden; }
+  .band::before { content: ''; position: absolute; right: -200px; top: -260px; width: 640px; height: 640px; background: radial-gradient(closest-side, rgba(124,240,168,.16), transparent); }
+  .band > * { position: relative; }
+  .band .eyebrow { background: rgba(124,240,168,.12); color: var(--lime); } .band .eyebrow b { background: rgba(255,255,255,.1); }
+  .band h2 { color: #fff; }
+  .rel { margin-top: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .rel div { padding: 28px 28px 30px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .rel div:not(:nth-child(3n+1)) { padding-left: 28px; border-left: 1px solid rgba(255,255,255,.12); }
+  .rel div:nth-child(n+4) { border-bottom: 0; padding-bottom: 0; }
+  .rel i { font-family: var(--mono); font-style: normal; font-size: 12px; color: var(--lime); }
+  .rel h3 { color: #fff; margin-top: 10px; } .rel p { margin-top: 8px; font-size: 14.5px; color: #A9AFBA; }
+
+  /* milestones */
+  .m { display: flex; flex-direction: column; }
+  .m .top { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--mut); }
+  .m .top b { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+  .m .top span { font-family: var(--mono); font-size: 12px; background: var(--soft); padding: 4px 10px; border-radius: 999px; }
+  .m .prog { margin: 18px 0 20px; height: 4px; border-radius: 999px; background: var(--soft2); overflow: hidden; }
+  .m .prog i { display: block; height: 100%; width: var(--w); background: var(--ac2); border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1.2s cubic-bezier(.3,.7,.2,1) .35s; }
+  .m.in .prog i { transform: scaleX(1); }
+  .m h3 { font-size: 1.25rem; letter-spacing: -.03em; }
+  .see { margin-top: auto; padding: 14px 16px; border-radius: 14px; background: var(--acbg); font-size: 14px; color: var(--tx); }
+  .m p { margin-bottom: 20px; }
+  .see b { display: block; font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); margin-bottom: 4px; }
+
+  /* pricing */
+  .seg { margin-top: 36px; display: inline-flex; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 999px; position: relative; box-shadow: var(--sh); }
+  .seg button { position: relative; z-index: 1; font: inherit; font-size: 14px; font-weight: 500; color: var(--mut); background: none; border: 0; padding: 9px 20px; border-radius: 999px; cursor: pointer; transition: color .25s; }
+  .seg button[aria-pressed="true"] { color: #fff; }
+  .seg i { position: absolute; top: 4px; bottom: 4px; left: 4px; width: var(--sw, 50%); transform: translateX(var(--sx, 0)); background: var(--ink); border-radius: 999px; transition: transform .35s cubic-bezier(.3,.7,.2,1), width .35s cubic-bezier(.3,.7,.2,1); }
+  .price { margin-top: 20px; display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; }
+  .price .card:hover { transform: none; }
+  .plan { display: none; } [data-plan="full"] .plan.full, [data-plan="p1"] .plan.p1 { display: block; animation: fade .45s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+  .big { font-size: clamp(3.6rem, 6.4vw, 5rem); font-weight: 600; letter-spacing: -.055em; line-height: 1; color: var(--ink); }
+  .big + span { color: var(--mut); margin-left: 10px; }
+  .terms { margin-top: 10px; font-size: 14.5px; color: var(--mut); }
+  .ledger { margin-top: 26px; }
+  .ledger div { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+  .ledger strong { font-weight: 500; font-size: 15px; display: block; color: var(--ink); } .ledger small { font-size: 13px; color: var(--mut); } .ledger b { font-family: var(--mono); font-weight: 500; font-size: 14px; background: var(--soft); border-radius: 8px; padding: 4px 10px; color: var(--ink); }
+  .ledger .later { opacity: .6; } .ledger .later b { background: none; border: 1px dashed var(--line2); }
+  [data-plan="p1"] .ticks .p2 { color: var(--dim); text-decoration: line-through; text-decoration-color: var(--line2); } [data-plan="p1"] .ticks .p2::before { filter: grayscale(1); opacity: .45; }
+  .ticks .p1only { display: none; } [data-plan="p1"] .ticks .p1only { display: flex; }
+  .costs { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .costs > header { grid-column: 1 / -1; margin-top: 28px; margin-bottom: 4px; }
+  .costs > div { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+  .costs strong { font-weight: 600; font-size: 14.5px; color: var(--ink); display: block; } .costs code { display: table; margin-top: 8px; font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ac); background: var(--acbg); padding: 2px 9px; border-radius: 999px; white-space: nowrap; } .costs small { display: block; margin-top: 8px; font-size: 13px; color: var(--mut); line-height: 1.5; }
+  .fine { margin-top: 18px; font-size: 13px; color: var(--dim); }
+
+  .tags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; } .tags span { font-size: 12.5px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: var(--soft); color: var(--mut); }
+  .q { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 24px 26px; background: #fff; border: 1px solid var(--line); border-radius: 18px; transition: border-color .25s, transform .25s; }
+  .q + .q { margin-top: 12px; } .q:hover { border-color: var(--line2); transform: translateX(4px); }
+  .q > b { width: 36px; height: 36px; border-radius: 10px; background: var(--acbg); color: var(--ac); font-family: var(--mono); font-weight: 500; font-size: 12.5px; display: grid; place-items: center; }
+  .q p { margin-top: 6px; font-size: 15px; color: var(--mut); }
+  .about { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
+  .who { position: sticky; top: 110px; }
+  .who i { width: 64px; height: 64px; border-radius: 20px; background: var(--ink); color: var(--lime); font-style: normal; font-weight: 600; font-size: 1.5rem; display: grid; place-items: center; }
+  .who b { display: block; margin-top: 16px; font-size: 1.1rem; color: var(--ink); letter-spacing: -.02em; } .who span { font-size: 13.5px; color: var(--mut); display: block; }
+  .about p { color: var(--tx); font-size: 1.08rem; line-height: 1.75; } .about p + p { margin-top: 18px; }
+
+  .final { background: var(--ink); color: #fff; border-radius: 32px; padding: 88px 40px; text-align: center; position: relative; overflow: hidden; }
+  .final::before { content: ''; position: absolute; left: 50%; bottom: -420px; width: 900px; height: 700px; margin-left: -450px; background: radial-gradient(closest-side, rgba(22,184,92,.32), transparent); }
+  .final > * { position: relative; }
+  .final h2 { color: #fff; margin: 0 auto; font-size: clamp(2.3rem, 4.6vw, 3.6rem); }
+  .final p { margin: 20px auto 0; max-width: 640px; color: #B4BAC5; font-size: 1.08rem; }
+  .final .fine { margin-top: 40px; color: #8A919D; font-size: 13.5px; }
+  footer.ft { padding: 28px 0 36px; font-size: 13px; color: var(--dim); }
+  footer.ft .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (max-width: 960px) {
+    .links { display: none; }
+    .split, .price, .about, .card.dark { grid-template-columns: 1fr; gap: 32px; }
+    .lanes, .grid3, .rel { grid-template-columns: 1fr; }
+    .rel div, .rel div:not(:nth-child(3n+1)) { padding: 24px 0; border-left: 0; border-bottom: 1px solid rgba(255,255,255,.12); } .rel div:last-child { border-bottom: 0; padding-bottom: 0; }
+    .costs { grid-template-columns: repeat(2, 1fr); }
+    .track { display: none; } .lanes { margin-top: 44px; }
+    .band { padding: 52px 28px; border-radius: 24px; } .who { position: static; display: flex; gap: 16px; align-items: center; } .who b { margin: 0; }
+    section.sec { padding: 80px 0; }
+  }
+  @media (max-width: 640px) {
+    .grid2, .ticks, .costs { grid-template-columns: 1fr; } .span2 { grid-column: auto; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .hero { padding-top: 116px; } h1 em { white-space: normal; } h1 em svg { display: none; }
+    .board .tabs span:not(.on) { display: none; } .hide-s { display: none; }
+    .field { grid-template-columns: 1fr; gap: 6px; } .final { padding: 60px 24px; border-radius: 24px; }
+    .seg button { padding: 9px 14px; font-size: 13px; }
+    .badge { font-size: 12.5px; padding-right: 12px; text-align: left; border-radius: 16px; } .badge b { white-space: nowrap; }
+    .board th:nth-child(2), .board td:nth-child(2) { display: none; } .board td { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js [data-r] { opacity: 1; transform: none; transition: none; }
+    h1 em path { stroke-dashoffset: 0; transition: none; } .track::after, .m .prog i { transform: none; transition: none; }
+    *, *::before, *::after { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="pill">
+    <a href="#top" class="brand"><span class="bolt"><svg viewBox="0 0 24 24" fill="none" stroke="#7CF0A8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>Flowtive</a>
+    <nav class="links">
+      <a href="#understanding">Understanding</a>
+      <a href="#flow">The build</a>
+      <a href="#controls">Settings</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <a href="#contact" class="btn p s">Get in touch</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="badge" data-r><b>Project proposal</b>Prepared for your self-assessment launch</div>
+    <h1 data-r style="--d:80ms">Your tested Claude prompt, wrapped in a <em>polished product<svg viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 8 C 60 2, 120 11, 180 6 S 270 3, 298 7"/></svg></em> people buy, finish on a phone and keep.</h1>
+    <p class="lede" data-r style="--d:160ms">Checkout, access codes, a one-question-at-a-time conversation that survives a dead phone, and one branded report on screen, as a PDF and by email. Every service in accounts you own, the prompt and model in a settings file you edit, the API key on the server.</p>
+    <div class="cta-row" data-r style="--d:240ms">
+      <a href="#flow" class="btn p">See the build <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a href="#pricing" class="btn g">View itemised bid</a>
+    </div>
+
+    <div class="board" data-r style="--d:320ms">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><b>Admin · Sessions</b><span class="hide-s">your domain /admin</span><span class="tabs"><span class="on">Sessions</span><span>Codes</span><span>Reports</span><span>Feedback</span></span></div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Code · first name</th><th>Pack · AI cost</th><th class="hide-s">Progress</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>K7QM-42 · Hannah</td><td>Single · $0.91</td><td class="hide-s"><div class="meter"><i style="--w:100%"></i></div></td><td><span class="chip ok">Report emailed · PDF sent</span></td></tr>
+            <tr class="live"><td>R2XD-88 · Marcus</td><td>Two-pack (1 of 2) · $0.47</td><td class="hide-s"><div class="meter"><i id="liveBar"></i></div></td><td><span class="chip" id="liveChip">Code sent</span></td></tr>
+            <tr><td>T9LP-15 · Aisha</td><td>Single · $0.38</td><td class="hide-s"><div class="meter"><i style="--w:55%"></i></div></td><td><span class="chip wait">Paused · resumes on same code</span></td></tr>
+            <tr><td>BETA-06 · invited tester</td><td>Beta · $1.02</td><td class="hide-s"><div class="meter"><i style="--w:100%"></i></div></td><td><span class="chip run">Debrief submitted · in export</span></td></tr>
+            <tr><td>M4WN-30 · Leo</td><td>Single · $0.00</td><td class="hide-s"><div class="meter"><i style="--w:0%"></i></div></td><td><span class="chip flag">Refunded · code disabled</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">Illustrative. Every session shows where the buyer is, what the AI has cost so far, and what you can do next: reopen, refund or resend.</div>
+    </div>
+
+    <div class="stats" data-stagger>
+      <div><b>Every answer</b><small>Saved before the next question</small></div>
+      <div><b>1 template</b><small>Screen, PDF and email match</small></div>
+      <div><b>Mid-Jan beta</b><small>Two weeks of beta before 1 Feb</small></div>
+      <div><b>$3,800</b><small>Fixed core build · 4 milestones</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="understanding">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>01</b>Understanding</div>
+    <h2 data-r>What you're solving for</h2>
+    <p class="intro" data-r>The hard part is done: your prompt is finished and tested in person. What you need is the app around it, one that <em>feels like a polished product, not a chat window</em>, takes payment, hands out codes, and carries someone through 45 to 60 minutes on their phone without losing a word.</p>
+    <p class="intro" data-r>That length is the real design constraint. Over an hour, phones lock, tabs close and signal drops. So the server, not the browser, holds the conversation: each answer is saved before the next question is asked, and the report is generated by a background job that finishes and emails itself even if nobody is watching the "preparing your results" screen.</p>
+
+    <div class="grid2" data-stagger>
+      <div class="card req"><div class="quote"><span>You asked for</span>"Answers typed, or spoken using the device's built-in dictation, and editable before sending"</div><p>A plain, roomy text box that works with the microphone on the iPhone and Android keyboard. Nothing to install or allow, and every word is editable before it is sent. In-browser speech recognition is patchy on iPhone, so it isn't built in place of the keyboard's own dictation.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"If the connection drops or the phone dies, the same code resumes where they left off"</div><p>The code is the key to the session. Re-entering it on any device loads the full transcript and shows the last unanswered question. A half-typed answer is kept on the device as a draft too.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"The prompt and model kept in a settings file I can change without touching code"</div><p>One settings file holds the prompt, the model, the time limit and the report sections. It is checked when you save it, so a typo can't take the live app down, and every version is kept so you can roll back.</p></div>
+      <div class="card req"><div class="quote"><span>You asked for</span>"the report on screen, as a PDF, and by email, in one consistent branded layout"</div><p>Claude returns the report as labelled sections (title, key statement, profile and the rest of your structure). One designed template renders them on screen, as the PDF and in the email, so all three always match.</p></div>
+      <div class="card dark span2"><div><div class="k">Not in your brief, but it protects your margin and your prompt</div><h3>Your prompt never reaches the browser, and the long conversation stays cheap</h3></div><p>The prompt is your product, so it lives only on the server; the browser sees questions, never instructions. Prompt caching means the fixed prompt and the growing transcript are re-read at a small fraction of the normal input price each turn, which keeps an hour-long session around a dollar. Admin shows the actual cost of every session from Claude's own usage figures, not an estimate.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="flow">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>02</b>The build</div>
+    <h2 data-r>Purchase to report, in one diagram</h2>
+    <p class="intro" data-r>The buyer only ever sees your brand. <em>Your server does the work</em> and your accounts hold the money, the emails and the list.</p>
+
+    <div class="track" data-r aria-hidden="true"><span class="you">Buy</span><span>Code</span><span class="you">Start</span><span class="you">Answer</span><span>Save</span><span>Report</span><span>Email</span></div>
+
+    <div class="lanes" data-stagger>
+      <div class="lane">
+        <header>Buyer · phone or computer<span>lane 1</span></header>
+        <div class="step"><div class="k">Sales page</div><strong>Reads your copy, picks single or two-pack</strong><span>Copy and prices come from admin, so you change them without a developer.</span></div>
+        <div class="step"><div class="k">Code entry</div><strong>Enters code and first name, sees the start screen</strong><span>A used, refunded or expired code gets a clear message, not an error.</span></div>
+        <div class="step"><div class="k">Conversation</div><strong>One question at a time, typed or dictated, edited, sent</strong><span>Progress indicator throughout; closing the tab loses nothing.</span></div>
+        <div class="step"><div class="k">Results</div><strong>"Preparing your results", then the report on screen</strong><span>PDF download button; the same report arrives by email.</span></div>
+      </div>
+      <div class="lane">
+        <header>Your app · server<span>lane 2</span></header>
+        <div class="step"><div class="k">Stripe webhook</div><strong>Payment confirmed, one or two codes created</strong><span>Codes are only issued from Stripe's confirmation, never from the browser.</span></div>
+        <div class="step"><div class="k">Save, then ask</div><strong>Each answer written to the database first</strong><span>Then the transcript goes to Claude with your prompt, cached.</span></div>
+        <div class="step"><div class="k">Claude</div><strong>Returns exactly one next question, or "complete"</strong><span>The response format enforces one question at a time.</span></div>
+        <div class="step gate"><div class="k">Report job</div><strong>Background job builds the labelled report</strong><span>Checked against your section list; one automatic retry, then you're alerted.</span></div>
+      </div>
+      <div class="lane">
+        <header>Your accounts<span>lane 3</span></header>
+        <div class="step"><div class="k">Stripe</div><strong>Checkout, receipts, refunds</strong><span>Refunds issued from admin also disable the unused code.</span></div>
+        <div class="step"><div class="k">Email</div><strong>Codes, report and your resource PDFs</strong><span>Sent from your domain, authenticated so it lands in the inbox.</span></div>
+        <div class="step"><div class="k">Kit</div><strong>Buyer added to your list with a tag</strong><span>Beta testers tagged separately, so they don't get launch emails meant for buyers.</span></div>
+        <div class="step"><div class="k">Anthropic</div><strong>Your API key, your usage dashboard</strong><span>The key lives on the server only.</span></div>
+      </div>
+    </div>
+
+    <div class="then" data-r>
+      <div class="k">Then, for every session</div>
+      <ul class="ticks">
+        <li>Transcript, report and AI cost stored against the code</li>
+        <li>Report kept, so a lost email can be resent from admin</li>
+        <li>Feedback, when given, linked to the session for export</li>
+        <li>Any failure logged and emailed to you with the code it affected</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="controls">
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow" data-r><b>03</b>Settings and admin</div>
+      <h2 data-r>Everything you'll want to change, without touching code</h2>
+      <p class="intro" data-r>The settings file is read on every new session, so a prompt edit applies to the next buyer. Admin covers everything else day to day.</p>
+      <ul class="feat" data-stagger>
+        <li><b>Settings file</b>Prompt, model, time limit and report sections. Checked on save, versioned, one-click rollback.</li>
+        <li><b>Codes</b>Every code, how it was issued, its status. Create codes by hand for gifts or partners.</li>
+        <li><b>Sessions</b>Progress, cost, transcript. Reopen an expired session in one click.</li>
+        <li><b>Reports</b>View, download or resend any report.</li>
+        <li><b>Pages and prices</b>Sales page text and single and two-pack prices.</li>
+        <li><b>Feedback and beta</b>Beta invites, debrief answers, CSV export of everything.</li>
+        <li><b>Log and errors</b>What ran and what failed, with the code it affected.</li>
+      </ul>
+    </div>
+    <div class="panel" data-r style="--d:120ms">
+      <header><b>Settings</b><span>assessment settings · versioned</span></header>
+      <div class="field"><label>Prompt</label><div class="in m">prompt-v7 (edited 12 Jan)</div></div>
+      <div class="field"><label>Model</label><div class="in m">claude-opus-5-5</div></div>
+      <div class="field"><label>Report sections</label><div class="in">Title · Key statement · Profile · 5 more</div></div>
+      <div class="field"><label>Time limit</label><div class="in">14 days from first use</div></div>
+      <div class="field"><label>Prices</label><div class="in">Single · Two-pack (set in admin)</div></div>
+      <div class="field"><label>Beta mode</label><div class="row"><span class="sw on"></span>Invited testers see the debrief form</div></div>
+      <div class="field"><label>Public sales</label><div class="row"><span class="sw"></span>Off until launch day</div></div>
+      <div class="note">Illustrative values. Your full spec sets the real sections and limits.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="reliability" style="padding-top:0">
+  <div class="wrap">
+    <div class="band" data-r>
+      <div class="eyebrow"><b>04</b>Reliability</div>
+      <h2>Built so a paid assessment is never lost halfway</h2>
+      <div class="rel">
+        <div><i>01</i><h3>The phone dies at question 30</h3><p>Every answer is saved before the next question is generated. The same code on any device resumes at question 30, with the transcript intact.</p></div>
+        <div><i>02</i><h3>They close the results screen</h3><p>The report is built by a background job, not by the open page. It finishes anyway, is stored, and arrives by email with the PDF.</p></div>
+        <div><i>03</i><h3>Claude is slow or briefly down</h3><p>Requests retry automatically. If a question still can't be generated, the buyer sees a calm "try again in a minute" and their answer is already saved.</p></div>
+        <div><i>04</i><h3>A payment is disputed or refunded</h3><p>Refunds from admin go through Stripe and disable any unused codes in the same step, so a refunded code can't be started.</p></div>
+        <div><i>05</i><h3>A prompt edit breaks the report</h3><p>A report that doesn't match your section list is retried once, then held and flagged to you, never sent half-formed. Rolling the settings back takes one click.</p></div>
+        <div><i>06</i><h3>You decide to move on from me</h3><p>Code in your repository, services in your accounts, a handover guide and a walkthrough. Any developer can pick it up.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="milestones" style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>05</b>Milestones</div>
+    <h2 data-r>Four milestones, beta in mid-January</h2>
+    <p class="intro" data-r>Starting the week of 8 December, with a short pause over Christmas. Each milestone ends with something you can click through on your own domain.</p>
+    <div class="grid2" data-stagger>
+      <div class="card m"><div class="top"><b>1</b><span>Weeks 1–2</span></div><div class="prog"><i style="--w:25%"></i></div><h3>Foundations and purchase</h3><p>App hosted and on your domain, database, sales page with editable copy, Stripe checkout for single and two-pack, codes emailed from your domain.</p><div class="see"><b>You'll see</b>Buy a two-pack on your domain in Stripe test mode and get both codes by email.</div></div>
+      <div class="card m"><div class="top"><b>2</b><span>Weeks 3–4</span></div><div class="prog"><i style="--w:50%"></i></div><h3>The conversation</h3><p>Code entry, first name, start screen, the one-question-at-a-time interface with dictation and editing, saving after every answer, resume on any device, the settings file.</p><div class="see"><b>You'll see</b>Your own prompt running on your phone, closed halfway, resumed on your laptop.</div></div>
+      <div class="card m"><div class="top"><b>3</b><span>Week 5</span></div><div class="prog"><i style="--w:75%"></i></div><h3>The report</h3><p>"Preparing your results" screen, background report job, the designed template on screen, as PDF and in the email with your resource PDFs. Buyers added to Kit.</p><div class="see"><b>You'll see</b>A full run ending in the styled report in all three places, title, key statement and profile visibly designed.</div></div>
+      <div class="card m"><div class="top"><b>4</b><span>Weeks 6–7</span></div><div class="prog"><i style="--w:100%"></i></div><h3>Admin, beta and handover</h3><p>Admin area with cost per session, code creation, reopen, refunds and prices; beta mode with debrief and exports; your acceptance test; repository, handover guide and walkthrough.</p><div class="see"><b>You'll see</b>Beta testers invited from admin in mid-January, and your seven "done means" points ticked off one by one.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="pricing">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>06</b>Investment</div>
+    <h2 data-r>Itemised fixed-price bid</h2>
+    <p class="intro" data-r>A ballpark you can plan around, confirmed as a final itemised quote once I've read the full spec. Paid per milestone through Upwork.</p>
+
+    <div class="price" data-r style="margin-top:36px">
+      <div class="card">
+        <div class="k">Core build</div>
+        <div style="margin-top:10px"><span class="big">$3,800</span><span>USD</span></div>
+        <div class="terms">Fixed price · 7 weeks · paid per milestone</div>
+        <div class="ledger">
+          <div><span><strong>M1 — Foundations and purchase</strong><small>Due when a test purchase delivers codes by email</small></span><b>$1,000</b></div>
+          <div><span><strong>M2 — The conversation</strong><small>Due when a full session runs and resumes on your phone</small></span><b>$1,100</b></div>
+          <div><span><strong>M3 — The report</strong><small>Due when the report matches on screen, PDF and email</small></span><b>$800</b></div>
+          <div><span><strong>M4 — Admin, beta and handover</strong><small>Due when your acceptance test passes</small></span><b>$900</b></div>
+          <div class="later"><span><strong>Optional · reminder email before the time limit</strong><small>Sent automatically to unfinished sessions</small></span><b>$150</b></div>
+          <div class="later"><span><strong>Optional · customer feedback form</strong><small>Reuses the beta form for paying buyers</small></span><b>$100</b></div>
+          <div class="later"><span><strong>Optional · link-source tracking</strong><small>Which link or campaign each sale came from, in admin and exports</small></span><b>$150</b></div>
+          <div class="later"><span><strong>Included · first-name greeting</strong><small>You already collect the first name, so this costs nothing extra</small></span><b>$0</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="k" style="color:var(--mut)">What's included</div>
+        <ul class="ticks one">
+          <li>Sales page with editable copy, on your GoDaddy domain</li>
+          <li>Stripe checkout, single and two-pack, prices set in admin</li>
+          <li>Access codes, guided conversation, resume on any device</li>
+          <li>Report as labelled sections in one designed template: screen, PDF, email</li>
+          <li>Admin: codes, sessions, reports, feedback, cost per session, refunds</li>
+          <li>Beta mode with debrief form and CSV exports</li>
+          <li>Kit list sync, settings file for prompt and model</li>
+          <li>Visual design of the app and report, from your brand</li>
+          <li>Repository, handover guide, walkthrough, one month of fixes after launch</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="costs" data-stagger>
+      <header><div class="k" style="color:var(--mut)">Running costs after launch, paid by you to the vendors</div></header>
+      <div><strong>Claude API<code>~$1 per assessment</code></strong><small>45–60 minutes on Opus 5.5 with prompt caching; about half that on Sonnet 5.5. Logged per session in admin.</small></div>
+      <div><strong>Render hosting<code>~$15–25/month</code></strong><small>Web service plus a managed Postgres database. No per-visitor charge.</small></div>
+      <div><strong>Stripe<code>per sale only</code></strong><small>Standard card fees per transaction, no monthly fee.</small></div>
+      <div><strong>Email (Resend)<code>$0, then ~$20/month</code></strong><small>Free tier covers launch volumes; the paid plan once you pass about 3,000 emails a month.</small></div>
+      <div><strong>Kit<code>your current plan</code></strong><small>No change; buyers are added through Kit's API.</small></div>
+      <div><strong>Domain<code>your GoDaddy renewal</code></strong><small>DNS records added for the app and for email; no transfer needed.</small></div>
+    </div>
+    <p class="fine">Vendor prices as published in November 2026. Final itemised quote after the full spec and NDA.</p>
+  </div>
+</section>
+
+<section class="sec" id="answers">
+  <div class="wrap narrow">
+    <div class="eyebrow" data-r><b>07</b>Your questions</div>
+    <h2 data-r style="margin-bottom:40px">The six things you asked for, answered</h2>
+    <div data-stagger>
+      <div class="q"><b>1</b><div><h3>Ballpark fixed price</h3><p>$3,800 for the core build, itemised by milestone above. Nice-to-haves: reminder email $150, customer feedback form $100, link-source tracking $150, first-name greeting included.</p></div></div>
+      <div class="q"><b>2</b><div><h3>Realistic timeline</h3><p>Seven build weeks from the week of 8 December with a Christmas pause: beta in testers' hands in mid-January, two weeks of beta, public launch on 1 February with a little room to spare.</p></div></div>
+      <div class="q"><b>3</b><div><h3>Stack, host, payments, running cost</h3><p>Next.js (TypeScript) on Render with Postgres, Stripe Checkout, Resend for email, Kit's API, the Anthropic SDK on the server. Roughly $15–45 a month fixed, plus about $1 of Claude per assessment and Stripe's card fees.</p></div></div>
+      <div class="q"><b>4</b><div><h3>Visual design</h3><p>I do it. Send your logo, colours and any fonts; you review the sales page and report template as designs before they are built, one round of changes on each.</p></div></div>
+      <div class="q"><b>5</b><div><h3>Report display: (a) or (b)</h3><p>(b), labelled sections filling a designed template. It is the only way the screen, PDF and email reliably match and the title, key statement and profile are always styled the same. Included in the core price; (a) would be $200 less but looks different every time.</p></div></div>
+      <div class="q"><b>6</b><div><h3>A Claude API project, and how the conversation was stored</h3><p>A past build: a WhatsApp assistant on respond.io, Make and the Claude API, where each contact's recent messages are kept and sent back with every turn. Here the transcript lives in your Postgres database, one row per message, and the full history is sent each turn with prompt caching, which is what makes resume trivial.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tint" id="kickoff">
+  <div class="wrap narrow">
+    <div class="eyebrow" data-r><b>08</b>Before kickoff</div>
+    <h2 data-r style="margin-bottom:40px">Three things I'll confirm on our first call</h2>
+    <div data-stagger>
+      <div class="q"><b>Q1</b><div><h3>How long should a code stay valid, and what counts as "expired"?</h3><p>It decides the reminder email and the reopen button. Default: 14 days from first use, unused codes valid for a year.</p></div></div>
+      <div class="q"><b>Q2</b><div><h3>Should a two-pack buyer be able to give the second code away?</h3><p>Default: yes. The second code works for anyone, and its first-name screen captures who used it.</p></div></div>
+      <div class="q"><b>Q3</b><div><h3>Which model did you test the prompt on?</h3><p>The app should launch on the same model you tested in person, so the report reads as you expect. Default: that model, set in the settings file, with cost compared against Sonnet 5.5 during beta.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="eyebrow" data-r><b>09</b>Who's building it</div>
+    <h2 data-r style="margin-bottom:44px">A short note on me</h2>
+    <div class="about">
+      <div class="who" data-r><i>K</i><div><b>Kristof</b><span>Flowtive</span><span>Claude Certified Architect</span></div></div>
+      <div>
+        <p data-r>I'm Kristof. I build products and systems on the Claude API for founders and small businesses: multi-turn conversations, structured outputs, prompt caching, and the plumbing around them that makes them dependable.</p>
+        <p data-r>For your launch that means treating the prompt as the finished product it is and building everything around it to protect it: the conversation can't be lost, the report always comes out in your layout, the cost of every session is visible, and you own every account when we're done.</p>
+        <p data-r>Happy to walk you through a past build on a call before you commit, and to sign your NDA for the full brief.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="padding:0 0 24px">
+  <div class="wrap">
+    <div class="final" data-r>
+      <h2>Ready to move forward?</h2>
+      <p>Send the NDA and the full spec. I'll come back inside 48 hours with the final itemised quote and a kickoff date in the week of 8 December, and you'll test a purchase on your own domain two weeks after that.</p>
+      <div class="cta-row">
+        <a href="mailto:kristof@getflowtive.com" class="btn w">Email Kristof <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a href="#milestones" class="btn o">Re-read the milestones</a>
+      </div>
+      <div class="fine">kristof@getflowtive.com · Proposal valid for 30 days</div>
+    </div>
+  </div>
+</section>
+
+<footer class="ft"><div class="wrap"><span>© 2026 Flowtive · Prepared for your self-assessment launch</span><span>AI-guided self-assessment web app</span></div></footer>
+
+<script>
+(function () {
+  var STATES = [
+    ['Code sent', '', 4],
+    ['In conversation · question 12', 'run', 35],
+    ['Paused · resumes on same code', 'wait', 60],
+    ['Preparing report', 'run', 90],
+    ['Report emailed · $0.84', 'ok', 100]
+  ];
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll reveal
+  document.querySelectorAll('[data-stagger]').forEach(function (g) {
+    Array.prototype.forEach.call(g.children, function (c, i) { c.setAttribute('data-r', ''); c.style.setProperty('--d', (i * 70) + 'ms'); });
+  });
+  var els = document.querySelectorAll('[data-r]');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  } else { els.forEach(function (el) { el.classList.add('in'); }); }
+
+  // nav state
+  var nav = document.getElementById('nav'), links = document.querySelectorAll('.links a');
+  var secs = Array.prototype.map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    var cur = -1; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 150) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // pricing toggle (only present when snippet-phased-pricing.html is used)
+  var seg = document.getElementById('seg'), plans = document.getElementById('plans');
+  if (seg && plans) {
+    var thumb = seg.querySelector('i');
+    var place = function (btn) { thumb.style.setProperty('--sw', btn.offsetWidth + 'px'); thumb.style.setProperty('--sx', (btn.offsetLeft - 4) + 'px'); };
+    seg.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        seg.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        plans.setAttribute('data-plan', b.getAttribute('data-v')); place(b);
+      });
+    });
+    var init = function () { place(seg.querySelector('[aria-pressed="true"]')); };
+    init(); window.addEventListener('resize', init); if (document.fonts && document.fonts.ready) document.fonts.ready.then(init);
+  }
+
+  // hero board: the live row moves through STATES
+  var chip = document.getElementById('liveChip'), bar = document.getElementById('liveBar');
+  if (chip && STATES.length) {
+    var show = function (i) { chip.textContent = STATES[i][0]; chip.className = 'chip ' + STATES[i][1]; if (bar) bar.style.setProperty('--w', STATES[i][2] + '%'); };
+    if (reduce) { show(Math.max(0, STATES.length - 2)); return; }
+    var n = 0; show(0);
+    (function tick() { setTimeout(function () { n = (n + 1) % STATES.length; show(n); tick(); }, n === STATES.length - 1 ? 3800 : 1900); })();
+  }
+})();
+</script>
+</body>
+</html>
